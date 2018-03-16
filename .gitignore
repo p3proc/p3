@@ -99,3 +99,19 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# add test dataset
+/dataset
+
+# add scripts directory
+/scripts
+
+# add pipeline outputs
+/output
+/P3
+/tmp
+
+# miscellaneous output files
+graph.dot
+graph.png
+
