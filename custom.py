@@ -87,36 +87,35 @@ def QCreduceset(QClist):
     # return lists of epis to process
     return (epi, epi_sidecar)
 
-# Define class to extract slice time info and write to file
-class exslt:
-    def __init__(self,TMP_DIR):
-        self.TMP_DIR = TMP_DIR
+# Define string function to extract slice time info and write to file
+extract_slicetime_func = lambda TMP_DIR: """
+def extract_slicetime(epi_sidecar):
+    # import necessary libraries
+    import json
+    import csv
+    from os.path import join,basename,splitext
+    from os import getcwd
 
-    def extract_slicetime(self,epi_sidecar):
-        # import necessary libraries
-        import json
-        import csv
-        from os.path import join,basename,splitext
-        from os import getcwd
+    # open the sidecar file
+    with open(epi_sidecar) as sidecar:
+        # read the sidecar
+        bids_data = json.load(sidecar)
 
-        # open the sidecar file
-        with open(epi_sidecar) as sidecar:
-            # read the sidecar
-            bids_data = json.load(sidecar)
+        # extract slice time information
+        slice_timing = bids_data['SliceTiming']
 
-            # extract slice time information
-            slice_timing = bids_data['SliceTiming']
+        # extract TR
+        TR = bids_data['RepetitionTime']
 
-            # extract TR
-            TR = bids_data['RepetitionTime']
+    # write slice timing to file
+    with open(join('{0}','{{}}.SLICETIME'.format(splitext(basename(epi_sidecar))[0])),'w') as st_file:
+        wr = csv.writer(st_file,delimiter=' ')
+        wr.writerow(slice_timing)
 
-        # write slice timing to file
-        with open(join(self.TMP_DIR,'{}.SLICETIME'.format(splitext(basename(epi_sidecar))[0])),'w') as st_file:
-            wr = csv.writer(st_file,delimiter=' ')
-            wr.writerow(slice_timing)
-
-        # return timing pattern and TR
-        return ("@{}".format(join(self.TMP_DIR,'{}.SLICETIME'.format(splitext(basename(epi_sidecar))[0]))), str(TR))
+    # return timing pattern and TR
+    return ('@{{}}'.format(join('{0}','{{}}.SLICETIME'.format(splitext(basename(epi_sidecar))[0]))), str(TR))""".format(
+    TMP_DIR
+    )
 
 # Extend afni despike
 # define extended input spec
@@ -132,27 +131,3 @@ class ExtendedDespikeOutputSpec(afni.base.AFNICommandOutputSpec):
 class ExtendedDespike(afni.Despike):
     input_spec = ExtendedDespikeInputSpec
     output_spec = ExtendedDespikeOutputSpec
-
-# Extend afni volreg
-# Extend afni volreg input spec to register to specific frame
-class ExtendedVolregInputSpec(afni.preprocess.VolregInputSpec):
-    # Create class method to store IGNOREFRAMES argument and return class spec
-    @classmethod
-    def init_class(cls,IGNOREFRAMES=4):
-        # modify the base file to allow IGNOREFRAMES argument
-        cls.basefile = base.File(
-            desc='base file for registration',
-            argstr="-base %s'[{}]'".format(IGNOREFRAMES),
-            position=-6,
-            exists=True)
-
-        # return the class
-        return cls
-
-# define extended afni volreg
-class ExtendedVolreg(afni.Volreg):
-    # Create class method to initialize the input spec and return the class
-    @classmethod
-    def init_class(cls,IGNOREFRAMES):
-        cls.input_spec = ExtendedVolregInputSpec.init_class(IGNOREFRAMES)
-        return cls
