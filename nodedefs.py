@@ -193,15 +193,15 @@ class definednodes:
             name='brainmask_mriconvert'
         )
 
-        # 3dAllineate
-        self.allineate = Node(
+        # 3dAllineate (FSorig)
+        self.allineate_orig = Node(
             afni.Allineate(
                 out_file=os.path.join(self.TMP_DIR,'orig_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
                 out_matrix='FSorig.XFM.FS2MPR.aff12.1D',
                 overwrite=True,
                 outputtype='NIFTI_GZ'
             ),
-            name='3dallineate'
+            name='3dallineate_orig'
         )
 
         # Inline function for setting up to copy IJK_TO_DICOM_REAL file attribute
@@ -214,22 +214,97 @@ class definednodes:
             name='refitsetup'
         )
 
-        # 3dRefit
-        self.refit = Node(
-            afni.Refit(),
-            name='3drefit'
+        # 3dRefit (Create 2, one for FSorig and one for FSbrainmask)
+        self.refit = []
+        for n in range(2):
+            self.refit.append(Node(
+                afni.Refit(),
+                name='3drefit{}'.format(n)
+            ))
+        
+        # 3dAllineate (FSbrainmask)
+        self.allineate_bm = Node(
+            afni.Allineate(
+                out_file=os.path.join(self.TMP_DIR,'orig_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
+                overwrite=True,
+                no_pad=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='3dallineate_brainmask'
+        )
+
+        # 3dcalc for uniform intensity
+        self.uniform = Node(
+            afni.Calc(
+                expr='a*and(b,b)',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='uniformintensity'
+        )
+
+        # 3dcalc operations for achieving final mask
+        self.maskop1 = Node(
+            afni.Calc(
+                expr='step(a)',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='maskop1'
+        )
+        self.maskop2 = []
+        for n in range(3):
+            self.maskop2.append(Node(
+                afni.Calc(
+                    args='-b a+i -c a-i -d a+j -e a-j -f a+k -g a-k',
+                    expr='ispositive(a+b+c+d+e+f+g)',
+                    overwrite=True,
+                    outputtype='NIFTI_GZ'
+                ),
+                name='maskop2_{}'.format(n)
+            ))
+        self.maskop3 = Node(
+            afni.Calc(
+                expr='and(a,or(b,c))',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='maskop3'
+        )
+        self.maskop4 = Node(
+            afni.Calc(
+                expr='a*b',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='maskop4'
+        )
+        self.maskop5 = Node(
+            afni.Calc(
+                expr='or(a,b,c)',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='maskop5'
+        )
+        self.maskop6 = Node(
+            afni.Calc(
+                expr='c*and(a,b)',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='maskop6'
         )
 
         # Output
-        self.output1 = Node(
-             DataSink(base_directory=self.BASE_DIR),
-             name='output1'
-        )
-        self.output2 = Node(
-             DataSink(base_directory=self.BASE_DIR),
-             name='output2'
-        )
-        self.output3 = Node(
-             DataSink(base_directory=self.BASE_DIR),
-             name='output3'
-        )
+        self.output = []
+        for n in range(1):
+            self.output.append(Node(
+                DataSink(
+                    base_directory=self.BASE_DIR,
+                    substitutions=[
+                        ('_subject_id',''),
+                    ]
+                ),
+                name='output{}'.format(n)
+            ))

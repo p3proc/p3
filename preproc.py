@@ -10,8 +10,8 @@ from nodedefs import * # import all defined nodes
 settings = {}
 settings['BASE_DIR'] = os.path.dirname(os.path.realpath(__file__))
 settings['ignoreframes'] = 4
-config.enable_debug_mode()
-logging.update_logging(config)
+#config.enable_debug_mode()
+#logging.update_logging(config)
 
 # initialize nodes from nodedefs
 p3 = definednodes(settings)
@@ -150,6 +150,9 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ]),
 
     ### Skullstrip
+    # AFNI skull stripped images are missing edge of cortical ribbon often
+    # FSL has more of the ribbon often but can have weird neck stuff too
+    # Freesurfer rarely clips and is the most lenient of the skullstrips
     (p3.fileselection,p3.afni_skullstrip,[
         ('T1','in_file')
     ]),
@@ -165,7 +168,8 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
         ('T1','T1_files')
     ]),
 
-    ### Convert orig and brainmask
+    ### REGISTER THE MPRAGE TO THE ATLAS
+    # Convert orig and brainmask
     (p3.reconall,p3.orig_convert,[
         ('orig','in_file')
     ]),
@@ -173,28 +177,97 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
         ('brainmask','in_file')
     ]),
 
-    ### Align T1 to ATLAS
-    (p3.orig_convert,p3.allineate,[
+    # Create transformation of FSorig to T1 
+    (p3.orig_convert,p3.allineate_orig,[
         ('out_file','in_file')
     ]),
-    (p3.fileselection,p3.allineate,[
+    (p3.fileselection,p3.allineate_orig,[
         ('T1','reference')
     ]),
     (p3.afni_skullstrip,p3.refit_setup,[
         ('out_file','noskull_T1')
     ]),
-    (p3.refit_setup,p3.refit,[
+    (p3.refit_setup,p3.refit[0],[
         ('refit_input','atrcopy')
     ]),
-    (p3.allineate,p3.refit,[
+    (p3.allineate_orig,p3.refit[0],[
         ('out_file','in_file')
     ]),
-
-    ### Output Data
-    (p3.allineate,p3.output1,[
-        ('out_matrix','output')
+    
+    # create atlas-aligned skull stripped brainmask
+    (p3.brainmask_convert,p3.allineate_bm,[
+        ('out_file','in_file')
     ]),
-    (p3.refit,p3.output2,[
+    (p3.fileselection,p3.allineate_bm,[
+        ('T1','reference')
+    ]),
+    (p3.allineate_orig,p3.allineate_bm,[
+        ('out_matrix','in_matrix')
+    ]),
+    (p3.refit_setup,p3.refit[1],[
+        ('refit_input','atrcopy')
+    ]),
+    (p3.allineate_bm,p3.refit[1],[
+        ('out_file','in_file')
+    ]),
+    
+    # intensities are differently scaled in FS image, replace with native intensities for uniformity
+    (p3.fileselection,p3.uniform,[
+        ('T1','in_file_a')
+    ]),
+    (p3.refit[1],p3.uniform,[
+        ('out_file','in_file_b')
+    ]),
+    
+    # Use OR of AFNI, FSL, and FS skullstrips within a 3-shell expanded AFNI mask as final
+    (p3.afni_skullstrip,p3.maskop1,[
+        ('out_file','in_file_a')
+    ]),
+    (p3.maskop1,p3.maskop2[0],[
+        ('out_file','in_file_a')
+    ]),
+    (p3.maskop2[0],p3.maskop2[1],[
+        ('out_file','in_file_a')
+    ]),
+    (p3.maskop2[1],p3.maskop2[2],[
+        ('out_file','in_file_a')
+    ]),
+    (p3.maskop2[2],p3.maskop3,[
+        ('out_file','in_file_a')
+    ]),
+    (p3.fsl_skullstrip,p3.maskop3,[
+        ('out_file','in_file_b')
+    ]),
+    (p3.afni_skullstrip,p3.maskop3,[
+        ('out_file','in_file_c')
+    ]),
+    (p3.fileselection,p3.maskop4,[ # apparently the old way of getting noskull mprage...
+        ('T1','in_file_a')
+    ]),
+    (p3.maskop3,p3.maskop4,[
+        ('out_file','in_file_b')
+    ]),
+    (p3.fsl_skullstrip,p3.maskop5,[
+        ('out_file','in_file_a')
+    ]),
+    (p3.afni_skullstrip,p3.maskop5,[
+        ('out_file','in_file_b')
+    ]),
+    (p3.uniform,p3.maskop5,[
+        ('out_file','in_file_c')
+    ]),
+    (p3.maskop2[2],p3.maskop6,[ # final noskull mprage
+        ('out_file','in_file_a')
+    ]),
+    (p3.maskop5,p3.maskop6,[
+        ('out_file','in_file_b')
+    ]),
+    (p3.fileselection,p3.maskop6,[
+        ('T1','in_file_c')
+    ]),
+
+    # Output
+    (p3.maskop6,p3.output[0],[
         ('out_file','output')
     ])
 ])
