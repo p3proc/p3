@@ -10,8 +10,11 @@ from nodedefs import * # import all defined nodes
 settings = {}
 settings['BASE_DIR'] = os.path.dirname(os.path.realpath(__file__))
 settings['ignoreframes'] = 4
+config.set('logging','workflow_level','DEBUG')
+config.set('logging','workflow_level','DEBUG')
+config.set('execution','hash_method','content')
 #config.enable_debug_mode()
-#logging.update_logging(config)
+logging.update_logging(config)
 
 # initialize nodes from nodedefs
 p3 = definednodes(settings)
@@ -265,9 +268,25 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.fileselection,p3.maskop6,[
         ('T1','in_file_c')
     ]),
+    
+    # Register the final skullstripped mprage to atlas
+    (p3.maskop6,p3.register,[
+        ('out_file','in_file')
+    ]),
+
+    #TODO Transform the unskull stripped mprage
+
+    #TODO For comparison, calculate the transform with only the AFNI version
+
+    #TODO Transform the un-skull-stripped mprage (AFNI version)
 
     # Output
     (p3.maskop6,p3.output[0],[
+        ('out_file','output')
+    ]),
+    
+    # Output
+    (p3.register,p3.output[1],[
         ('out_file','output')
     ])
 ])

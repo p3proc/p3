@@ -22,6 +22,7 @@ class definednodes:
         self.BASE_DIR = settings['BASE_DIR']
         self.SUBJECTS_DIR = os.path.join(self.BASE_DIR,'output','freesurfer_output')
         self.TMP_DIR = os.path.join(self.BASE_DIR,'tmp')
+        self.REF_IMGS = os.path.join(self.BASE_DIR,'refimgs')
 
         # make directories if not exist
         os.makedirs(self.SUBJECTS_DIR,exist_ok=True)
@@ -225,7 +226,7 @@ class definednodes:
         # 3dAllineate (FSbrainmask)
         self.allineate_bm = Node(
             afni.Allineate(
-                out_file=os.path.join(self.TMP_DIR,'orig_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
+                out_file=os.path.join(self.TMP_DIR,'brainmask_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
                 overwrite=True,
                 no_pad=True,
                 outputtype='NIFTI_GZ'
@@ -296,14 +297,37 @@ class definednodes:
             name='maskop6'
         )
 
+        # Register to Atlas
+        self.register = Node(
+            afni.AutoTLRC(
+                base='TT_N27+tlrc',
+                no_ss=True,
+                args='-pad_input 60',
+                outputtype='NIFTI_GZ'
+            ),
+            name='atlasregister'
+        )
+
+        # 3dAllineate (for un-skull stripped T1)
+        self.allineate_unstrip = Node(
+            afni.Allineate(
+                out_file=os.path.join(self.TMP_DIR,'unstrip_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
+                reference=os.path.join(self.REF_IMGS,'TT_N27.nii.gz'),
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            name='3dallineate_unstrip'
+        )
+
         # Output
         self.output = []
-        for n in range(1):
+        for n in range(2):
             self.output.append(Node(
                 DataSink(
                     base_directory=self.BASE_DIR,
                     substitutions=[
-                        ('_subject_id',''),
+                        ('_subject_id_',''),
+                        ('_calc_calc_calc_calc_calc','')
                     ]
                 ),
                 name='output{}'.format(n)
