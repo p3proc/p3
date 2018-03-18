@@ -108,7 +108,6 @@ ENV/
 
 # add pipeline outputs
 /output
-/P3
 /tmp
 
 # miscellaneous output files

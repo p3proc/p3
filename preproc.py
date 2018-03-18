@@ -13,7 +13,6 @@ settings['ignoreframes'] = 4
 config.set('logging','workflow_level','DEBUG')
 config.set('logging','workflow_level','DEBUG')
 config.set('execution','hash_method','content')
-#config.enable_debug_mode()
 logging.update_logging(config)
 
 # initialize nodes from nodedefs
@@ -24,7 +23,7 @@ p3 = definednodes(settings)
 """
 
 # create a workflow
-wf = Workflow(name='P3')
+wf = Workflow(name='P3',base_dir=os.path.join(settings['BASE_DIR'],'tmp'))
 wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ### File selection Nodes
     (p3.infosource,p3.fileselection,[
@@ -270,9 +269,9 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ]),
     
     # Register the final skullstripped mprage to atlas
-    (p3.maskop6,p3.register,[
-        ('out_file','in_file')
-    ]),
+    #(p3.maskop6,p3.register,[
+    #    ('out_file','in_file')
+    #]),
 
     #TODO Transform the unskull stripped mprage
 
@@ -286,9 +285,9 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ]),
     
     # Output
-    (p3.register,p3.output[1],[
-        ('out_file','output')
-    ])
+    #(p3.register,p3.output[1],[
+    #    ('out_file','output')
+    #])
 ])
 wf.run()
 wf.write_graph()
