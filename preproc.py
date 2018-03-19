@@ -13,6 +13,7 @@ settings['ignoreframes'] = 4
 config.set('logging','workflow_level','DEBUG')
 config.set('logging','workflow_level','DEBUG')
 config.set('execution','hash_method','content')
+config.set('execution','stop_on_first_crash','true')
 logging.update_logging(config)
 
 # initialize nodes from nodedefs
@@ -290,4 +291,6 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     #])
 ])
 wf.run()
+#print(p3.allineate_orig.inputs)
+#wf.run(plugin='MultiProc')
 wf.write_graph()

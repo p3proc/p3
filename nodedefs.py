@@ -197,7 +197,6 @@ class definednodes:
         # 3dAllineate (FSorig)
         self.allineate_orig = Node(
             afni.Allineate(
-                out_file=os.path.join(self.TMP_DIR,'orig_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
                 out_matrix='FSorig.XFM.FS2MPR.aff12.1D',
                 overwrite=True,
                 outputtype='NIFTI_GZ'
@@ -226,7 +225,6 @@ class definednodes:
         # 3dAllineate (FSbrainmask)
         self.allineate_bm = Node(
             afni.Allineate(
-                out_file=os.path.join(self.TMP_DIR,'brainmask_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
                 overwrite=True,
                 no_pad=True,
                 outputtype='NIFTI_GZ'
