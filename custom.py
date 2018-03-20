@@ -131,3 +131,23 @@ class ExtendedDespikeOutputSpec(afni.base.AFNICommandOutputSpec):
 class ExtendedDespike(afni.Despike):
     input_spec = ExtendedDespikeInputSpec
     output_spec = ExtendedDespikeOutputSpec
+
+# define custom register to atlas function (the afni interface in nipype is pretty bad...)
+def register_atlas(in_file):
+    import os
+
+    # spawn the auto_tlrc process with os.system
+    os.system(
+        '@auto_tlrc -no_ss -base {0} -input {1} -pad_input {2}'.format(
+            'TT_N27+tlrc',
+            in_file,
+            str(60)
+        )
+    )
+
+    # TODO test that all our outfiles are there
+    # raise exception if not
+
+    # TODO get the out_file
+
+    # TODO return the out_file
