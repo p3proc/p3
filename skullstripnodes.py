@@ -6,7 +6,6 @@ from nipype import Node,MapNode,IdentityInterface
 from nipype.interfaces import afni,fsl,freesurfer
 from nipype.interfaces.io import SelectFiles,DataSink
 from nipype.interfaces.utility import Function
-from custom import * # import our custom functions/interfaces
 
 class definednodes:
     """
@@ -73,6 +72,7 @@ class definednodes:
         self.orig_convert = Node(
             freesurfer.MRIConvert(
                 in_type='mgz',
+                environ=self.ENV,
                 out_type='niigz'
             ),
             name='orig_mriconvert'
@@ -80,6 +80,7 @@ class definednodes:
         self.brainmask_convert = Node(
             freesurfer.MRIConvert(
                 in_type='mgz',
+                environ=self.ENV,
                 out_type='niigz'
             ),
             name='brainmask_mriconvert'
