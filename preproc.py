@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 import os
 from nipype import Workflow,config,logging
@@ -180,7 +180,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
         ('brainmask','in_file')
     ]),
 
-    # Create transformation of FSorig to T1 
+    # Create transformation of FSorig to T1
     (p3.orig_convert,p3.allineate_orig,[
         ('out_file','in_file')
     ]),
@@ -196,7 +196,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.allineate_orig,p3.refit[0],[
         ('out_file','in_file')
     ]),
-    
+
     # create atlas-aligned skull stripped brainmask
     (p3.brainmask_convert,p3.allineate_bm,[
         ('out_file','in_file')
@@ -213,7 +213,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.allineate_bm,p3.refit[1],[
         ('out_file','in_file')
     ]),
-    
+
     # intensities are differently scaled in FS image, replace with native intensities for uniformity
     (p3.fileselection,p3.uniform,[
         ('T1','in_file_a')
@@ -221,7 +221,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.refit[1],p3.uniform,[
         ('out_file','in_file_b')
     ]),
-    
+
     # Use OR of AFNI, FSL, and FS skullstrips within a 3-shell expanded AFNI mask as final
     (p3.afni_skullstrip,p3.maskop1,[
         ('out_file','in_file_a')
@@ -268,7 +268,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.fileselection,p3.maskop6,[
         ('T1','in_file_c')
     ]),
-    
+
     # Register the final skullstripped mprage to atlas
     #(p3.maskop6,p3.register,[
     #    ('out_file','in_file')
@@ -284,7 +284,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.maskop6,p3.output[0],[
         ('out_file','output')
     ]),
-    
+
     # Output
     #(p3.register,p3.output[1],[
     #    ('out_file','output')
