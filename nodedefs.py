@@ -5,7 +5,7 @@ import os
 from nipype import Node,MapNode,IdentityInterface
 from nipype.interfaces import afni,fsl,freesurfer
 from nipype.interfaces.io import SelectFiles,DataSink
-from nipype.interfaces.utility import Function
+from nipype.interfaces.utility import Function,IdentityInterface,Rename,Merge
 from custom import * # import our custom functions/interfaces
 
 class definednodes:
@@ -89,7 +89,6 @@ class definednodes:
             ))
 
         # extract slice timing so we can pass it to slice time correction
-        extract_slicetime = extract_slicetime_func(self.TMP_DIR) # create object
         self.extract_stc = MapNode(
             Function(
                 input_names=['epi_sidecar'],
@@ -221,7 +220,7 @@ class definednodes:
                 afni.Refit(),
                 name='3drefit{}'.format(n)
             ))
-        
+
         # 3dAllineate (FSbrainmask)
         self.allineate_bm = Node(
             afni.Allineate(
@@ -296,30 +295,283 @@ class definednodes:
         )
 
         # Register to Atlas
-        self.register = Node(
-            afni.AutoTLRC(
-                base='TT_N27+tlrc',
-                no_ss=True,
-                args='-pad_input 60',
+        self.register = []
+        for n in range(2):
+            self.register.append(Node(
+                Function(
+                    input_names=['in_file'],
+                    output_names=['out_file','transform_file'],
+                    function=register_atlas
+                ),
+                name='atlasregister_{}'.format(n)
+            ))
+
+        # Transform the unskullstripped image
+        self.allineate_unskullstripped = []
+        for n in range(2):
+            self.allineate_unskullstripped.append(Node(
+                afni.Allineate(
+                    overwrite=True,
+                    reference=os.path.join(self.REF_IMGS,'TT_N27.nii.gz'),
+                    outputtype='NIFTI_GZ'
+                ),
+                name='3dallineate_unskullstripped_{}'.format(n)
+            ))
+
+        # Skullstrip the EPI image
+        self.epi_skullstrip = MapNode(
+            fsl.BET(),
+            iterfield=['in_file'],
+            name='epi_skullstrip'
+        )
+        self.epi_automask = MapNode(
+            afni.Automask(
+                args='-overwrite',
                 outputtype='NIFTI_GZ'
             ),
-            name='atlasregister'
+            iterfield=['in_file'],
+            name='epi_automask'
         )
-
-        # 3dAllineate (for un-skull stripped T1)
-        self.allineate_unstrip = Node(
-            afni.Allineate(
-                out_file=os.path.join(self.TMP_DIR,'unstrip_out_allineate.nii.gz'), # bug in nipype, it doesn't produce output without setting this parameter... we write this to our own tmp dir for now...
-                reference=os.path.join(self.REF_IMGS,'TT_N27.nii.gz'),
+        self.epi_3dcalc = MapNode(
+            afni.Calc(
+                expr='c*or(a,b)',
                 overwrite=True,
                 outputtype='NIFTI_GZ'
             ),
-            name='3dallineate_unstrip'
+            iterfield=['in_file_a','in_file_b','in_file_c'],
+            name='epi_3dcalc'
         )
+
+        # deoblique the MPRAGE and compute the transform between EPIREF and MPRAGE obliquity
+        self.warp_args = Node(
+            IdentityInterface(
+                fields=['args']
+            ),
+            name='warp_args'
+        )
+        self.warp_args.inputs.args = '-newgrid 1.000000'
+        self.warp = MapNode(
+            Function(
+                input_names=['in_file','card2oblique','args'],
+                output_names=['out_file','ob_transform'],
+                function=warp_custom
+            ),
+            iterfield=['in_file','card2oblique'],
+            name='3dwarp'
+        )
+
+        # resample the EPIREF to the MPRAGE
+        self.resample = MapNode(
+            afni.Resample(
+                resample_mode='Cu',
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_file','master'],
+            name='resample'
+        )
+
+        # calculate a weight mask for the lpc weighting
+        self.weightmask = MapNode(
+            Function(
+                input_names=['in_file','no_skull'],
+                output_names=['out_file'],
+                function=create_weightmask
+            ),
+            iterfield=['in_file','no_skull'],
+            name='weightmask'
+        )
+
+        # register the mprage to the tcat (BASE=TARGET, REGISTER TO THIS SPACE; SOURCE=INPUT, LEAVE THIS SPACE)
+        # this registration is on images with the same grids, whose obliquity has been accounted for
+        self.registert12tcat = MapNode(
+            afni.Allineate(
+                args='-lpc -nocmass -weight_frac 1.0 -master SOURCE',
+                maxrot=6,
+                maxshf=10,
+                verbose=True,
+                warp_type='affine_general',
+                source_automask=4,
+                two_pass=True,
+                two_best=11,
+                out_matrix='t12tcat_transform_mat.aff12.1D',
+                out_weight_file='t12tcat_transform_weight_file.nii.gz',
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_file','weight','reference'],
+            name='registermpragetotcat'
+        )
+
+        # Transfrom rawEPI into ATL space
+        # Concatenate MPR-ATL -I, OMMPR-OBEMPI and MPR-EPI -I into a master transform
+        self.mastertransform = MapNode(
+            Function(
+                input_names=['in_file','transform1','transform2'],
+                output_names=['out_file','out_file2'],
+                function=mastertransform
+            ),
+            iterfield=['transform1','transform2'],
+            name='mastertransform'
+        )
+
+        # transform the tcat image into the atlas space via the mprage transform
+        self.transformtcat2atl = MapNode(
+            afni.Allineate(
+                args='-master BASE -mast_dxyz 3',
+                verbose=True,
+                outputtype='NIFTI_GZ',
+                overwrite=True
+            ),
+            iterfield=['in_file','in_matrix'],
+            name='transformtcat2atl'
+        )
+
+        # transform the tcat image into the mpr space via the mprage transform
+        self.transformtcat2mpr = MapNode(
+            afni.Allineate(
+                args='-master BASE',
+                verbose=True,
+                outputtype='NIFTI_GZ',
+                overwrite=True
+            ),
+            iterfield=['in_file','in_matrix'],
+            name='transformtcat2mpr'
+        )
+
+        # if the mprage is oblique (it probably is) you have to manually restore the obliquity
+        # becaue 3dAllineate (and many AFNI tools) set the image to Plumb even if it isn't
+        self.prermoblique = Node(
+            Merge(
+                in2='IJK_TO_DICOM_REAL'
+            ),
+            name='prermoblique'
+        )
+        self.remakeoblique = MapNode(
+            afni.Refit(),
+            iterfield=['in_file'],
+            name='remakeoblique'
+        )
+
+        # deoblique the MASTEREPIREF and compute the transform between EPIREF and MASTEREPIREF obliquity
+        self.deobliquemasterepiref = MapNode(
+            Function(
+                input_names=['in_file','card2oblique'],
+                output_names=['out_file','ob_transform'],
+                function=warp_custom
+            ),
+            iterfield=['in_file','card2oblique'],
+            name='deobliquemasterepiref'
+        )
+
+        # resample the EPIREF to the MASTEREPIREF grid
+        self.resampleepiref2masterepiref = MapNode(
+            afni.Resample(
+                outputtype='NIFTI_GZ',
+                resample_mode='Cu'
+            ),
+            iterfield=['in_file','master'],
+            name='resampleepiref2masterepiref'
+        )
+
+        # register the MASTER to the EPIREF
+        self.registermaster2epiref = MapNode(
+            afni.Allineate(
+                args='-nocmass -source_automask -master SOURCE',
+                verbose=True,
+                warp_type='shift_rotate',
+                two_pass=True,
+                two_best=11,
+                autoweight='',
+                cost='nmi',
+                out_matrix='EPI1_e2a_only_mat.aff12.1D',
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_file','reference'],
+            name='registermaster2epiref'
+        )
+
+        # TRANSFORM rawEPI into ATL space
+        # concatenate MPR-ATL -I, OBMPR-OBEPI, and MPR-EPI -I into a master transform
+        self.transformrawEPI2ATL = MapNode(
+            Function(
+                input_names=['in_file','tfm1','tfm2','tfm3','tfm4'],
+                output_names=['master_transform'],
+                function=concattransform
+            ),
+            iterfield=['tfm1','tfm2','tfm3','tfm4'],
+            name='transformrawEPI2ATL'
+        )
+
+        # transform the tcat image into the atlas space via the mprage-EPI1 transform
+        self.transformtcat2mprageepi = MapNode(
+            afni.Allineate(
+                args='-master BASE -mast_dxyz 3',
+                verbose=True,
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_file','in_matrix'],
+            name='transformtcat2mprageepi'
+        )
+
+        # TRANSFORM rawEPI into EPI1 space
+        self.transformrawEPI2EPI1 = MapNode(
+            Function(
+                input_names=['tfm1','tfm2'],
+                output_names=['master_transform'],
+                function=concattransform2
+            ),
+            iterfield=['tfm1','tfm2'],
+            name='transformrawEPI2EPI1'
+        )
+
+        # transform the tcat image into the EPI1 space
+        self.transformtcat2epi1 = MapNode(
+            afni.Allineate(
+                args='-master BASE',
+                verbose=True,
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_file','in_matrix','reference'],
+            name='transformtcat2epi1'
+        )
+
+        # if the mprage is oblique (it probably is) you have to manually restore the obliquity
+        # it would be nice if 3dAllineate didn't set this to Plumb by default
+        self.brikconvert = MapNode( # convert to AFNI because the atrcopy doesn't work in nifti mode
+            afni.Copy(
+                outputtype='AFNI'
+            ),
+            iterfield=['in_file'],
+            name='brikconvert'
+        )
+        self.prermoblique2 = Node(
+            Function(
+                input_names=['in1'],
+                output_names=['out'],
+                function=lambda in1: (in1[0],'IJK_TO_DICOM_REAL')
+            ),
+            name='prermoblique2'
+        )
+        self.remakeoblique2 = MapNode(
+            afni.Refit(),
+            iterfield=['in_file'],
+            name='remakeoblique2'
+        )
+
+        # there are 3 ways to bring rawEPI into the ATLAS space (all need volreg, epi-mpr, and mpr-atl:
+        # use the volreg results with EPI1 as the referent, and the epi-mpr transform for EPI1
+        # use the volreg results with INT  as the referent, and the epi-mpr transform for EPI1
+        # use the volreg results with INT  as the referent, and the epi-mpr tranfrorm for EPIX
+        #
+        # only the first and second options will enforce cross-run alignment
+
+        # for run 1, all methods are the same
+
 
         # Output
         self.output = []
-        for n in range(2):
+        for n in range(4):
             self.output.append(Node(
                 DataSink(
                     base_directory=self.BASE_DIR,
@@ -328,5 +580,5 @@ class definednodes:
                         ('_calc_calc_calc_calc_calc','')
                     ]
                 ),
-                name='output{}'.format(n)
+                name='output_{}'.format(n)
             ))

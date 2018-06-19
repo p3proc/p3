@@ -3,7 +3,8 @@ FROM vanandrew/dglabimg:latest
 MAINTAINER Andrew Van <vanandrew@wustl.edu>
 
 # install xvfb and xvfbwrapper
-RUN apt-get install -y xvfb
+RUN apt-get install -y xvfb python3 python3-pip python2.7 python-pip tcsh bc tar libgomp1 perl-modules curl
+RUN pip3 install nibabel pandas
 RUN pip3 install xvfbwrapper
 
 # Add files to /mnt

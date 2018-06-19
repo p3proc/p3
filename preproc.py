@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 
 import os
 from nipype import Workflow,config,logging
@@ -270,25 +270,212 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ]),
 
     # Register the final skullstripped mprage to atlas
-    #(p3.maskop6,p3.register,[
-    #    ('out_file','in_file')
-    #]),
-
-    #TODO Transform the unskull stripped mprage
-
-    #TODO For comparison, calculate the transform with only the AFNI version
-
-    #TODO Transform the un-skull-stripped mprage (AFNI version)
-
-    # Output
-    (p3.maskop6,p3.output[0],[
-        ('out_file','output')
+    (p3.maskop6,p3.register[0],[
+        ('out_file','in_file')
     ]),
 
+    # Transform the unskull stripped mprage
+    (p3.fileselection,p3.allineate_unskullstripped[0],[
+        ('T1','in_file')
+    ]),
+    (p3.register[0],p3.allineate_unskullstripped[0],[
+        ('transform_file','in_matrix')
+    ]),
+
+    #For comparison, calculate the transform with only the AFNI version
+    (p3.afni_skullstrip,p3.register[1],[
+        ('out_file','in_file')
+    ]),
+
+    #Transform the un-skull-stripped mprage (AFNI version)
+    (p3.fileselection,p3.allineate_unskullstripped[1],[
+        ('T1','in_file')
+    ]),
+    (p3.register[1],p3.allineate_unskullstripped[1],[
+        ('transform_file','in_matrix')
+    ]),
+
+    # Skullstrip the EPI image
+    (p3.extractroi[0],p3.epi_skullstrip,[
+        ('roi_file','in_file')
+    ]),
+    (p3.extractroi[0],p3.epi_automask,[
+        ('roi_file','in_file')
+    ]),
+    (p3.epi_automask,p3.epi_3dcalc,[
+        ('brain_file','in_file_a')
+    ]),
+    (p3.epi_skullstrip,p3.epi_3dcalc,[
+        ('out_file','in_file_b')
+    ]),
+    (p3.extractroi[0],p3.epi_3dcalc,[
+        ('roi_file','in_file_c')
+    ]),
+
+    # deoblique
+    (p3.epi_3dcalc,p3.warp,[
+        ('out_file','card2oblique')
+    ]),
+    (p3.maskop6,p3.warp,[
+        ('out_file','in_file')
+    ]),
+    (p3.warp_args,p3.warp,[
+        ('args','args')
+    ]),
+
+    # resample the EPIREF to MPRAGE
+    (p3.warp,p3.resample,[
+        ('out_file','master')
+    ]),
+    (p3.epi_3dcalc,p3.resample,[
+        ('out_file','in_file')
+    ]),
+
+    # create weightmask
+    (p3.resample,p3.weightmask,[
+        ('out_file','in_file')
+    ]),
+    (p3.epi_3dcalc,p3.weightmask,[
+        ('out_file','no_skull')
+    ]),
+
+    # register mprage to tcat
+    (p3.weightmask,p3.registert12tcat,[
+        ('out_file','weight')
+    ]),
+    (p3.resample,p3.registert12tcat,[
+        ('out_file','reference')
+    ]),
+    (p3.warp,p3.registert12tcat,[
+        ('out_file','in_file')
+    ]),
+
+    # Transform rawEPI in ATL space and MPR space
+    (p3.register[0],p3.mastertransform,[
+        ('out_file','in_file')
+    ]),
+    (p3.warp,p3.mastertransform,[
+        ('ob_transform','transform1')
+    ]),
+    (p3.registert12tcat,p3.mastertransform,[
+        ('out_matrix','transform2')
+    ]),
+
+    # Transform the tcat image into atlas space
+    (p3.register[0],p3.transformtcat2atl,[
+        ('out_file','reference')
+    ]),
+    (p3.mastertransform,p3.transformtcat2atl,[
+        ('out_file','in_matrix')
+    ]),
+    (p3.epi_3dcalc,p3.transformtcat2atl,[
+        ('out_file','in_file')
+    ]),
+
+    # Transform the tcat image into mpr space
+    (p3.maskop6,p3.transformtcat2mpr,[
+        ('out_file','reference')
+    ]),
+    (p3.mastertransform,p3.transformtcat2mpr,[
+        ('out_file2','in_matrix')
+    ]),
+    (p3.epi_3dcalc,p3.transformtcat2mpr,[
+        ('out_file','in_file')
+    ]),
+
+    # restore obliquity
+    (p3.maskop6,p3.prermoblique,[
+        ('out_file','in1')
+    ]),
+    (p3.prermoblique,p3.remakeoblique,[
+        ('out','atrcopy')
+    ]),
+    (p3.transformtcat2mpr,p3.remakeoblique,[
+        ('out_file','in_file')
+    ]),
+
+    # you have to do cross-run alignment for anatomical consistency across runs
+    # 3dvolreg can do this for you, or you can do it yourself. this is the yourself version.
+    # here we register the reference images from each run to the first run reference
+    # NOTE: MI and NMI seem to do a better intra-modal job of registering than correlation-based methods
+    (p3.extractroi[0],p3.deobliquemasterepiref,[
+        ('roi_file','card2oblique')
+    ]),
+    (p3.extractroi[1],p3.deobliquemasterepiref,[
+        ('roi_file','in_file')
+    ]),
+    (p3.deobliquemasterepiref,p3.resampleepiref2masterepiref,[
+        ('out_file','master')
+    ]),
+    (p3.extractroi[0],p3.resampleepiref2masterepiref,[
+        ('roi_file','in_file')
+    ]),
+    (p3.deobliquemasterepiref,p3.registermaster2epiref,[
+        ('out_file','in_file')
+    ]),
+    (p3.resampleepiref2masterepiref,p3.registermaster2epiref,[
+        ('out_file','reference')
+    ]),
+    (p3.register[0],p3.transformrawEPI2ATL,[
+        ('out_file','in_file')
+    ]),
+    (p3.warp,p3.transformrawEPI2ATL,[
+        ('ob_transform','tfm1')
+    ]),
+    (p3.registert12tcat,p3.transformrawEPI2ATL,[
+        ('out_matrix','tfm2')
+    ]),
+    (p3.deobliquemasterepiref,p3.transformrawEPI2ATL,[
+        ('ob_transform','tfm3')
+    ]),
+    (p3.registermaster2epiref,p3.transformrawEPI2ATL,[
+        ('out_matrix','tfm4')
+    ]),
+    (p3.register[0],p3.transformtcat2mprageepi,[
+        ('out_file','reference')
+    ]),
+    (p3.transformrawEPI2ATL,p3.transformtcat2mprageepi,[
+        ('master_transform','in_matrix')
+    ]),
+    (p3.remakeoblique,p3.transformtcat2mprageepi,[
+        ('out_file','in_file')
+    ]),
+    (p3.deobliquemasterepiref,p3.transformrawEPI2EPI1,[
+        ('ob_transform','tfm1')
+    ]),
+    (p3.registermaster2epiref,p3.transformrawEPI2EPI1,[
+        ('out_matrix','tfm2')
+    ]),
+    (p3.extractroi[0],p3.transformtcat2epi1,[
+        ('roi_file','reference')
+    ]),
+    (p3.transformrawEPI2EPI1,p3.transformtcat2epi1,[
+        ('master_transform','in_matrix')
+    ]),
+    (p3.remakeoblique,p3.transformtcat2epi1,[
+        ('out_file','in_file')
+    ]),
+    (p3.extractroi[0],p3.brikconvert,[
+        ('roi_file','in_file')
+    ]),
+    (p3.brikconvert,p3.prermoblique2,[
+        ('out_file','in1')
+    ]),
+    (p3.prermoblique2,p3.remakeoblique2,[
+        ('out','atrcopy')
+    ]),
+    (p3.transformtcat2epi1,p3.remakeoblique2,[
+        ('out_file','in_file')
+    ]),
+
+    # Create Atlas-Registered BOLD Data
+
+
+
     # Output
-    #(p3.register,p3.output[1],[
-    #    ('out_file','output')
-    #])
+    (p3.remakeoblique2,p3.output[0],[
+        ('out_file','output')
+    ])
 ])
 wf.run()
 #print(p3.allineate_orig.inputs)

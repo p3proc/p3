@@ -88,13 +88,15 @@ def QCreduceset(QClist):
     return (epi, epi_sidecar)
 
 # Define string function to extract slice time info and write to file
-extract_slicetime_func = lambda TMP_DIR: """
 def extract_slicetime(epi_sidecar):
     # import necessary libraries
     import json
     import csv
+    import os
     from os.path import join,basename,splitext
-    from os import getcwd
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # open the sidecar file
     with open(epi_sidecar) as sidecar:
@@ -108,14 +110,12 @@ def extract_slicetime(epi_sidecar):
         TR = bids_data['RepetitionTime']
 
     # write slice timing to file
-    with open(join('{0}','{{}}.SLICETIME'.format(splitext(basename(epi_sidecar))[0])),'w') as st_file:
+    with open(join(cwd,'{}.SLICETIME'.format(splitext(basename(epi_sidecar))[0])),'w') as st_file:
         wr = csv.writer(st_file,delimiter=' ')
         wr.writerow(slice_timing)
 
     # return timing pattern and TR
-    return ('@{{}}'.format(join('{0}','{{}}.SLICETIME'.format(splitext(basename(epi_sidecar))[0]))), str(TR))""".format(
-    TMP_DIR
-    )
+    return ('@{}'.format(join(cwd,'{}.SLICETIME'.format(splitext(basename(epi_sidecar))[0]))),str(TR))
 
 # Extend afni despike
 # define extended input spec
@@ -132,22 +132,241 @@ class ExtendedDespike(afni.Despike):
     input_spec = ExtendedDespikeInputSpec
     output_spec = ExtendedDespikeOutputSpec
 
-# define custom register to atlas function (the afni interface in nipype is pretty bad...)
+# Extend afni 3dwarp
+# define extended input spec
+class ExtendedWarpInputSpec(afni.preprocess.WarpInputSpec):
+    card2oblique = base.File(
+        desc='spike image file name',
+        argstr='-card2oblique %s',
+        exists=True)
+
+# define extended afni despike
+class ExtendedWarp(afni.Warp):
+    input_spec = ExtendedWarpInputSpec
+
+# Define custom warp command function
+def warp_custom(in_file,card2oblique,args=''):
+    import os
+    import subprocess
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,cwd))
+    card_file = os.path.basename(shutil.copy2(card2oblique,cwd))
+
+    # strip filename
+    name_nii,_ = os.path.splitext(input_file)
+    filename,_ = os.path.splitext(name_nii)
+
+    print("3dWarp -verb -card2oblique {} -prefix {}_ob.nii.gz {} -overwrite {}".format(
+        os.path.join(cwd,card_file),
+        os.path.join(cwd,filename),
+        args,
+        os.path.join(cwd,input_file)))
+
+    # spawn the 3dwarp command with the subprocess command
+    warpcmd = subprocess.run(
+        "3dWarp -verb -card2oblique {} -prefix {}_ob.nii.gz {} -overwrite {}".format(
+            os.path.join(cwd,card_file),
+            os.path.join(cwd,filename),
+            args,
+            os.path.join(cwd,input_file)
+        ),
+        stdout=subprocess.PIPE,
+        shell=True
+        )
+    with open(os.path.join(cwd,"{}_obla2e_mat.1D".format(filename)),"w") as text_file:
+        print(warpcmd.stdout.decode('utf-8'),file=text_file)
+
+    # get the out files
+    out_file = os.path.join(cwd,'{}_ob.nii.gz'.format(filename))
+    ob_transform = os.path.join(cwd,'{}_obla2e_mat.1D'.format(filename))
+
+    return (out_file,ob_transform)
+
+# define custom register to atlas function (the afni interface in nipype sucks...)
 def register_atlas(in_file):
     import os
+    import shutil
+
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,os.getcwd()))
 
     # spawn the auto_tlrc process with os.system
     os.system(
-        '@auto_tlrc -no_ss -base {0} -input {1} -pad_input {2}'.format(
-            'TT_N27+tlrc',
-            in_file,
-            str(60)
+        '@auto_tlrc -no_ss -base TT_N27+tlrc -input {0} -pad_input 60'.format(
+            input_file,
         )
     )
 
-    # TODO test that all our outfiles are there
-    # raise exception if not
+    # split extension of input file
+    name_nii,_ = os.path.splitext(input_file)
+    filename,_ = os.path.splitext(name_nii)
 
-    # TODO get the out_file
+    #  gzip the nifti
+    os.system(
+        'gzip {}'.format('{}_at.nii'.format(filename))
+    )
 
-    # TODO return the out_file
+    # get the out_file
+    out_file = os.path.join(os.getcwd(),'{}_at.nii.gz'.format(filename))
+    transform_file = os.path.join(os.getcwd(),'{}_at.nii.Xaff12.1D'.format(filename))
+
+    # return the out_file
+    return (out_file,transform_file)
+
+# weight mask
+def create_weightmask(in_file,no_skull):
+    import subprocess
+    import os
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,cwd))
+
+    # strip filename
+    name_nii,_ = os.path.splitext(input_file)
+    filename,_ = os.path.splitext(name_nii)
+
+    rtn = subprocess.run(
+        '3dBrickStat -automask -percentile 90.000000 1 90.000000 {} | tail -n1 | awk \'{{print $2}}\''.format(
+            no_skull
+        ),
+        stdout=subprocess.PIPE,
+        shell=True
+    )
+    perc = float(rtn.stdout.decode('utf-8'))
+    calc = subprocess.run(
+        '3dcalc -datum float -prefix {}_weighted.nii.gz -a {} -expr \'min(1,(a/\'{}\'))\''.format(
+            os.path.join(cwd,filename),
+            os.path.join(cwd,input_file),
+            perc
+        ),
+        shell=True
+    )
+
+    # return weightmask
+    weightmask = os.path.join(cwd,'{}_weighted.nii.gz'.format(filename))
+    return weightmask
+
+# master transform
+def mastertransform(in_file,transform1,transform2):
+    import os
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy files to cwd
+    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
+    transform_file1 = os.path.abspath(shutil.copy2(transform1,cwd))
+    transform_file2 = os.path.abspath(shutil.copy2(transform2,cwd))
+
+    # strip filename
+    name_nii,_ = os.path.splitext(os.path.basename(transform_file1))
+    filename,_ = os.path.splitext(name_nii)
+
+    # format string
+    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I'.format(
+        input_file,
+        transform_file1,
+        transform_file2
+    )
+
+    # run cat_matvec for transform to ATL space
+    os.system('cat_matvec {} > {}'.format(
+        format_string,
+        os.path.join(cwd,'{}_rawEPI2ATL.aff12.1D'.format(filename))
+    ))
+    master_transform1 = os.path.join(cwd,'{}_rawEPI2ATL.aff12.1D'.format(filename))
+
+    # format string
+    format_string = '-ONELINE {} {} -I'.format(
+        transform_file1,
+        transform_file2
+    )
+
+    # run cat_matvec for transform to MPR space
+    os.system('cat_matvec {} > {}'.format(
+        format_string,
+        os.path.join(cwd,'{}_rawEPI2MPR.aff12.1D'.format(filename))
+    ))
+    master_transform2 = os.path.join(cwd,'{}_rawEPI2MPR.aff12.1D'.format(filename))
+
+    # return master transforms
+    return master_transform1, master_transform2
+
+# concatenate transform
+def concattransform(in_file,tfm1,tfm2,tfm3,tfm4):
+    import os
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy files to cwd
+    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
+    tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
+    tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
+    tfm_file3 = os.path.abspath(shutil.copy2(tfm3,cwd))
+    tfm_file4 = os.path.abspath(shutil.copy2(tfm4,cwd))
+
+    # strip filename
+    name_nii,_ = os.path.splitext(os.path.basename(tfm_file1))
+    filename,_ = os.path.splitext(name_nii)
+
+    # format string
+    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I {} {} -I'.format(
+        input_file,
+        tfm_file1,
+        tfm_file2,
+        tfm_file3,
+        tfm_file4,
+    )
+
+    # run cat_matvec for transform to ATL space
+    os.system('cat_matvec {} > {}'.format(
+        format_string,
+        os.path.join(cwd,'{}_rawEPI_viaEPI1_to_ATL.aff12.1D'.format(filename))
+    ))
+    master_transform = os.path.join(cwd,'{}_rawEPI_viaEPI1_to_ATL.aff12.1D'.format(filename))
+
+    # return master transform
+    return master_transform
+
+def concattransform2(tfm1,tfm2):
+    import os
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy files to cwd
+    tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
+    tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
+
+    # strip filename
+    name_nii,_ = os.path.splitext(os.path.basename(tfm_file1))
+    filename,_ = os.path.splitext(name_nii)
+
+    # format string
+    format_string = '-ONELINE {} {} -I'.format(
+        tfm_file1,
+        tfm_file2
+    )
+
+    # run cat_matvec for transform to ATL space
+    os.system('cat_matvec {} > {}'.format(
+        format_string,
+        os.path.join(cwd,'{}_XFM_rawEPI_to_EPI1.aff12.1D'.format(filename))
+    ))
+    master_transform = os.path.join(cwd,'{}_XFM_rawEPI_to_EPI1.aff12.1D'.format(filename))
+
+    # return master transform
+    return master_transform
