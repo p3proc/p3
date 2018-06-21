@@ -75,18 +75,16 @@ class definednodes:
         )
 
         # Despike epi data (create 2 for permutations with slice time correction)
-        self.despike = []
-        for n in range(2):
-            self.despike.append(MapNode(
-                ExtendedDespike(
-                    args="-ignore {} -NEW -nomask".format(
-                        self.IGNOREFRAMES
-                    ),
-                    outputtype="NIFTI_GZ"
+        self.despike = MapNode(
+            ExtendedDespike(
+                args="-ignore {} -NEW -nomask".format(
+                    self.IGNOREFRAMES
                 ),
-                iterfield=['in_file'],
-                name='despike{}'.format(n)
-            ))
+                outputtype="NIFTI_GZ"
+            ),
+            iterfield=['in_file'],
+            name='despike'
+        )
 
         # extract slice timing so we can pass it to slice time correction
         self.extract_stc = MapNode(
@@ -100,18 +98,16 @@ class definednodes:
         )
 
         # timeshift data (create 2 for permutations with despiking)
-        self.tshift = []
-        for n in range(2):
-            self.tshift.append(MapNode(
-                afni.TShift(
-                    args="-heptic",
-                    ignore=self.IGNOREFRAMES,
-                    tzero=0,
-                    outputtype="NIFTI_GZ"
-                ),
-                iterfield=['in_file','tpattern','tr'],
-                name='tshift{}'.format(n)
-            ))
+        self.tshift = MapNode(
+            afni.TShift(
+                args="-heptic",
+                ignore=self.IGNOREFRAMES,
+                tzero=0,
+                outputtype="NIFTI_GZ"
+            ),
+            iterfield=['in_file','tpattern','tr'],
+            name='tshift'
+        )
 
         # Setup basefile for volreg
         self.firstrunonly = Node( # this will create a list of the first run to feed as a basefile
@@ -124,7 +120,7 @@ class definednodes:
         )
 
         self.extractroi = []
-        for n in range(2): # create 2 nodes to align to first run and each run
+        for n in range(2): # create 2 nodes to obtain ref frame of first run and each run
             self.extractroi.append(MapNode(
                 fsl.ExtractROI(
                     t_min=self.IGNOREFRAMES,
@@ -135,21 +131,35 @@ class definednodes:
                 name='extractroi{}'.format(n)
             ))
 
+        # Create Named Output for first frame alignment (each run)
+        self.firstframeeachrun = Node(
+            IdentityInterface(
+                fields=['refimg']
+            ),
+            name='firstframeeachrun'
+        )
+
+        # Create Named Output for first frame alignment (first run only)
+        self.firstframefirstrun = Node(
+            IdentityInterface(
+                fields=['refimg']
+            ),
+            name='firstframefirstrun'
+        )
+
         # Motion correction (create 10 nodes for different permutations of inputs)
-        self.volreg = []
-        for n in range(10):
-            self.volreg.append(MapNode(
-                afni.Volreg(
-                    args="-heptic -maxite {}".format(
-                        25
-                    ),
-                    verbose=True,
-                    zpad=10,
-                    outputtype="NIFTI_GZ"
+        self.volreg = MapNode(
+            afni.Volreg(
+                args="-heptic -maxite {}".format(
+                    25
                 ),
-                iterfield=['basefile','in_file'],
-                name='volreg{}'.format(n)
-            ))
+                verbose=True,
+                zpad=10,
+                outputtype="NIFTI_GZ"
+            ),
+            iterfield=['basefile','in_file'],
+            name='volreg'
+        )
 
         # Skullstrip
         # skullstrip mprage (afni)
@@ -293,6 +303,12 @@ class definednodes:
             ),
             name='maskop6'
         )
+        self.skullstripped_mprage = Node(
+            IdentityInterface(
+                fields=['noskull']
+            ),
+            name='skullstripped_mprage'
+        )
 
         # Register to Atlas
         self.register = []
@@ -305,6 +321,12 @@ class definednodes:
                 ),
                 name='atlasregister_{}'.format(n)
             ))
+        self.skullstripped_atlas_mprage = Node(
+            IdentityInterface(
+                fields=['noskull_at','transform']
+            ),
+            name='skullstripped_atlas_mprage'
+        )
 
         # Transform the unskullstripped image
         self.allineate_unskullstripped = []
@@ -358,6 +380,12 @@ class definednodes:
             ),
             iterfield=['in_file','card2oblique'],
             name='3dwarp'
+        )
+        self.noskull_obla2e = Node( # Transform between EPIREF and MPRAGE obliquity
+            IdentityInterface(
+                fields=['noskull_ob','noskull_obla2e_mat']
+            ),
+            name='noskull_obla2e'
         )
 
         # resample the EPIREF to the MPRAGE
@@ -567,6 +595,28 @@ class definednodes:
         # only the first and second options will enforce cross-run alignment
 
         # for run 1, all methods are the same
+
+        # Create transform
+        self.transformepi2epi2mpr2atl = MapNode(
+            Function(
+                input_names=['in_file','tfm1','tfm2','tfm3'],
+                output_names=['master_transform'],
+                function=concattransform3
+            ),
+            iterfield=['tfm1','tfm2','tfm3'],
+            name='transformepi2epi2mpr2atl'
+        )
+
+        # align images
+        self.alignepi2atl = MapNode(
+            afni.Allineate(
+                args='-mast_dxyz 3',
+                overwrite=True,
+                outputtype='NIFTI_GZ'
+            ),
+            iterfield=['in_matrix','in_file'],
+            name='alignepi2atl'
+        )
 
 
         # Output

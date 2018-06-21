@@ -46,25 +46,15 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     ]),
 
     ### Time Shift/Despiking
-    (p3.QCreduce,p3.despike[0],[ # despike
+    (p3.QCreduce,p3.despike,[ # despike
         ('epi','in_file')
     ]),
-    (p3.despike[0],p3.tshift[0],[ # despike + time shift
+    (p3.despike,p3.tshift,[ # time shift
         ('out_file','in_file')
     ]),
-    (p3.extract_stc,p3.tshift[0],[ # despike + time shift
+    (p3.extract_stc,p3.tshift,[
         ('slicetiming','tpattern'),
         ('TR','tr')
-    ]),
-    (p3.QCreduce,p3.tshift[1],[ # timeshift
-        ('epi','in_file')
-    ]),
-    (p3.extract_stc,p3.tshift[1],[ # timeshift
-        ('slicetiming','tpattern'),
-        ('TR','tr')
-    ]),
-    (p3.tshift[1],p3.despike[1],[ # timeshift + despike
-        ('out_file','in_file')
     ]),
 
     ### Setup basefile for motion correction
@@ -77,78 +67,19 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.firstrunonly,p3.extractroi[1],[
         ('epi','in_file')
     ]),
+    (p3.extractroi[0],p3.firstframeeachrun,[
+        ('roi_file','refimg')
+    ]),
+    (p3.extractroi[1],p3.firstframefirstrun,[
+        ('roi_file','refimg')
+    ]),
 
     ### Do the actual motion correction
-    # Align to first frame of each run
-    # No despike, No stc
-    (p3.extractroi[0],p3.volreg[0],[
-        ('roi_file','basefile')
-    ]),
-    (p3.QCreduce,p3.volreg[0],[
-        ('epi','in_file')
-    ]),
-    # despike only
-    (p3.extractroi[0],p3.volreg[1],[
-        ('roi_file','basefile')
-    ]),
-    (p3.despike[0],p3.volreg[1],[
-        ('out_file','in_file')
-    ]),
-    # despike + stc
-    (p3.extractroi[0],p3.volreg[2],[
-        ('roi_file','basefile')
-    ]),
-    (p3.tshift[0],p3.volreg[2],[
-        ('out_file','in_file')
-    ]),
-    # stc only
-    (p3.extractroi[0],p3.volreg[3],[
-        ('roi_file','basefile')
-    ]),
-    (p3.tshift[1],p3.volreg[3],[
-        ('out_file','in_file')
-    ]),
-    # stc + despike
-    (p3.extractroi[0],p3.volreg[4],[
-        ('roi_file','basefile')
-    ]),
-    (p3.despike[1],p3.volreg[4],[
-        ('out_file','in_file')
-    ]),
     # Align to first frame of first run
-    # No despike, No stc
-    (p3.extractroi[1],p3.volreg[5],[
-        ('roi_file','basefile')
+    (p3.firstframefirstrun,p3.volreg,[
+        ('refimg','basefile')
     ]),
-    (p3.QCreduce,p3.volreg[5],[
-        ('epi','in_file')
-    ]),
-    # despike only
-    (p3.extractroi[1],p3.volreg[6],[
-        ('roi_file','basefile')
-    ]),
-    (p3.despike[0],p3.volreg[6],[
-        ('out_file','in_file')
-    ]),
-    # despike + stc
-    (p3.extractroi[1],p3.volreg[7],[
-        ('roi_file','basefile')
-    ]),
-    (p3.tshift[0],p3.volreg[7],[
-        ('out_file','in_file')
-    ]),
-    # stc only
-    (p3.extractroi[1],p3.volreg[8],[
-        ('roi_file','basefile')
-    ]),
-    (p3.tshift[1],p3.volreg[8],[
-        ('out_file','in_file')
-    ]),
-    # stc + despike
-    (p3.extractroi[1],p3.volreg[9],[
-        ('roi_file','basefile')
-    ]),
-    (p3.despike[1],p3.volreg[9],[
+    (p3.tshift,p3.volreg,[
         ('out_file','in_file')
     ]),
 
@@ -235,21 +166,21 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.maskop2[1],p3.maskop2[2],[
         ('out_file','in_file_a')
     ]),
-    (p3.maskop2[2],p3.maskop3,[
-        ('out_file','in_file_a')
-    ]),
-    (p3.fsl_skullstrip,p3.maskop3,[
-        ('out_file','in_file_b')
-    ]),
-    (p3.afni_skullstrip,p3.maskop3,[
-        ('out_file','in_file_c')
-    ]),
-    (p3.fileselection,p3.maskop4,[ # apparently the old way of getting noskull mprage...
-        ('T1','in_file_a')
-    ]),
-    (p3.maskop3,p3.maskop4,[
-        ('out_file','in_file_b')
-    ]),
+    # (p3.maskop2[2],p3.maskop3,[
+    #     ('out_file','in_file_a')
+    # ]),
+    # (p3.fsl_skullstrip,p3.maskop3,[
+    #     ('out_file','in_file_b')
+    # ]),
+    # (p3.afni_skullstrip,p3.maskop3,[
+    #     ('out_file','in_file_c')
+    # ]),
+    # (p3.fileselection,p3.maskop4,[ # apparently the old way of getting noskull mprage...
+    #     ('T1','in_file_a')
+    # ]),
+    # (p3.maskop3,p3.maskop4,[
+    #     ('out_file','in_file_b')
+    # ]),
     (p3.fsl_skullstrip,p3.maskop5,[
         ('out_file','in_file_a')
     ]),
@@ -259,7 +190,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.uniform,p3.maskop5,[
         ('out_file','in_file_c')
     ]),
-    (p3.maskop2[2],p3.maskop6,[ # final noskull mprage
+    (p3.maskop2[2],p3.maskop6,[
         ('out_file','in_file_a')
     ]),
     (p3.maskop5,p3.maskop6,[
@@ -268,39 +199,49 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.fileselection,p3.maskop6,[
         ('T1','in_file_c')
     ]),
+    # final noskull mprage
+    (p3.maskop6,p3.skullstripped_mprage,[
+        ('out_file','noskull')
+    ]),
+
 
     # Register the final skullstripped mprage to atlas
-    (p3.maskop6,p3.register[0],[
-        ('out_file','in_file')
+    (p3.skullstripped_mprage,p3.register[0],[
+        ('noskull','in_file')
     ]),
+    (p3.register[0],p3.skullstripped_atlas_mprage,[
+        ('out_file','noskull_at'),
+        ('transform_file','transform')
+    ]),
+
 
     # Transform the unskull stripped mprage
-    (p3.fileselection,p3.allineate_unskullstripped[0],[
-        ('T1','in_file')
-    ]),
-    (p3.register[0],p3.allineate_unskullstripped[0],[
-        ('transform_file','in_matrix')
-    ]),
+    # (p3.fileselection,p3.allineate_unskullstripped[0],[
+    #     ('T1','in_file')
+    # ]),
+    # (p3.skullstripped_atlas_mprage,p3.allineate_unskullstripped[0],[
+    #     ('transform','in_matrix')
+    # ]),
 
     #For comparison, calculate the transform with only the AFNI version
-    (p3.afni_skullstrip,p3.register[1],[
-        ('out_file','in_file')
-    ]),
+    # (p3.afni_skullstrip,p3.register[1],[
+    #     ('out_file','in_file')
+    # ]),
 
     #Transform the un-skull-stripped mprage (AFNI version)
-    (p3.fileselection,p3.allineate_unskullstripped[1],[
-        ('T1','in_file')
-    ]),
-    (p3.register[1],p3.allineate_unskullstripped[1],[
-        ('transform_file','in_matrix')
-    ]),
+    # (p3.fileselection,p3.allineate_unskullstripped[1],[
+    #     ('T1','in_file')
+    # ]),
+    # (p3.register[1],p3.allineate_unskullstripped[1],[
+    #     ('transform_file','in_matrix')
+    # ]),
 
     # Skullstrip the EPI image
-    (p3.extractroi[0],p3.epi_skullstrip,[
-        ('roi_file','in_file')
+    (p3.firstframefirstrun,p3.epi_skullstrip,[
+        ('refimg','in_file')
     ]),
-    (p3.extractroi[0],p3.epi_automask,[
-        ('roi_file','in_file')
+    (p3.firstframefirstrun,p3.epi_automask,[
+        ('refimg','in_file')
     ]),
     (p3.epi_automask,p3.epi_3dcalc,[
         ('brain_file','in_file_a')
@@ -308,24 +249,28 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.epi_skullstrip,p3.epi_3dcalc,[
         ('out_file','in_file_b')
     ]),
-    (p3.extractroi[0],p3.epi_3dcalc,[
-        ('roi_file','in_file_c')
+    (p3.firstframefirstrun,p3.epi_3dcalc,[
+        ('refimg','in_file_c')
     ]),
 
     # deoblique
     (p3.epi_3dcalc,p3.warp,[
         ('out_file','card2oblique')
     ]),
-    (p3.maskop6,p3.warp,[
-        ('out_file','in_file')
+    (p3.skullstripped_mprage,p3.warp,[
+        ('noskull','in_file')
     ]),
     (p3.warp_args,p3.warp,[
         ('args','args')
     ]),
+    (p3.warp,p3.noskull_obla2e,[
+        ('out_file','noskull_ob'),
+        ('ob_transform','noskull_obla2e_mat')
+    ]),
 
     # resample the EPIREF to MPRAGE
-    (p3.warp,p3.resample,[
-        ('out_file','master')
+    (p3.noskull_obla2e,p3.resample,[
+        ('noskull_ob','master')
     ]),
     (p3.epi_3dcalc,p3.resample,[
         ('out_file','in_file')
@@ -346,136 +291,158 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.resample,p3.registert12tcat,[
         ('out_file','reference')
     ]),
-    (p3.warp,p3.registert12tcat,[
-        ('out_file','in_file')
+    (p3.noskull_obla2e,p3.registert12tcat,[
+        ('noskull_ob','in_file')
     ]),
 
-    # Transform rawEPI in ATL space and MPR space
-    (p3.register[0],p3.mastertransform,[
-        ('out_file','in_file')
-    ]),
-    (p3.warp,p3.mastertransform,[
-        ('ob_transform','transform1')
-    ]),
-    (p3.registert12tcat,p3.mastertransform,[
-        ('out_matrix','transform2')
-    ]),
+    # # Transform rawEPI in ATL space and MPR space
+    # (p3.skullstripped_atlas_mprage,p3.mastertransform,[
+    #     ('noskull_at','in_file')
+    # ]),
+    # (p3.noskull_obla2e,p3.mastertransform,[
+    #     ('noskull_obla2e_mat','transform1')
+    # ]),
+    # (p3.registert12tcat,p3.mastertransform,[
+    #     ('out_matrix','transform2')
+    # ]),
 
-    # Transform the tcat image into atlas space
-    (p3.register[0],p3.transformtcat2atl,[
-        ('out_file','reference')
-    ]),
-    (p3.mastertransform,p3.transformtcat2atl,[
-        ('out_file','in_matrix')
-    ]),
-    (p3.epi_3dcalc,p3.transformtcat2atl,[
-        ('out_file','in_file')
-    ]),
+    # # Transform the tcat image into atlas space
+    # (p3.skullstripped_atlas_mprage,p3.transformtcat2atl,[
+    #     ('noskull_at','reference')
+    # ]),
+    # (p3.mastertransform,p3.transformtcat2atl,[
+    #     ('out_file','in_matrix')
+    # ]),
+    # (p3.epi_3dcalc,p3.transformtcat2atl,[
+    #     ('out_file','in_file')
+    # ]),
 
-    # Transform the tcat image into mpr space
-    (p3.maskop6,p3.transformtcat2mpr,[
-        ('out_file','reference')
-    ]),
-    (p3.mastertransform,p3.transformtcat2mpr,[
-        ('out_file2','in_matrix')
-    ]),
-    (p3.epi_3dcalc,p3.transformtcat2mpr,[
-        ('out_file','in_file')
-    ]),
-
-    # restore obliquity
-    (p3.maskop6,p3.prermoblique,[
-        ('out_file','in1')
-    ]),
-    (p3.prermoblique,p3.remakeoblique,[
-        ('out','atrcopy')
-    ]),
-    (p3.transformtcat2mpr,p3.remakeoblique,[
-        ('out_file','in_file')
-    ]),
+    # # Transform the tcat image into mpr space
+    # (p3.skullstripped_mprage,p3.transformtcat2mpr,[
+    #     ('noskull','reference')
+    # ]),
+    # (p3.mastertransform,p3.transformtcat2mpr,[
+    #     ('out_file2','in_matrix')
+    # ]),
+    # (p3.epi_3dcalc,p3.transformtcat2mpr,[
+    #     ('out_file','in_file')
+    # ]),
+    #
+    # # restore obliquity
+    # (p3.skullstripped_mprage,p3.prermoblique,[
+    #     ('noskull','in1')
+    # ]),
+    # (p3.prermoblique,p3.remakeoblique,[
+    #     ('out','atrcopy')
+    # ]),
+    # (p3.transformtcat2mpr,p3.remakeoblique,[
+    #     ('out_file','in_file')
+    # ]),
 
     # you have to do cross-run alignment for anatomical consistency across runs
     # 3dvolreg can do this for you, or you can do it yourself. this is the yourself version.
     # here we register the reference images from each run to the first run reference
     # NOTE: MI and NMI seem to do a better intra-modal job of registering than correlation-based methods
-    (p3.extractroi[0],p3.deobliquemasterepiref,[
-        ('roi_file','card2oblique')
-    ]),
-    (p3.extractroi[1],p3.deobliquemasterepiref,[
-        ('roi_file','in_file')
-    ]),
-    (p3.deobliquemasterepiref,p3.resampleepiref2masterepiref,[
-        ('out_file','master')
-    ]),
-    (p3.extractroi[0],p3.resampleepiref2masterepiref,[
-        ('roi_file','in_file')
-    ]),
-    (p3.deobliquemasterepiref,p3.registermaster2epiref,[
-        ('out_file','in_file')
-    ]),
-    (p3.resampleepiref2masterepiref,p3.registermaster2epiref,[
-        ('out_file','reference')
-    ]),
-    (p3.register[0],p3.transformrawEPI2ATL,[
-        ('out_file','in_file')
-    ]),
-    (p3.warp,p3.transformrawEPI2ATL,[
-        ('ob_transform','tfm1')
-    ]),
-    (p3.registert12tcat,p3.transformrawEPI2ATL,[
-        ('out_matrix','tfm2')
-    ]),
-    (p3.deobliquemasterepiref,p3.transformrawEPI2ATL,[
-        ('ob_transform','tfm3')
-    ]),
-    (p3.registermaster2epiref,p3.transformrawEPI2ATL,[
-        ('out_matrix','tfm4')
-    ]),
-    (p3.register[0],p3.transformtcat2mprageepi,[
-        ('out_file','reference')
-    ]),
-    (p3.transformrawEPI2ATL,p3.transformtcat2mprageepi,[
-        ('master_transform','in_matrix')
-    ]),
-    (p3.remakeoblique,p3.transformtcat2mprageepi,[
-        ('out_file','in_file')
-    ]),
-    (p3.deobliquemasterepiref,p3.transformrawEPI2EPI1,[
-        ('ob_transform','tfm1')
-    ]),
-    (p3.registermaster2epiref,p3.transformrawEPI2EPI1,[
-        ('out_matrix','tfm2')
-    ]),
-    (p3.extractroi[0],p3.transformtcat2epi1,[
-        ('roi_file','reference')
-    ]),
-    (p3.transformrawEPI2EPI1,p3.transformtcat2epi1,[
-        ('master_transform','in_matrix')
-    ]),
-    (p3.remakeoblique,p3.transformtcat2epi1,[
-        ('out_file','in_file')
-    ]),
-    (p3.extractroi[0],p3.brikconvert,[
-        ('roi_file','in_file')
-    ]),
-    (p3.brikconvert,p3.prermoblique2,[
-        ('out_file','in1')
-    ]),
-    (p3.prermoblique2,p3.remakeoblique2,[
-        ('out','atrcopy')
-    ]),
-    (p3.transformtcat2epi1,p3.remakeoblique2,[
-        ('out_file','in_file')
-    ]),
+    # (p3.firstframeeachrun,p3.deobliquemasterepiref,[
+    #     ('refimg','card2oblique')
+    # ]),
+    # (p3.firstframefirstrun,p3.deobliquemasterepiref,[
+    #     ('refimg','in_file')
+    # ]),
+    # (p3.deobliquemasterepiref,p3.resampleepiref2masterepiref,[
+    #     ('out_file','master')
+    # ]),
+    # (p3.firstframeeachrun,p3.resampleepiref2masterepiref,[
+    #     ('refimg','in_file')
+    # ]),
+    # (p3.deobliquemasterepiref,p3.registermaster2epiref,[
+    #     ('out_file','in_file')
+    # ]),
+    # (p3.resampleepiref2masterepiref,p3.registermaster2epiref,[
+    #     ('out_file','reference')
+    # ]),
+    # (p3.skullstripped_atlas_mprage,p3.transformrawEPI2ATL,[
+    #     ('noskull_at','in_file')
+    # ]),
+    # (p3.noskull_obla2e,p3.transformrawEPI2ATL,[
+    #     ('noskull_obla2e_mat','tfm1')
+    # ]),
+    # (p3.registert12tcat,p3.transformrawEPI2ATL,[
+    #     ('out_matrix','tfm2')
+    # ]),
+    # (p3.deobliquemasterepiref,p3.transformrawEPI2ATL,[
+    #     ('ob_transform','tfm3')
+    # ]),
+    # (p3.registermaster2epiref,p3.transformrawEPI2ATL,[
+    #     ('out_matrix','tfm4')
+    # ]),
+    # (p3.skullstripped_atlas_mprage,p3.transformtcat2mprageepi,[
+    #     ('noskull_at','reference')
+    # ]),
+    # (p3.transformrawEPI2ATL,p3.transformtcat2mprageepi,[
+    #     ('master_transform','in_matrix')
+    # ]),
+    # (p3.remakeoblique,p3.transformtcat2mprageepi,[
+    #     ('out_file','in_file')
+    # ]),
+    # (p3.deobliquemasterepiref,p3.transformrawEPI2EPI1,[
+    #     ('ob_transform','tfm1')
+    # ]),
+    # (p3.registermaster2epiref,p3.transformrawEPI2EPI1,[
+    #     ('out_matrix','tfm2')
+    # ]),
+    # (p3.firstframeeachrun,p3.transformtcat2epi1,[
+    #     ('refimg','reference')
+    # ]),
+    # (p3.transformrawEPI2EPI1,p3.transformtcat2epi1,[
+    #     ('master_transform','in_matrix')
+    # ]),
+    # (p3.remakeoblique,p3.transformtcat2epi1,[
+    #     ('out_file','in_file')
+    # ]),
+    # (p3.firstframeeachrun,p3.brikconvert,[
+    #     ('refimg','in_file')
+    # ]),
+    # (p3.brikconvert,p3.prermoblique2,[
+    #     ('out_file','in1')
+    # ]),
+    # (p3.prermoblique2,p3.remakeoblique2,[
+    #     ('out','atrcopy')
+    # ]),
+    # (p3.transformtcat2epi1,p3.remakeoblique2,[
+    #     ('out_file','in_file')
+    # ]),
 
     # Create Atlas-Registered BOLD Data
-
-
+    (p3.skullstripped_atlas_mprage,p3.transformepi2epi2mpr2atl,[
+        ('noskull_at','in_file')
+    ]),
+    (p3.noskull_obla2e,p3.transformepi2epi2mpr2atl,[
+        ('noskull_obla2e_mat','tfm1')
+    ]),
+    (p3.registert12tcat,p3.transformepi2epi2mpr2atl,[
+        ('out_matrix','tfm2')
+    ]),
+    (p3.volreg,p3.transformepi2epi2mpr2atl,[
+        ('oned_matrix_save','tfm3')
+    ]),
+    (p3.tshift,p3.alignepi2atl,[
+        ('out_file','in_file')
+    ]),
+    (p3.transformepi2epi2mpr2atl,p3.alignepi2atl,[
+        ('master_transform','in_matrix')
+    ]),
+    (p3.skullstripped_atlas_mprage,p3.alignepi2atl,[
+        ('noskull_at','reference')
+    ]),
 
     # Output
-    (p3.remakeoblique2,p3.output[0],[
+    (p3.alignepi2atl,p3.output[0],[
         ('out_file','output')
-    ])
+    ]),
+    (p3.transformepi2epi2mpr2atl,p3.output[1],[
+        ('master_transform','output')
+    ]),
 ])
 wf.run()
 #print(p3.allineate_orig.inputs)
