@@ -132,18 +132,6 @@ class ExtendedDespike(afni.Despike):
     input_spec = ExtendedDespikeInputSpec
     output_spec = ExtendedDespikeOutputSpec
 
-# Extend afni 3dwarp
-# define extended input spec
-class ExtendedWarpInputSpec(afni.preprocess.WarpInputSpec):
-    card2oblique = base.File(
-        desc='spike image file name',
-        argstr='-card2oblique %s',
-        exists=True)
-
-# define extended afni despike
-class ExtendedWarp(afni.Warp):
-    input_spec = ExtendedWarpInputSpec
-
 # Define custom warp command function
 def warp_custom(in_file,card2oblique,args=''):
     import os
@@ -255,123 +243,8 @@ def create_weightmask(in_file,no_skull):
     weightmask = os.path.join(cwd,'{}_weighted.nii.gz'.format(filename))
     return weightmask
 
-# master transform
-def mastertransform(in_file,transform1,transform2):
-    import os
-    import shutil
-
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
-
-    # copy files to cwd
-    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
-    transform_file1 = os.path.abspath(shutil.copy2(transform1,cwd))
-    transform_file2 = os.path.abspath(shutil.copy2(transform2,cwd))
-
-    # strip filename
-    name_nii,_ = os.path.splitext(os.path.basename(transform_file1))
-    filename,_ = os.path.splitext(name_nii)
-
-    # format string
-    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I'.format(
-        input_file,
-        transform_file1,
-        transform_file2
-    )
-
-    # run cat_matvec for transform to ATL space
-    os.system('cat_matvec {} > {}'.format(
-        format_string,
-        os.path.join(cwd,'{}_rawEPI2ATL.aff12.1D'.format(filename))
-    ))
-    master_transform1 = os.path.join(cwd,'{}_rawEPI2ATL.aff12.1D'.format(filename))
-
-    # format string
-    format_string = '-ONELINE {} {} -I'.format(
-        transform_file1,
-        transform_file2
-    )
-
-    # run cat_matvec for transform to MPR space
-    os.system('cat_matvec {} > {}'.format(
-        format_string,
-        os.path.join(cwd,'{}_rawEPI2MPR.aff12.1D'.format(filename))
-    ))
-    master_transform2 = os.path.join(cwd,'{}_rawEPI2MPR.aff12.1D'.format(filename))
-
-    # return master transforms
-    return master_transform1, master_transform2
-
 # concatenate transform
-def concattransform(in_file,tfm1,tfm2,tfm3,tfm4):
-    import os
-    import shutil
-
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
-
-    # copy files to cwd
-    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
-    tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
-    tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
-    tfm_file3 = os.path.abspath(shutil.copy2(tfm3,cwd))
-    tfm_file4 = os.path.abspath(shutil.copy2(tfm4,cwd))
-
-    # strip filename
-    name_nii,_ = os.path.splitext(os.path.basename(tfm_file1))
-    filename,_ = os.path.splitext(name_nii)
-
-    # format string
-    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I {} {} -I'.format(
-        input_file,
-        tfm_file1,
-        tfm_file2,
-        tfm_file3,
-        tfm_file4,
-    )
-
-    # run cat_matvec for transform to ATL space
-    os.system('cat_matvec {} > {}'.format(
-        format_string,
-        os.path.join(cwd,'{}_rawEPI_viaEPI1_to_ATL.aff12.1D'.format(filename))
-    ))
-    master_transform = os.path.join(cwd,'{}_rawEPI_viaEPI1_to_ATL.aff12.1D'.format(filename))
-
-    # return master transform
-    return master_transform
-
-def concattransform2(tfm1,tfm2):
-    import os
-    import shutil
-
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
-
-    # copy files to cwd
-    tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
-    tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
-
-    # strip filename
-    name_nii,_ = os.path.splitext(os.path.basename(tfm_file1))
-    filename,_ = os.path.splitext(name_nii)
-
-    # format string
-    format_string = '-ONELINE {} {} -I'.format(
-        tfm_file1,
-        tfm_file2
-    )
-
-    # run cat_matvec for transform to epi space
-    os.system('cat_matvec {} > {}'.format(
-        format_string,
-        os.path.join(cwd,'{}_XFM_rawEPI_to_EPI1.aff12.1D'.format(filename))
-    ))
-    master_transform = os.path.join(cwd,'{}_XFM_rawEPI_to_EPI1.aff12.1D'.format(filename))
-
-    # return master transform
-    return master_transform
-
-def concattransform3(in_file,tfm1,tfm2,tfm3):
+def concattransform(in_file,tfm1,tfm2,tfm3):
     import os
     import shutil
 
