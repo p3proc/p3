@@ -114,18 +114,17 @@ class definednodes:
             Function(
                 input_names=['epi'],
                 output_names=['epi'],
-                function=lambda epi: [epi[0] for item in epi]
+                function=lambda epi: epi[0]
             ),
             name='retrievefirstrun'
         )
 
-        self.extractroi = MapNode( # create 2 nodes to obtain ref frame of first run and each run
+        self.extractroi = Node( # get reference frame of first run
             fsl.ExtractROI(
                 t_min=self.IGNOREFRAMES,
                 t_size=1,
                 output_type='NIFTI_GZ'
             ),
-            iterfield=['in_file'],
             name='extractroi'
         )
 
@@ -147,7 +146,7 @@ class definednodes:
                 zpad=10,
                 outputtype="NIFTI_GZ"
             ),
-            iterfield=['basefile','in_file'],
+            iterfield=['in_file'],
             name='volreg'
         )
 
@@ -213,13 +212,11 @@ class definednodes:
             name='refitsetup'
         )
 
-        # 3dRefit (Create 2, one for FSorig and one for FSbrainmask)
-        self.refit = []
-        for n in range(2):
-            self.refit.append(Node(
-                afni.Refit(),
-                name='3drefit{}'.format(n)
-            ))
+        # 3dRefit
+        self.refit = Node(
+            afni.Refit(),
+            name='3drefit'
+        )
 
         # 3dAllineate (FSbrainmask)
         self.allineate_bm = Node(
@@ -301,26 +298,23 @@ class definednodes:
         )
 
         # Skullstrip the EPI image
-        self.epi_skullstrip = MapNode(
+        self.epi_skullstrip = Node(
             fsl.BET(),
-            iterfield=['in_file'],
             name='epi_skullstrip'
         )
-        self.epi_automask = MapNode(
+        self.epi_automask = Node(
             afni.Automask(
                 args='-overwrite',
                 outputtype='NIFTI_GZ'
             ),
-            iterfield=['in_file'],
             name='epi_automask'
         )
-        self.epi_3dcalc = MapNode(
+        self.epi_3dcalc = Node(
             afni.Calc(
                 expr='c*or(a,b)',
                 overwrite=True,
                 outputtype='NIFTI_GZ'
             ),
-            iterfield=['in_file_a','in_file_b','in_file_c'],
             name='epi_3dcalc'
         )
 
@@ -332,13 +326,12 @@ class definednodes:
             name='warp_args'
         )
         self.warp_args.inputs.args = '-newgrid 1.000000'
-        self.warp = MapNode(
+        self.warp = Node(
             Function(
                 input_names=['in_file','card2oblique','args'],
                 output_names=['out_file','ob_transform'],
                 function=warp_custom
             ),
-            iterfield=['in_file','card2oblique'],
             name='3dwarp'
         )
         self.noskull_obla2e = Node( # Transform between EPIREF and MPRAGE obliquity
@@ -349,29 +342,27 @@ class definednodes:
         )
 
         # resample the EPIREF to the MPRAGE
-        self.resample = MapNode(
+        self.resample = Node(
             afni.Resample(
                 resample_mode='Cu',
                 outputtype='NIFTI_GZ'
             ),
-            iterfield=['in_file','master'],
             name='resample'
         )
 
         # calculate a weight mask for the lpc weighting
-        self.weightmask = MapNode(
+        self.weightmask = Node(
             Function(
                 input_names=['in_file','no_skull'],
                 output_names=['out_file'],
                 function=create_weightmask
             ),
-            iterfield=['in_file','no_skull'],
             name='weightmask'
         )
 
         # register the mprage to the tcat (BASE=TARGET, REGISTER TO THIS SPACE; SOURCE=INPUT, LEAVE THIS SPACE)
         # this registration is on images with the same grids, whose obliquity has been accounted for
-        self.registert12tcat = MapNode(
+        self.registert12tcat = Node(
             afni.Allineate(
                 args='-lpc -nocmass -weight_frac 1.0 -master SOURCE',
                 maxrot=6,
@@ -385,7 +376,6 @@ class definednodes:
                 out_weight_file='t12tcat_transform_weight_file.nii.gz',
                 outputtype='NIFTI_GZ'
             ),
-            iterfield=['in_file','weight','reference'],
             name='registermpragetotcat'
         )
 
@@ -405,7 +395,7 @@ class definednodes:
                 output_names=['master_transform'],
                 function=concattransform
             ),
-            iterfield=['tfm1','tfm2','tfm3'],
+            iterfield=['tfm3'],
             name='transformepi2epi2mpr2atl'
         )
 

@@ -115,12 +115,6 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.afni_skullstrip,p3.refit_setup,[
         ('out_file','noskull_T1')
     ]),
-    (p3.refit_setup,p3.refit[0],[
-        ('refit_input','atrcopy')
-    ]),
-    (p3.allineate_orig,p3.refit[0],[
-        ('out_file','in_file')
-    ]),
 
     # create atlas-aligned skull stripped brainmask
     (p3.brainmask_convert,p3.allineate_bm,[
@@ -132,10 +126,10 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.allineate_orig,p3.allineate_bm,[
         ('out_matrix','in_matrix')
     ]),
-    (p3.refit_setup,p3.refit[1],[
+    (p3.refit_setup,p3.refit,[
         ('refit_input','atrcopy')
     ]),
-    (p3.allineate_bm,p3.refit[1],[
+    (p3.allineate_bm,p3.refit,[
         ('out_file','in_file')
     ]),
 
@@ -143,7 +137,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (p3.fileselection,p3.uniform,[
         ('T1','in_file_a')
     ]),
-    (p3.refit[1],p3.uniform,[
+    (p3.refit,p3.uniform,[
         ('out_file','in_file_b')
     ]),
 
