@@ -102,6 +102,8 @@ ENV/
 
 # add test dataset
 /dataset
+/MSC_BIDS
+/P3
 
 # add scripts directory
 /scripts
@@ -113,4 +115,3 @@ ENV/
 # miscellaneous output files
 graph.dot
 graph.png
-
