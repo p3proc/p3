@@ -55,11 +55,14 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (wf_bidsselector,wf_alignt1toatlas,[
         ('output.T1','input.T1')
     ]),
-    (wf_timeshiftanddespike,wf_alignt1toatlas,[
+    (wf_timeshiftanddespike,wf_alignboldtot1,[
         ('output.refimg','input.refimg')
     ]),
+    (wf_alignt1toatlas,wf_alignboldtot1,[
+        ('output.T1_0','input.T1_0'),
+    ]),
     (wf_alignt1toatlas,wf_alignboldtoatlas,[
-        ('output.noskull_at','input.noskull_at')
+        ('output.noskull_at','input.noskull_at'),
     ]),
     (wf_alignboldtot1,wf_alignboldtoatlas,[
         ('output.oblique_transform','input.oblique_transform'),

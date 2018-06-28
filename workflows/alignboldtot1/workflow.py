@@ -39,7 +39,7 @@ class alignboldtot1workflow(workflowgenerator):
             (self.dn.epi_3dcalc,self.dn.warp,[
                 ('out_file','card2oblique')
             ]),
-            (self.dn.select0T1,self.dn.warp,[
+            (self.dn.inputnode,self.dn.warp,[
                 ('T1_0','in_file')
             ]),
 

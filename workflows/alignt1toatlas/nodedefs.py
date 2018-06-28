@@ -50,7 +50,7 @@ class definednodes(basenodedefs):
         # define output node
         self.outputnode = Node(
             IdentityInterface(
-                fields=['noskull_at','t1_2_atlas_transform']
+                fields=['noskull_at','t1_2_atlas_transform','T1_0']
             ),
             name='output'
         )

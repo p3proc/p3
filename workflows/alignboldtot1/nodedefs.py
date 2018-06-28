@@ -23,7 +23,7 @@ class definednodes(basenodedefs):
         # define input node
         self.inputnode = Node(
             IdentityInterface(
-                fields=['refimg']
+                fields=['refimg','T1_0']
             ),
             name='input'
         )

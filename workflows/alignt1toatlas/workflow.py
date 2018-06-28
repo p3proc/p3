@@ -30,5 +30,8 @@ class alignt1toatlasworkflow(workflowgenerator):
             (self.dn.register,self.dn.outputnode,[
                 ('out_file','noskull_at'),
                 ('transform_file','t1_2_atlas_transform')
+            ]),
+            (self.dn.select0T1,self.dn.outputnode,[
+                ('T1_0','T1_0')
             ])
         ])
