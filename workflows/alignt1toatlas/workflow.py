@@ -1,14 +1,15 @@
 from nipype import Workflow
 from .nodedefs import definednodes
+from ..base import workflowgenerator
 
 class alignt1toatlasworkflow(workflowgenerator):
-    """ Defines the time shift and despike workflow
+    """ Defines the align t1 to atlas workflow
 
         TODO
 
     """
 
-    def __init__(name,settings):
+    def __init__(self,name,settings):
         # call base constructor
         super().__init__(name,settings)
 
@@ -18,14 +19,16 @@ class alignt1toatlasworkflow(workflowgenerator):
         # connect the workflow
         self.workflow.connect([ # connect nodes
             # Register the (1st) final skullstripped mprage to atlas
-            (p3.skullstripped_mprage,p3.select0T1,[
-                ('noskull','T1_list')
+            (self.dn.inputnode,self.dn.select0T1,[
+                ('T1','T1_list')
             ]),
-            (p3.select0T1,p3.register,[
+            (self.dn.select0T1,self.dn.register,[
                 ('T1_0','in_file')
             ]),
-            (p3.register,p3.skullstripped_atlas_mprage,[
+
+            # output to output node
+            (self.dn.register,self.dn.outputnode,[
                 ('out_file','noskull_at'),
-                ('transform_file','transform')
-            ]),
+                ('transform_file','t1_2_atlas_transform')
+            ])
         ])

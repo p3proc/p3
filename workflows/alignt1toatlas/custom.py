@@ -1,7 +1,6 @@
 """
     Define Custom Functions and Interfaces
 """
-from nipype.interfaces import afni,base,fsl
 
 # define custom register to atlas function (the afni interface in nipype sucks...)
 def register_atlas(in_file):

@@ -109,7 +109,7 @@ class definednodes(basenodedefs):
         # define output node
         self.outputnode = Node(
             IdentityInterface(
-                fields=['epi2epi1','firstframefirstrun','tcat']
+                fields=['epi2epi1','refimg','tcat']
             ),
             name='output'
         )

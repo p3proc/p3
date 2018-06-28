@@ -57,7 +57,7 @@ class timeshiftanddespikeworkflow(workflowgenerator):
                 ('oned_matrix_save','epi2epi1')
             ]),
             (self.dn.extractroi,self.dn.outputnode,[
-                ('roi_file','firstframefirstrun')
+                ('roi_file','refimg')
             ]),
             (self.dn.tshift,self.dn.outputnode,[
                 ('out_file','tcat')
