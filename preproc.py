@@ -52,8 +52,8 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
     (wf_bidsselector,wf_timeshiftanddespike,[
         ('output.epi','input.epi')
     ]),
-    (wf_bidsselector,wf_alignt1toatlas,[
-        ('output.T1','input.T1')
+    (wf_skullstrip,wf_alignt1toatlas,[
+        ('output.T1_skullstrip','input.T1_skullstrip')
     ]),
     (wf_timeshiftanddespike,wf_alignboldtot1,[
         ('output.refimg','input.refimg')

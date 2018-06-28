@@ -20,7 +20,7 @@ class alignt1toatlasworkflow(workflowgenerator):
         self.workflow.connect([ # connect nodes
             # Register the (1st) final skullstripped mprage to atlas
             (self.dn.inputnode,self.dn.select0T1,[
-                ('skullstripped_mprage','T1_list')
+                ('T1_skullstrip','T1_list')
             ]),
             (self.dn.select0T1,self.dn.register,[
                 ('T1_0','in_file')

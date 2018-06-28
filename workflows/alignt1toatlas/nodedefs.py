@@ -22,7 +22,7 @@ class definednodes(basenodedefs):
         # define input node
         self.inputnode = Node(
             IdentityInterface(
-                fields=['skullstripped_mprage']
+                fields=['T1_skullstrip']
             ),
             name='input'
         )

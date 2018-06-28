@@ -142,7 +142,7 @@ class definednodes(basenodedefs):
         # define output node
         self.outputnode = Node(
             IdentityInterface(
-                fields=['skullstripped_mprage']
+                fields=['T1_skullstrip']
             ),
             name='output'
         )

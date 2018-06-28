@@ -100,6 +100,6 @@ class skullstripworkflow(workflowgenerator):
 
             # output to output node
             (self.dn.maskop4,self.dn.outputnode,[
-                ('out_file','skullstripped_mprage')
+                ('out_file','T1_skullstrip')
             ]),
         ])
