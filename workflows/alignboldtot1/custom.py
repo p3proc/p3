@@ -33,7 +33,7 @@ def warp_custom(in_file,card2oblique,args=''):
             args,
             os.path.join(cwd,input_file)
         ),
-        stdout=subprocess.PIPE,l
+        stdout=subprocess.PIPE,
         shell=True
         )
     with open(os.path.join(cwd,"{}_obla2e_mat.1D".format(filename)),"w") as text_file:
