@@ -73,6 +73,7 @@ wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
         ('output.tcat','input.tcat'),
     ])
 ])
+wf.write_graph(graph2use='flat',simple_form=False)
+wf.write_graph(graph2use='colored')
 wf.run()
 #wf.run(plugin='MultiProc')
-wf.write_graph()

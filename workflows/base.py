@@ -37,32 +37,3 @@ class workflowgenerator:
     def __init__(self,name,settings):
         # define workflow name and path
         self.workflow = Workflow(name=name,base_dir=os.path.join(settings['BASE_DIR'],'tmp'))
-
-# class definednodes(basenodedefs):
-#     """Class initializing all nodes in workflow
-#
-#         TODO
-#
-#     """
-#
-#     def __init__(self,settings):
-#         """
-#             Initialize settings and define nodes
-#         """
-#
-#         # call base constructor
-#         super().__init__(settings)
-#
-#         # Output
-#         self.output = []
-#         for n in range(4):
-#             self.output.append(Node(
-#                 DataSink(
-#                     base_directory=self.BASE_DIR,
-#                     substitutions=[
-#                         ('_subject_id_',''),
-#                         ('_calc_calc_calc_calc_calc','')
-#                     ]
-#                 ),
-#                 name='output_{}'.format(n)
-#             ))
