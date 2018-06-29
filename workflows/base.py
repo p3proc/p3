@@ -18,11 +18,14 @@ class basenodedefs:
         self.SUBJECTS_DIR = os.path.join(self.BASE_DIR,'output','freesurfer_output')
         self.TMP_DIR = os.path.join(self.BASE_DIR,'tmp')
         self.REF_IMGS = os.path.join(self.BASE_DIR,'refimgs')
-        self.DATA_DIR = 'MSC_BIDS'
-        self.SUBJECT = 'MSC01'
+        self.DATA_DIR = settings['DATA_DIR']
+        self.OUTPUT_DIR = os.path.join(self.BASE_DIR,'output',settings['subject'])
+        self.SUBJECT = settings['subject']
 
         # make directories if not exist
         os.makedirs(self.SUBJECTS_DIR,exist_ok=True)
+        os.makedirs(os.path.join(self.SUBJECTS_DIR,'skullstrip'),exist_ok=True)
+        os.makedirs(self.OUTPUT_DIR,exist_ok=True)
         os.makedirs(self.TMP_DIR,exist_ok=True)
 
         # set number of initial frames to ignore

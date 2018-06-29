@@ -28,9 +28,6 @@ class reconallworkflow(workflowgenerator):
             (self.dn.inputnode,self.dn.recon1,[
                 ('T1','T1_files')
             ]),
-            (self.dn.inputnode,self.dn.reconall,[
-                ('T1','T1_files')
-            ]),
 
             # Convert orig and brainmask
             (self.dn.recon1,self.dn.orig_convert,[
@@ -48,3 +45,11 @@ class reconallworkflow(workflowgenerator):
                 ('out_file','brainmask')
             ]),
         ])
+
+        # run recon-all
+        if settings['run_recon_all']:
+            self.workflow.connect([ # connect recon-all node
+                (self.dn.inputnode,self.dn.reconall,[
+                    ('T1','T1_files')
+                ])
+            ])

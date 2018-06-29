@@ -16,13 +16,59 @@ class bidsselectorworkflow(workflowgenerator):
         # crete node definitions from settings
         self.dn = definednodes(settings)
 
-        # connect the workflow
-        self.workflow.connect([ # connect nodes
-            # output to output node
-            (self.dn.bidsselection,self.dn.outputnode,[
-                ('T1','T1')
-            ]),
-            (self.dn.bidsselection,self.dn.outputnode,[
-                ('epi','epi')
-            ]),
-        ])
+        # avg over all T1s if enabled
+        if settings['avgT1s']:
+            # connect the workflow
+            self.workflow.connect([ # connect nodes
+                # select T1 to reference to
+                (self.dn.bidsselection,self.dn.selectT1,[
+                    ('T1','T1')
+                ]),
+
+                # align T1s to each other
+                (self.dn.selectT1,self.dn.alignT1toT1,[
+                    ('T1_reference','reference'),
+                    ('T1_align','in_file')
+                ]),
+                (self.dn.selectT1,self.dn.mergeT1list,[
+                    ('T1_reference','in1'),
+                ]),
+                (self.dn.alignT1toT1,self.dn.mergeT1list,[
+                    ('out_file','in2'),
+                ]),
+                (self.dn.mergeT1list,self.dn.avgT1,[
+                    ('out','T1_list'),
+                ]),
+
+                # output to output node
+                (self.dn.avgT1,self.dn.outputnode,[
+                    ('avg_T1','T1')
+                ]),
+                (self.dn.bidsselection,self.dn.outputnode,[
+                    ('epi','epi')
+                ]),
+
+                # output QC
+                (self.dn.alignT1toT1,self.dn.qc_t1align,[
+                    ('out_file','container')
+                ]),
+                (self.dn.avgT1,self.dn.qc_t1avg,[
+                    ('avgT1','container')
+                ])
+            ])
+        else: # use only the selected reference frame
+            # connect the workflow
+            self.workflow.connect([ # connect nodes
+                # select T1 to reference to
+                (self.dn.bidsselection,self.dn.selectT1,[
+                    ('T1','T1')
+                ]),
+
+                # output to output node
+                (self.dn.selectT1,self.dn.outputnode,[
+                    ('T1_reference','T1')
+                ]),
+                (self.dn.bidsselection,self.dn.outputnode,[
+                    ('epi','epi')
+                ]),
+            ])

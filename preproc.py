@@ -15,7 +15,12 @@ import workflows.alignboldtoatlas.workflow as alignboldtoatlas
 """
 settings = {}
 settings['BASE_DIR'] = os.path.dirname(os.path.realpath(__file__))
-settings['ignoreframes'] = 4
+settings['DATA_DIR'] = 'MSC_BIDS'
+settings['subject'] = 'MSC01'
+settings['ignoreframes'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
+settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
+settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
+settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own freesurfer data under output freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
 config.set('logging','workflow_level','DEBUG')
 config.set('logging','workflow_level','DEBUG')
 config.set('execution','hash_method','content')
@@ -36,7 +41,7 @@ wf_alignboldtoatlas = alignboldtoatlas.alignboldtoatlasworkflow('alignboldtoatla
 
 # create a workflow
 wf = Workflow(name='P3',base_dir=os.path.join(settings['BASE_DIR'],'tmp'))
-wf.connect([ # connect nodes (see nodedefs.py for further details on each node)
+wf.connect([ # connect nodes
     (wf_bidsselector,wf_reconall,[
         ('output.T1','input.T1')
     ]),

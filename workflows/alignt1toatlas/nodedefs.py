@@ -27,7 +27,7 @@ class definednodes(basenodedefs):
             name='input'
         )
 
-        # Get only first T1 (TODO: align other T1 images to this first T1)
+        # Convert from list to string input
         self.select0T1 = Node(
             Function(
                 input_names=['T1_list'],

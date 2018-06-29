@@ -5,9 +5,11 @@ TODO
 """
 import os
 from ..base import basenodedefs
-from nipype.interfaces.io import BIDSDataGrabber
-from nipype.interfaces.utility import IdentityInterface
-from nipype import Node
+from .custom import *
+from nipype.interfaces import afni
+from nipype.interfaces.io import BIDSDataGrabber,DataSink
+from nipype.interfaces.utility import IdentityInterface,Merge,Function
+from nipype import Node,MapNode
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -38,10 +40,67 @@ class definednodes(basenodedefs):
             name='bidsselection'
         )
 
+        # select T1 to align to
+        self.selectT1 = Node(
+            Function(
+                input_names=['T1','refnum'],
+                output_names=['T1_reference','T1_align'],
+                function=lambda T1,refnum: (T1[refnum],[img for idx,img in enumerate(T1) if idx!=refnum])
+            ),
+            name='selectT1'
+        )
+        self.selectT1.inputs.refnum = settings['T1_reference']
+
+        # create node for aligning multiple T1 images to T1 reference
+        self.alignT1toT1 = MapNode(
+            afni.Allineate(
+                outputtype='NIFTI_GZ',
+            ),
+            iterfield=['in_file'],
+            name='alignT1toT1'
+        )
+
+        # merge T1s into single list
+        self.mergeT1list = Node(
+            Merge(
+                numinputs=2,
+                ravel_inputs=True
+            ),
+            name='mergeT1list'
+        )
+
+        # avg all T1s
+        self.avgT1 = Node(
+            Function(
+                input_names=['T1_list'],
+                output_names=['avg_T1'],
+                function=avgT1s
+            ),
+            name='avgT1'
+        )
+
         # define output node
         self.outputnode = Node(
             IdentityInterface(
                 fields=['T1','epi']
             ),
             name='output'
+        )
+
+        # define QC nodes
+
+        # output each individual alignment to reference T1
+        self.qc_t1align = Node(
+            DataSink(
+                base_directory=self.OUTPUT_DIR,
+            ),
+            name='QC_T1align'
+        )
+
+        # output avg t1 alignment image
+        self.qc_t1avg = Node(
+            DataSink(
+                base_directory=self.OUTPUT_DIR,
+            ),
+            name='QC_T1avg'
         )
