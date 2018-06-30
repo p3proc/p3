@@ -7,7 +7,7 @@ import os
 from ..base import basenodedefs
 from .custom import *
 from nipype.interfaces import afni
-from nipype.interfaces.io import BIDSDataGrabber,DataSink
+from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import IdentityInterface,Merge,Function
 from nipype import Node,MapNode
 
@@ -85,22 +85,4 @@ class definednodes(basenodedefs):
                 fields=['T1','epi']
             ),
             name='output'
-        )
-
-        # define QC nodes
-
-        # output each individual alignment to reference T1
-        self.qc_t1align = Node(
-            DataSink(
-                base_directory=self.OUTPUT_DIR,
-            ),
-            name='QC_T1align'
-        )
-
-        # output avg t1 alignment image
-        self.qc_t1avg = Node(
-            DataSink(
-                base_directory=self.OUTPUT_DIR,
-            ),
-            name='QC_T1avg'
         )

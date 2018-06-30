@@ -5,6 +5,8 @@ TODO
 """
 import os
 from nipype import Workflow
+from nipype import Node
+from nipype.interfaces.io import DataSink
 
 class basenodedefs:
     """Base class for initializing nodes in workflow
@@ -13,6 +15,7 @@ class basenodedefs:
 
     """
     def __init__(self,settings):
+        #TODO: Use settings directly rather than using intermediary variables
         # Define several directories to use
         self.BASE_DIR = settings['BASE_DIR']
         self.SUBJECTS_DIR = os.path.join(self.BASE_DIR,'output','freesurfer_output')
@@ -30,6 +33,14 @@ class basenodedefs:
 
         # set number of initial frames to ignore
         self.IGNOREFRAMES = settings['ignoreframes']
+
+        # Define QC output node
+        self.QC = Node(
+            DataSink(
+                base_directory=os.path.join(settings['BASE_DIR'],'output',settings['subject'])
+            ),
+            name='QCoutput' 
+        )
 
 class workflowgenerator:
     """ Base class defining a workflow

@@ -49,11 +49,11 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # output QC
-                (self.dn.alignT1toT1,self.dn.qc_t1align,[
-                    ('out_file','container')
+                (self.dn.alignT1toT1,self.dn.QC,[
+                    ('out_file','QC.alignT1toT1.@T1align')
                 ]),
-                (self.dn.avgT1,self.dn.qc_t1avg,[
-                    ('avgT1','container')
+                (self.dn.avgT1,self.dn.QC,[
+                    ('avg_T1','QC.alignT1toT1.@T1avg')
                 ])
             ])
         else: # use only the selected reference frame
