@@ -84,6 +84,19 @@ def main():
         Settings
     """
 
+    # print really cool graphic
+    print('\n'
+    '                  ad888888b,\n'
+    '                 d8\"     \"88\n'
+    '                         a8P\n'
+    '    8b,dPPYba,        aad8\"\n'
+    '    88P\'    \"8a       \"\"Y8,\n'
+    '    88       d8          \"8b\n'
+    '    88b,   ,a8\"  Y8,     a88\n'
+    '    88`YbbdP\"\'    \"Y888888P\'\n'
+    '    88\n'
+    '    88\n')
+
     # get the current directory
     cwd = os.getcwd()
 
@@ -115,8 +128,7 @@ def main():
     parser.add_argument('-s', '--settings', help='A JSON settings file that specifies how the pipeline '
                         'should be configured. If no settings file is provided, the pipeline will use '
                         'internally specified defaults. See docs for more help details.')
-    gen_set = parser.add_mutually_exclusive_group()
-    gen_set.add_argument('-g', '--generate_settings', help='Generates a default settings file in the '
+    parser.add_argument('-g', '--generate_settings', help='Generates a default settings file in the '
                         'current working directory for use/modification. This option will ignore all other '
                         'arguments.',
                         action='store_true')
@@ -131,7 +143,8 @@ def main():
 
     # check if bids_dir/output_dir is defined
     if not args.bids_dir or not args.output_dir:
-        print('Positional arguments bids_dir/output_dir are required.')
+        parser.print_usage()
+        print('p3: error: positional arguments bids_dir/output_dir are required.')
         sys.exit(1)
 
     # # only for a subset of subjects
