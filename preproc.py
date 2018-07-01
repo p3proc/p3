@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 """
-    An extensible pipeline in nipype
+    An extensible pipeline in python
 """
 import os
 import sys
