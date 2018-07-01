@@ -1,6 +1,6 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from ..base import workflowgenerator
+from p3.base import workflowgenerator
 
 class alignboldtot1workflow(workflowgenerator):
     """ Defines the time shift and despike workflow
@@ -9,72 +9,75 @@ class alignboldtot1workflow(workflowgenerator):
 
     """
 
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # call base constructor
-        super().__init__(name,settings)
+        super().__new__(cls,name,settings)
 
         # crete node definitions from settings
-        self.dn = definednodes(settings)
+        dn = definednodes(settings)
 
         # connect the workflow
-        self.workflow.connect([ # connect nodes
+        cls.workflow.connect([ # connect nodes
             # Skullstrip the EPI image
-            (self.dn.inputnode,self.dn.epi_skullstrip,[
+            (dn.inputnode,dn.epi_skullstrip,[
                 ('refimg','in_file')
             ]),
-            (self.dn.inputnode,self.dn.epi_automask,[
+            (dn.inputnode,dn.epi_automask,[
                 ('refimg','in_file')
             ]),
-            (self.dn.epi_automask,self.dn.epi_3dcalc,[
+            (dn.epi_automask,dn.epi_3dcalc,[
                 ('brain_file','in_file_a')
             ]),
-            (self.dn.epi_skullstrip,self.dn.epi_3dcalc,[
+            (dn.epi_skullstrip,dn.epi_3dcalc,[
                 ('out_file','in_file_b')
             ]),
-            (self.dn.inputnode,self.dn.epi_3dcalc,[
+            (dn.inputnode,dn.epi_3dcalc,[
                 ('refimg','in_file_c')
             ]),
 
             # deoblique
-            (self.dn.epi_3dcalc,self.dn.warp,[
+            (dn.epi_3dcalc,dn.warp,[
                 ('out_file','card2oblique')
             ]),
-            (self.dn.inputnode,self.dn.warp,[
+            (dn.inputnode,dn.warp,[
                 ('T1_0','in_file')
             ]),
 
             # resample the EPIREF to MPRAGE
-            (self.dn.warp,self.dn.resample,[
+            (dn.warp,dn.resample,[
                 ('out_file','master')
             ]),
-            (self.dn.epi_3dcalc,self.dn.resample,[
+            (dn.epi_3dcalc,dn.resample,[
                 ('out_file','in_file')
             ]),
 
             # create weightmask
-            (self.dn.resample,self.dn.weightmask,[
+            (dn.resample,dn.weightmask,[
                 ('out_file','in_file')
             ]),
-            (self.dn.epi_3dcalc,self.dn.weightmask,[
+            (dn.epi_3dcalc,dn.weightmask,[
                 ('out_file','no_skull')
             ]),
 
             # register mprage to tcat
-            (self.dn.weightmask,self.dn.registert12tcat,[
+            (dn.weightmask,dn.registert12tcat,[
                 ('out_file','weight')
             ]),
-            (self.dn.resample,self.dn.registert12tcat,[
+            (dn.resample,dn.registert12tcat,[
                 ('out_file','reference')
             ]),
-            (self.dn.warp,self.dn.registert12tcat,[
+            (dn.warp,dn.registert12tcat,[
                 ('out_file','in_file')
             ]),
 
             # output to output node
-            (self.dn.registert12tcat,self.dn.outputnode,[
+            (dn.registert12tcat,dn.outputnode,[
                 ('out_matrix','t1_2_epi')
             ]),
-            (self.dn.warp,self.dn.outputnode,[
+            (dn.warp,dn.outputnode,[
                 ('ob_transform','oblique_transform')
             ]),
         ])
+
+        # return workflow
+        return cls.workflow

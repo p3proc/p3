@@ -1,55 +1,58 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from ..base import workflowgenerator
+from p3.base import workflowgenerator
 
-class reconallworkflow(workflowgenerator):
-    """ Defines the freesurfer reconall workflow
+class freesurferworkflow(workflowgenerator):
+    """ Defines the freesurfer  workflow
 
         TODO
 
     """
 
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # call base constructor
-        super().__init__(name,settings)
+        super().__new__(cls,name,settings)
 
         # crete node definitions from settings
-        self.dn = definednodes(settings)
+        dn = definednodes(settings)
 
         # connect the workflow
-        self.workflow.connect([ # connect nodes
+        cls.workflow.connect([ # connect nodes
             ### Recon-all
-            (self.dn.inputnode,self.dn.t1names,[
+            (dn.inputnode,dn.t1names,[
                 ('T1','T1')
             ]),
-            (self.dn.t1names,self.dn.recon1,[
+            (dn.t1names,dn.recon1,[
                 ('T1name','subject_id')
             ]),
-            (self.dn.inputnode,self.dn.recon1,[
+            (dn.inputnode,dn.recon1,[
                 ('T1','T1_files')
             ]),
 
             # Convert orig and brainmask
-            (self.dn.recon1,self.dn.orig_convert,[
+            (dn.recon1,dn.orig_convert,[
                 ('orig','in_file')
             ]),
-            (self.dn.recon1,self.dn.brainmask_convert,[
+            (dn.recon1,dn.brainmask_convert,[
                 ('brainmask','in_file')
             ]),
 
             # output to output node
-            (self.dn.orig_convert,self.dn.outputnode,[
+            (dn.orig_convert,dn.outputnode,[
                 ('out_file','orig')
             ]),
-            (self.dn.brainmask_convert,self.dn.outputnode,[
+            (dn.brainmask_convert,dn.outputnode,[
                 ('out_file','brainmask')
             ]),
         ])
 
         # run recon-all
         if settings['run_recon_all']:
-            self.workflow.connect([ # connect recon-all node
-                (self.dn.inputnode,self.dn.reconall,[
+            cls.workflow.connect([ # connect recon-all node
+                (dn.inputnode,dn.reconall,[
                     ('T1','T1_files')
                 ])
             ])
+
+        # return workflow
+        return cls.workflow

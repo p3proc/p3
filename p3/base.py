@@ -34,12 +34,12 @@ class basenodedefs:
         # set number of initial frames to ignore
         self.IGNOREFRAMES = settings['ignoreframes']
 
-        # Define QC output node
-        self.QC = Node(
+        # Define datasink node
+        self.datasink = Node(
             DataSink(
                 base_directory=os.path.join(settings['BASE_DIR'],'output',settings['subject'])
             ),
-            name='QCoutput' 
+            name='datasink'
         )
 
 class workflowgenerator:
@@ -48,6 +48,6 @@ class workflowgenerator:
         TODO
 
     """
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # define workflow name and path
-        self.workflow = Workflow(name=name,base_dir=os.path.join(settings['BASE_DIR'],'tmp'))
+        cls.workflow = Workflow(name=name,base_dir=os.path.join(settings['BASE_DIR'],'tmp'))

@@ -1,6 +1,6 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from ..base import workflowgenerator
+from p3.base import workflowgenerator
 
 class timeshiftanddespikeworkflow(workflowgenerator):
     """ Defines the time shift and despike workflow
@@ -9,57 +9,60 @@ class timeshiftanddespikeworkflow(workflowgenerator):
 
     """
 
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # call base constructor
-        super().__init__(name,settings)
+        super().__new__(cls,name,settings)
 
         # crete node definitions from settings
-        self.dn = definednodes(settings)
+        dn = definednodes(settings)
 
         # connect the workflow
-        self.workflow.connect([ # connect nodes
+        cls.workflow.connect([ # connect nodes
             ### Extract Slice timing info + TR
-            (self.dn.inputnode,self.dn.extract_stc,[
+            (dn.inputnode,dn.extract_stc,[
                 ('epi','epi')
             ]),
 
             ### Time Shift/Despiking
-            (self.dn.inputnode,self.dn.despike,[ # despike
+            (dn.inputnode,dn.despike,[ # despike
                 ('epi','in_file')
             ]),
-            (self.dn.despike,self.dn.tshift,[ # time shift
+            (dn.despike,dn.tshift,[ # time shift
                 ('out_file','in_file')
             ]),
-            (self.dn.extract_stc,self.dn.tshift,[
+            (dn.extract_stc,dn.tshift,[
                 ('slicetiming','tpattern'),
                 ('TR','tr')
             ]),
 
             ### Setup basefile for motion correction
-            (self.dn.inputnode,self.dn.firstrunonly,[
+            (dn.inputnode,dn.firstrunonly,[
                 ('epi','epi')
             ]),
-            (self.dn.firstrunonly,self.dn.extractroi,[
+            (dn.firstrunonly,dn.extractroi,[
                 ('epi','in_file')
             ]),
 
             ### Do the actual motion correction
             # Align to first frame of first run
-            (self.dn.extractroi,self.dn.volreg,[
+            (dn.extractroi,dn.volreg,[
                 ('roi_file','basefile')
             ]),
-            (self.dn.tshift,self.dn.volreg,[
+            (dn.tshift,dn.volreg,[
                 ('out_file','in_file')
             ]),
 
             # output to output node
-            (self.dn.volreg,self.dn.outputnode,[
+            (dn.volreg,dn.outputnode,[
                 ('oned_matrix_save','epi2epi1')
             ]),
-            (self.dn.extractroi,self.dn.outputnode,[
+            (dn.extractroi,dn.outputnode,[
                 ('roi_file','refimg')
             ]),
-            (self.dn.tshift,self.dn.outputnode,[
+            (dn.tshift,dn.outputnode,[
                 ('out_file','tcat')
             ])
         ])
+
+        # return workflow
+        return cls.workflow

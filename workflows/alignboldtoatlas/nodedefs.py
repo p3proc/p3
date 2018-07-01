@@ -3,7 +3,7 @@
 TODO
 
 """
-from ..base import basenodedefs
+from p3.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni

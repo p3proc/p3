@@ -1,6 +1,6 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from ..base import workflowgenerator
+from p3.base import workflowgenerator
 
 class alignt1toatlasworkflow(workflowgenerator):
     """ Defines the align t1 to atlas workflow
@@ -9,29 +9,32 @@ class alignt1toatlasworkflow(workflowgenerator):
 
     """
 
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # call base constructor
-        super().__init__(name,settings)
+        super().__new__(cls,name,settings)
 
         # crete node definitions from settings
-        self.dn = definednodes(settings)
+        dn = definednodes(settings)
 
         # connect the workflow
-        self.workflow.connect([ # connect nodes
+        cls.workflow.connect([ # connect nodes
             # Register the (1st) final skullstripped mprage to atlas
-            (self.dn.inputnode,self.dn.select0T1,[
+            (dn.inputnode,dn.select0T1,[
                 ('T1_skullstrip','T1_list')
             ]),
-            (self.dn.select0T1,self.dn.register,[
+            (dn.select0T1,dn.register,[
                 ('T1_0','in_file')
             ]),
 
             # output to output node
-            (self.dn.register,self.dn.outputnode,[
+            (dn.register,dn.outputnode,[
                 ('out_file','noskull_at'),
                 ('transform_file','t1_2_atlas_transform')
             ]),
-            (self.dn.select0T1,self.dn.outputnode,[
+            (dn.select0T1,dn.outputnode,[
                 ('T1_0','T1_0')
             ])
         ])
+
+        # return workflow
+        return cls.workflow

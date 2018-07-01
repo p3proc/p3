@@ -1,6 +1,6 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from ..base import workflowgenerator
+from p3.base import workflowgenerator
 
 class bidsselectorworkflow(workflowgenerator):
     """ Defines the bids selector workflow
@@ -9,66 +9,69 @@ class bidsselectorworkflow(workflowgenerator):
 
     """
 
-    def __init__(self,name,settings):
+    def __new__(cls,name,settings):
         # call base constructor
-        super().__init__(name,settings)
+        super().__new__(cls,name,settings)
 
         # crete node definitions from settings
-        self.dn = definednodes(settings)
+        dn = definednodes(settings)
 
         # avg over all T1s if enabled
         if settings['avgT1s']:
             # connect the workflow
-            self.workflow.connect([ # connect nodes
+            cls.workflow.connect([ # connect nodes
                 # select T1 to reference to
-                (self.dn.bidsselection,self.dn.selectT1,[
+                (dn.bidsselection,dn.selectT1,[
                     ('T1','T1')
                 ]),
 
                 # align T1s to each other
-                (self.dn.selectT1,self.dn.alignT1toT1,[
+                (dn.selectT1,dn.alignT1toT1,[
                     ('T1_reference','reference'),
                     ('T1_align','in_file')
                 ]),
-                (self.dn.selectT1,self.dn.mergeT1list,[
+                (dn.selectT1,dn.mergeT1list,[
                     ('T1_reference','in1'),
                 ]),
-                (self.dn.alignT1toT1,self.dn.mergeT1list,[
+                (dn.alignT1toT1,dn.mergeT1list,[
                     ('out_file','in2'),
                 ]),
-                (self.dn.mergeT1list,self.dn.avgT1,[
+                (dn.mergeT1list,dn.avgT1,[
                     ('out','T1_list'),
                 ]),
 
                 # output to output node
-                (self.dn.avgT1,self.dn.outputnode,[
+                (dn.avgT1,dn.outputnode,[
                     ('avg_T1','T1')
                 ]),
-                (self.dn.bidsselection,self.dn.outputnode,[
+                (dn.bidsselection,dn.outputnode,[
                     ('epi','epi')
                 ]),
 
                 # output QC
-                (self.dn.alignT1toT1,self.dn.QC,[
+                (dn.alignT1toT1,dn.datasink,[
                     ('out_file','QC.alignT1toT1.@T1align')
                 ]),
-                (self.dn.avgT1,self.dn.QC,[
+                (dn.avgT1,dn.datasink,[
                     ('avg_T1','QC.alignT1toT1.@T1avg')
                 ])
             ])
         else: # use only the selected reference frame
             # connect the workflow
-            self.workflow.connect([ # connect nodes
+            cls.workflow.connect([ # connect nodes
                 # select T1 to reference to
-                (self.dn.bidsselection,self.dn.selectT1,[
+                (dn.bidsselection,dn.selectT1,[
                     ('T1','T1')
                 ]),
 
                 # output to output node
-                (self.dn.selectT1,self.dn.outputnode,[
+                (dn.selectT1,dn.outputnode,[
                     ('T1_reference','T1')
                 ]),
-                (self.dn.bidsselection,self.dn.outputnode,[
+                (dn.bidsselection,dn.outputnode,[
                     ('epi','epi')
                 ]),
             ])
+
+        # return workflow
+        return cls.workflow
