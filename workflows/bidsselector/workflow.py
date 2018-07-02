@@ -20,11 +20,6 @@ class bidsselectorworkflow(workflowgenerator):
         if settings['avgT1s']:
             # connect the workflow
             cls.workflow.connect([ # connect nodes
-                # select T1 to reference to
-                (dn.bidsselection,dn.selectT1,[
-                    ('T1','T1')
-                ]),
-
                 # align T1s to each other
                 (dn.selectT1,dn.alignT1toT1,[
                     ('T1_reference','reference'),
@@ -44,11 +39,11 @@ class bidsselectorworkflow(workflowgenerator):
                 (dn.avgT1,dn.outputnode,[
                     ('avg_T1','T1')
                 ]),
-                (dn.bidsselection,dn.outputnode,[
-                    ('epi','epi')
-                ]),
 
                 # output QC
+                (dn.inputnode,dn.datasink,[
+                    ('subject','container')
+                ]),
                 (dn.alignT1toT1,dn.datasink,[
                     ('out_file','QC.alignT1toT1.@T1align')
                 ]),
@@ -59,19 +54,32 @@ class bidsselectorworkflow(workflowgenerator):
         else: # use only the selected reference frame
             # connect the workflow
             cls.workflow.connect([ # connect nodes
-                # select T1 to reference to
-                (dn.bidsselection,dn.selectT1,[
-                    ('T1','T1')
-                ]),
-
                 # output to output node
                 (dn.selectT1,dn.outputnode,[
                     ('T1_reference','T1')
-                ]),
-                (dn.bidsselection,dn.outputnode,[
-                    ('epi','epi')
-                ]),
+                ])
             ])
+
+        # connect nodes common to both options
+        cls.workflow.connect([
+            # specify subject to process
+            (dn.inputnode,dn.bidsselection,[
+                ('subject','subject')
+            ]),
+
+            # select T1 to reference to
+            (dn.bidsselection,dn.selectT1,[
+                ('T1','T1')
+            ]),
+
+            # set outputs
+            (dn.bidsselection,dn.outputnode,[
+                ('epi','epi')
+            ]),
+            (dn.inputnode,dn.outputnode,[
+                ('subject','subject')
+            ])
+        ])
 
         # return workflow
         return cls.workflow

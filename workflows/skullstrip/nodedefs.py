@@ -6,7 +6,7 @@ TODO
 from p3.base import basenodedefs
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
-from nipype.interfaces.utility import IdentityInterface,Function
+from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -19,21 +19,9 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['T1','orig','brainmask']
-            ),
-            name='input'
-        )
-
-        # identity interface for inputting T1 images
-        self.T1imgs = Node(
-            IdentityInterface(
-                fields=['T1']
-            ),
-            name='T1imgs'
-        )
+        # define input/output node
+        self.set_input(['T1','orig','brainmask'])
+        self.set_output(['T1_skullstrip'])
 
         # 3dAllineate (FSorig)
         self.allineate_orig = MapNode(
@@ -137,12 +125,4 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_file_a','in_file_b','in_file_c'],
             name='maskop4'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['T1_skullstrip']
-            ),
-            name='output'
         )

@@ -8,7 +8,7 @@ from p3.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
-from nipype.interfaces.utility import IdentityInterface,Function
+from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -21,13 +21,9 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['epi']
-            ),
-            name='input'
-        )
+        # define input/output node
+        self.set_input(['epi'])
+        self.set_output(['epi2epi1','refimg','tcat'])
 
         # extract slice timing so we can pass it to slice time correction
         self.extract_stc = MapNode(
@@ -39,13 +35,13 @@ class definednodes(basenodedefs):
             iterfield=['epi'],
             name='extract_slicetime'
         )
-        self.extract_stc.inputs.bids_dir = os.path.join(self.BASE_DIR,self.DATA_DIR)
+        self.extract_stc.inputs.bids_dir = os.path.join(settings['bids_dir'])
 
         # Despike epi data (create 2 for permutations with slice time correction)
         self.despike = MapNode(
             ExtendedDespike(
                 args="-ignore {} -NEW -nomask".format(
-                    self.IGNOREFRAMES
+                    settings['epi_reference']
                 ),
                 outputtype="NIFTI_GZ"
             ),
@@ -57,7 +53,7 @@ class definednodes(basenodedefs):
         self.tshift = MapNode(
             afni.TShift(
                 args="-heptic",
-                ignore=self.IGNOREFRAMES,
+                ignore=settings['epi_reference'],
                 tzero=0,
                 outputtype="NIFTI_GZ"
             ),
@@ -77,19 +73,11 @@ class definednodes(basenodedefs):
 
         self.extractroi = Node( # get reference frame of first run
             fsl.ExtractROI(
-                t_min=self.IGNOREFRAMES,
+                t_min=settings['epi_reference'],
                 t_size=1,
                 output_type='NIFTI_GZ'
             ),
             name='extractroi'
-        )
-
-        # Create Named Output for first frame alignment (first run only)
-        self.firstframefirstrun = Node(
-            IdentityInterface(
-                fields=['refimg']
-            ),
-            name='firstframefirstrun'
         )
 
         # Motion correction (create 10 nodes for different permutations of inputs)
@@ -104,12 +92,4 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_file'],
             name='volreg'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['epi2epi1','refimg','tcat']
-            ),
-            name='output'
         )

@@ -6,7 +6,7 @@ TODO
 from p3.base import basenodedefs
 from .custom import *
 from nipype import Node
-from nipype.interfaces.utility import IdentityInterface,Function
+from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -19,13 +19,9 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['T1_skullstrip']
-            ),
-            name='input'
-        )
+        # define input/output node
+        self.set_input(['T1_skullstrip'])
+        self.set_output(['noskull_at','t1_2_atlas_transform','T1_0'])
 
         # Convert from list to string input
         self.select0T1 = Node(
@@ -45,12 +41,4 @@ class definednodes(basenodedefs):
                 function=register_atlas
             ),
             name='atlasregister'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['noskull_at','t1_2_atlas_transform','T1_0']
-            ),
-            name='output'
         )

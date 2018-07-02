@@ -8,7 +8,7 @@ from p3.base import basenodedefs
 from .custom import *
 from nipype.interfaces import afni
 from nipype.interfaces.io import BIDSDataGrabber
-from nipype.interfaces.utility import IdentityInterface,Merge,Function
+from nipype.interfaces.utility import Merge,Function
 from nipype import Node,MapNode
 
 class definednodes(basenodedefs):
@@ -22,11 +22,17 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
+        # define output node
+        self.set_input(['subject'])
+        self.set_output(['T1','epi','subject'])
+
+        # parametrize subject for multiple subject processing
+        self.inputnode.iterables = ('subject',settings['subject'])
+
         # Get BIDs dataset and organize data for input
         self.bidsselection = Node(
             BIDSDataGrabber(
-                base_dir=os.path.join(self.BASE_DIR,self.DATA_DIR),
-                subject=self.SUBJECT,
+                base_dir=settings['bids_dir'],
                 output_query={
                     'T1':{
                         'type':'T1w'
@@ -77,12 +83,4 @@ class definednodes(basenodedefs):
                 function=avgT1s
             ),
             name='avgT1'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['T1','epi']
-            ),
-            name='output'
         )

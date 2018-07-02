@@ -8,7 +8,6 @@ from p3.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import freesurfer
-from nipype.interfaces.utility import IdentityInterface
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -20,13 +19,14 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['T1']
-            ),
-            name='input'
-        )
+        # Define freesurfer directory
+        self.freesurfer_dir = os.path.join(settings['output_dir'],'freesurfer')
+        os.makedirs(self.freesurfer_dir,exist_ok=True)
+        os.makedirs(os.path.join(self.freesurfer_dir,'skullstrip'),exist_ok=True)
+
+        # define input/output node
+        self.set_input(['T1','subject'])
+        self.set_output(['orig','brainmask'])
 
         # get names of t1
         self.t1names = MapNode(
@@ -43,7 +43,7 @@ class definednodes(basenodedefs):
         self.recon1 = MapNode( # for T1 mask
             freesurfer.ReconAll(
                 directive='autorecon1',
-                subjects_dir=os.path.join(self.SUBJECTS_DIR,'skullstrip'),
+                subjects_dir=os.path.join(self.freesurfer_dir,'skullstrip'),
                 parallel=True,
                 openmp=4
             ),
@@ -53,13 +53,13 @@ class definednodes(basenodedefs):
         self.reconall = Node(
             freesurfer.ReconAll(
                 directive='all',
-                subjects_dir=self.SUBJECTS_DIR,
+                subjects_dir=self.freesurfer_dir,
                 parallel=True,
                 openmp=4
             ),
             name='reconall'
         )
-        self.reconall.inputs.subject_id = self.SUBJECT
+
         # MRIConvert
         self.orig_convert = MapNode(
             freesurfer.MRIConvert(
@@ -76,12 +76,4 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_file'],
             name='brainmask_mriconvert'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['orig','brainmask']
-            ),
-            name='output'
         )

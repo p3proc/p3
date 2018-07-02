@@ -50,7 +50,8 @@ class freesurferworkflow(workflowgenerator):
         if settings['run_recon_all']:
             cls.workflow.connect([ # connect recon-all node
                 (dn.inputnode,dn.reconall,[
-                    ('T1','T1_files')
+                    ('T1','T1_files'),
+                    ('subject','subject_id')
                 ])
             ])
 

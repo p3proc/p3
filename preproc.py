@@ -4,6 +4,7 @@
 """
 import os
 import sys
+from glob import glob
 from nipype import Workflow,config,logging
 import importlib
 import argparse
@@ -38,10 +39,11 @@ def create_and_run_p3_workflow(imported_workflows,settings):
                 pass # skip over non-workflow object
 
     # create a workflow
-    p3 = Workflow(name='P3',base_dir=os.path.join(settings['BASE_DIR'],'tmp'))
+    p3 = Workflow(name='P3',base_dir=settings['tmp_dir'])
     p3.connect([ # connect nodes
         (subworkflows['bidsselector'],subworkflows['freesurfer'],[
-            ('output.T1','input.T1')
+            ('output.T1','input.T1'),
+            ('output.subject','input.subject')
         ]),
         (subworkflows['bidsselector'],subworkflows['skullstrip'],[
             ('output.T1','input.T1')
@@ -76,7 +78,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     ])
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
-    #p3.run()
+    p3.run()
     #p3.run(plugin='MultiProc')
 
 def main():
@@ -147,23 +149,20 @@ def main():
         print('p3: error: positional arguments bids_dir/output_dir are required.')
         sys.exit(1)
 
-    # # only for a subset of subjects
-    # if args.participant_label:
-    #     subjects_to_analyze = args.participant_label
-    # # for all subjects
-    # else:
-    #     subject_dirs = glob(os.path.join(args.bids_dir, "sub-*"))
-    #     subjects_to_analyze = [subject_dir.split("-")[-1] for subject_dir in subject_dirs]
+    # only for a subset of subjects
+    if args.participant_label:
+        subjects_to_analyze = args.participant_label
+    # for all subjects
+    else:
+        subject_dirs = glob(os.path.join(args.bids_dir, "sub-*"))
+        subjects_to_analyze = [subject_dir.split("-")[-1] for subject_dir in subject_dirs]
 
     # running participant level
     if args.analysis_level == "participant":
 
         # define default settings
         settings = {}
-        settings['BASE_DIR'] = os.path.dirname(os.path.realpath(__file__))
-        settings['DATA_DIR'] = 'MSC_BIDS'
-        settings['subject'] = 'MSC01'
-        settings['ignoreframes'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
+        settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
         settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
         settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
         settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own freesurfer data under output freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
@@ -179,6 +178,16 @@ def main():
         imported_workflows = {}
         for module in settings['workflows']:
             imported_workflows[module] = importlib.import_module('{}.workflow'.format(module))
+
+        # add command line params to settings
+        settings['subject'] = subjects_to_analyze
+        settings['bids_dir'] = os.path.abspath(args.bids_dir)
+        settings['output_dir'] = os.path.abspath(args.output_dir)
+        settings['tmp_dir'] = os.path.join(settings['output_dir'],'tmp')
+
+        # make directories if not exist
+        os.makedirs(settings['output_dir'],exist_ok=True)
+        os.makedirs(settings['tmp_dir'],exist_ok=True)
 
         # construct and execute workflow
         create_and_run_p3_workflow(imported_workflows,settings)

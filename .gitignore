@@ -101,7 +101,7 @@ ENV/
 .mypy_cache/
 
 # add test dataset
-/dataset
+/CTS_BIDS
 /MSC_BIDS
 /P3
 

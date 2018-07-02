@@ -7,7 +7,7 @@ from p3.base import basenodedefs
 from .custom import *
 from nipype import Node
 from nipype.interfaces import afni,fsl
-from nipype.interfaces.utility import IdentityInterface,Function
+from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -20,13 +20,9 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['refimg','T1_0']
-            ),
-            name='input'
-        )
+        # define input/output node
+        self.set_input(['refimg','T1_0'])
+        self.set_output(['t1_2_epi','oblique_transform'])
 
         # Skullstrip the EPI image
         self.epi_skullstrip = Node(
@@ -96,12 +92,4 @@ class definednodes(basenodedefs):
                 outputtype='NIFTI_GZ'
             ),
             name='registert1totcat'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['t1_2_epi','oblique_transform']
-            ),
-            name='output'
         )

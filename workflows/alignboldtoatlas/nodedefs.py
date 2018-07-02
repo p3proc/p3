@@ -7,7 +7,7 @@ from p3.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni
-from nipype.interfaces.utility import IdentityInterface,Function
+from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -20,13 +20,9 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # define input node
-        self.inputnode = Node(
-            IdentityInterface(
-                fields=['noskull_at','oblique_transform','t1_2_epi','epi2epi1','tcat']
-            ),
-            name='input'
-        )
+        # define input/output node
+        self.set_input(['noskull_at','oblique_transform','t1_2_epi','epi2epi1','tcat'])
+        self.set_output(['epi_at'])
 
         # Create transform
         self.transformepi2epi2mpr2atl = MapNode(
@@ -48,12 +44,4 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_matrix','in_file'],
             name='alignepi2atl'
-        )
-
-        # define output node
-        self.outputnode = Node(
-            IdentityInterface(
-                fields=['epi_at']
-            ),
-            name='output'
         )

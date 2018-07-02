@@ -8,8 +8,8 @@ def warp_custom(in_file,card2oblique,args=''):
     import subprocess
     import shutil
 
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+    # save to node folder
+    cwd = os.getcwd()
 
     # copy file to cwd
     input_file = os.path.basename(shutil.copy2(in_file,cwd))
@@ -51,8 +51,8 @@ def create_weightmask(in_file,no_skull):
     import os
     import shutil
 
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+    # save to node folder
+    cwd = os.getcwd()
 
     # copy file to cwd
     input_file = os.path.basename(shutil.copy2(in_file,cwd))
