@@ -13,7 +13,7 @@ class bidsselectorworkflow(workflowgenerator):
         # call base constructor
         super().__new__(cls,name,settings)
 
-        # crete node definitions from settings
+        # create node definitions from settings
         dn = definednodes(settings)
 
         # avg over all T1s if enabled
@@ -41,14 +41,11 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # output QC
-                (dn.inputnode,dn.datasink,[
-                    ('subject','container')
-                ]),
                 (dn.alignT1toT1,dn.datasink,[
-                    ('out_file','QC.alignT1toT1.@T1align')
+                    ('out_file','QC.@alignT1toT1')
                 ]),
                 (dn.avgT1,dn.datasink,[
-                    ('avg_T1','QC.alignT1toT1.@T1avg')
+                    ('avg_T1','QC.@avgT1')
                 ])
             ])
         else: # use only the selected reference frame
@@ -75,9 +72,6 @@ class bidsselectorworkflow(workflowgenerator):
             # set outputs
             (dn.bidsselection,dn.outputnode,[
                 ('epi','epi')
-            ]),
-            (dn.inputnode,dn.outputnode,[
-                ('subject','subject')
             ])
         ])
 

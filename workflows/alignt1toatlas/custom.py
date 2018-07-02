@@ -3,7 +3,7 @@
 """
 
 # define custom register to atlas function (the afni interface in nipype sucks...)
-def register_atlas(in_file):
+def register_atlas(in_file,atlas):
     import os
     import shutil
 
@@ -12,8 +12,9 @@ def register_atlas(in_file):
 
     # spawn the auto_tlrc process with os.system
     os.system(
-        '@auto_tlrc -no_ss -base TT_N27+tlrc -input {0} -pad_input 60'.format(
-            input_file,
+        '@auto_tlrc -no_ss -base {} -input {} -pad_input 60'.format(
+            atlas,
+            input_file
         )
     )
 

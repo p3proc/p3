@@ -23,6 +23,11 @@ class definednodes(basenodedefs):
         self.set_input(['T1','orig','brainmask'])
         self.set_output(['T1_skullstrip'])
 
+        # define datasink substitutions
+        self.set_subs([
+            ('_maskop4','skullstrip')
+        ])
+
         # 3dAllineate (FSorig)
         self.allineate_orig = MapNode(
             afni.Allineate(

@@ -13,7 +13,7 @@ class skullstripworkflow(workflowgenerator):
         # call base constructor
         super().__new__(cls,name,settings)
 
-        # crete node definitions from settings
+        # create node definitions from settings
         dn = definednodes(settings)
 
         # connect the workflow
@@ -102,6 +102,11 @@ class skullstripworkflow(workflowgenerator):
             (dn.maskop4,dn.outputnode,[
                 ('out_file','T1_skullstrip')
             ]),
+
+            # save out skullstrip
+            (dn.maskop4,dn.datasink,[
+                ('out_file','QC')
+            ])
         ])
 
         # return workflow

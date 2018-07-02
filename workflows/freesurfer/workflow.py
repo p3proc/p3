@@ -13,7 +13,7 @@ class freesurferworkflow(workflowgenerator):
         # call base constructor
         super().__new__(cls,name,settings)
 
-        # crete node definitions from settings
+        # create node definitions from settings
         dn = definednodes(settings)
 
         # connect the workflow

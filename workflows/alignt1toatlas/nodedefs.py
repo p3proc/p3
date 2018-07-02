@@ -36,9 +36,10 @@ class definednodes(basenodedefs):
         # Register to Atlas
         self.register = Node(
             Function(
-                input_names=['in_file'],
+                input_names=['in_file','atlas'],
                 output_names=['out_file','transform_file'],
                 function=register_atlas
             ),
             name='atlasregister'
         )
+        self.register.inputs.atlas = settings['atlas']
