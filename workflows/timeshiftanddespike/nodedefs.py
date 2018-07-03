@@ -25,6 +25,11 @@ class definednodes(basenodedefs):
         self.set_input(['epi'])
         self.set_output(['epi2epi1','refimg','tcat'])
 
+        # define datasink substitutions
+        self.set_subs([
+            ('_volreg','_epi2epi')
+        ])
+
         # extract slice timing so we can pass it to slice time correction
         self.extract_stc = MapNode(
             Function(

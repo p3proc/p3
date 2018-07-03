@@ -33,6 +33,11 @@ class alignt1toatlasworkflow(workflowgenerator):
             ]),
             (dn.select0T1,dn.outputnode,[
                 ('T1_0','T1_0')
+            ]),
+
+            # output T1 atlas alignment for QC
+            (dn.register,dn.datasink,[
+                ('out_file','QC')
             ])
         ])
 

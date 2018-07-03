@@ -23,6 +23,11 @@ class definednodes(basenodedefs):
         self.set_input(['T1_skullstrip'])
         self.set_output(['noskull_at','t1_2_atlas_transform','T1_0'])
 
+        # define datasink substitutions
+        self.set_subs([
+            ('_calc_calc_calc_calc_calc_at','_atlas')
+        ])
+
         # Convert from list to string input
         self.select0T1 = Node(
             Function(

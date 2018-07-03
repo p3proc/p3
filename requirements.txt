@@ -4,3 +4,4 @@ duecredit == 0.2.2
 pybids == 0.6.3
 pandas == 0.23.1
 patsy == 0.5.0
+med2image == 1.1.2
