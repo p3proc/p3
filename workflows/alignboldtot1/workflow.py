@@ -1,6 +1,6 @@
 from nipype import Workflow
 from .nodedefs import definednodes
-from p3.base import workflowgenerator
+from ppp.base import workflowgenerator
 
 class alignboldtot1workflow(workflowgenerator):
     """ Defines the time shift and despike workflow

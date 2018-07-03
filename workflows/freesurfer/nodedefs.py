@@ -4,7 +4,7 @@ TODO
 
 """
 import os
-from p3.base import basenodedefs
+from ppp.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import freesurfer

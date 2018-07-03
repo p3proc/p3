@@ -8,7 +8,7 @@ from glob import glob
 from nipype import Workflow,config,logging
 import importlib
 import argparse
-from p3.base import generate_subworkflows
+from ppp.base import generate_subworkflows
 
 # add p3 base files to path
 sys.path.append('p3')
@@ -28,7 +28,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     subworkflows = generate_subworkflows(imported_workflows,settings)
 
     # create a workflow
-    p3 = Workflow(name='P3',base_dir=settings['tmp_dir'])
+    p3 = Workflow(name='p3_pipeline',base_dir=settings['tmp_dir'])
     p3.connect([ # connect nodes
         (subworkflows['bidsselector'],subworkflows['freesurfer'],[
             ('output.T1','input.T1'),
