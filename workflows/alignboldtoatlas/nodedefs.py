@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['noskull_at','noskull_Qwarp','oblique_transform','t1_2_epi','epi2epi1','tcat'])
+        self.set_input(['noskull_at','nonlin_warp','oblique_transform','t1_2_epi','epi2epi1','tcat'])
         self.set_output(['epi_at'])
 
         # Create transform

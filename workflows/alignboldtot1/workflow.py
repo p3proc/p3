@@ -77,6 +77,11 @@ class alignboldtot1workflow(workflowgenerator):
             (dn.warp,dn.outputnode,[
                 ('ob_transform','oblique_transform')
             ]),
+
+            # output to QC datasink
+            (dn.resample,dn.datasink,[
+                ('out_file','QC.@epi_skullstrip_resample')
+            ])
         ])
 
         # return workflow

@@ -50,6 +50,7 @@ def nonlinear_register(in_file,base_file):
     while(ext != ''):
         name,ext = os.path.splitext(name)
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
+    warp_file = os.path.join(cwd,'{}_Qwarp_WARP.nii.gz'.format(name))
 
     # spawn the 3dQwarp process
     os.system('3dQwarp -prefix {} -base {} -source {}'.format(
@@ -59,4 +60,4 @@ def nonlinear_register(in_file,base_file):
     ))
 
     # return nonlinear transformed file
-    return out_file
+    return (out_file,warp_file)

@@ -23,18 +23,6 @@ class timeshiftanddespikeworkflow(workflowgenerator):
                 ('epi','epi')
             ]),
 
-            ### Time Shift/Despiking
-            (dn.inputnode,dn.despike,[ # despike
-                ('epi','in_file')
-            ]),
-            (dn.despike,dn.tshift,[ # time shift
-                ('out_file','in_file')
-            ]),
-            (dn.extract_stc,dn.tshift,[
-                ('slicetiming','tpattern'),
-                ('TR','tr')
-            ]),
-
             ### Setup basefile for motion correction
             (dn.inputnode,dn.firstrunonly,[
                 ('epi','epi')
@@ -43,13 +31,21 @@ class timeshiftanddespikeworkflow(workflowgenerator):
                 ('epi','in_file')
             ]),
 
-            ### Do the actual motion correction
+            # do motion correction (before stc/despike)
+            (dn.extractroi,dn.volreg_before,[
+                ('roi_file','basefile')
+            ]),
+            (dn.inputnode,dn.volreg_before,[
+                ('epi','in_file')
+            ]),
+
+            ### Do motion correction (after stc/despike)
             # Align to first frame of first run
             (dn.extractroi,dn.volreg,[
                 ('roi_file','basefile')
             ]),
-            (dn.tshift,dn.volreg,[
-                ('out_file','in_file')
+            (dn.stc_despike_pool,dn.volreg,[
+                ('epi','in_file')
             ]),
 
             # output to output node
@@ -59,15 +55,65 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             (dn.extractroi,dn.outputnode,[
                 ('roi_file','refimg')
             ]),
-            (dn.tshift,dn.outputnode,[
-                ('out_file','tcat')
+            (dn.stc_despike_pool,dn.outputnode,[
+                ('epi','tcat')
             ]),
 
             # output epi alignments for QC
             (dn.volreg,dn.datasink,[
                 ('out_file','QC')
+            ]),
+
+            # output motion params to file before/after despike/tshift
+            (dn.volreg_before,dn.datasink,[ # before
+                ('oned_file','p3.@mocobefore')
+            ]),
+            (dn.volreg,dn.datasink,[ # after
+                ('oned_file','p3.@mocoafter')
             ])
         ])
+
+        # Conditionals for Time Shift/Despiking
+        if settings['despiking']:
+            cls.workflow.connect([
+                (dn.inputnode,dn.despike,[ # despike
+                    ('epi','in_file')
+                ]),
+                (dn.despike,dn.despike_pool,[
+                    ('out_file','epi')
+                ])
+            ])
+        else:
+            cls.workflow.connect([
+                (dn.inputnode,dn.skip_despike,[ # skip despike
+                    ('epi','epi')
+                ]),
+                (dn.skip_despike,dn.despike_pool,[
+                    ('epi','epi')
+                ])
+            ])
+        if settings['slice_time_correction']:
+            cls.workflow.connect([
+                (dn.despike_pool,dn.tshift,[ # time shift
+                    ('epi','in_file')
+                ]),
+                (dn.extract_stc,dn.tshift,[
+                    ('slicetiming','tpattern'),
+                    ('TR','tr')
+                ]),
+                (dn.tshift,dn.stc_despike_pool,[
+                    ('out_file','epi')
+                ]),
+            ])
+        else:
+            cls.workflow.connect([
+                (dn.despike_pool,dn.skip_stc,[ # skip time shift
+                    ('epi','epi')
+                ]),
+                (dn.skip_stc,dn.stc_despike_pool,[
+                    ('epi','epi')
+                ]),
+            ])
 
         # return workflow
         return cls.workflow

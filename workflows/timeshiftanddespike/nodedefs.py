@@ -8,7 +8,7 @@ from ppp.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
-from nipype.interfaces.utility import Function
+from nipype.interfaces.utility import Function,IdentityInterface
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -54,7 +54,25 @@ class definednodes(basenodedefs):
             name='despike'
         )
 
-        # timeshift data (create 2 for permutations with despiking)
+        # skip despike node
+        self.skip_despike = MapNode(
+            IdentityInterface(
+                fields=['epi']
+            ),
+            iterfield=['epi'],
+            name='skip_despike'
+        )
+
+        # despike pool node
+        self.despike_pool = MapNode(
+            IdentityInterface(
+                fields=['epi']
+            ),
+            iterfield=['epi'],
+            name='despike_pool'
+        )
+
+        # timeshift data
         self.tshift = MapNode(
             afni.TShift(
                 args="-heptic",
@@ -64,6 +82,24 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_file','tpattern','tr'],
             name='tshift'
+        )
+
+        # skip stc node
+        self.skip_stc = MapNode(
+            IdentityInterface(
+                fields=['epi']
+            ),
+            iterfield=['epi'],
+            name='skip_stc'
+        )
+
+        # despike/stc pool node
+        self.stc_despike_pool = MapNode(
+            IdentityInterface(
+                fields=['epi']
+            ),
+            iterfield=['epi'],
+            name='stc_despike_pool'
         )
 
         # Setup basefile for volreg
@@ -85,7 +121,7 @@ class definednodes(basenodedefs):
             name='extractroi'
         )
 
-        # Motion correction (create 10 nodes for different permutations of inputs)
+        # Motion correction (after)
         self.volreg = MapNode(
             afni.Volreg(
                 args="-heptic -maxite {}".format(
@@ -97,4 +133,18 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_file'],
             name='volreg'
+        )
+
+        # Motion correction (before)
+        self.volreg_before = MapNode(
+            afni.Volreg(
+                args="-heptic -maxite {}".format(
+                    25
+                ),
+                verbose=True,
+                zpad=10,
+                outputtype="NIFTI_GZ"
+            ),
+            iterfield=['in_file'],
+            name='volreg_before'
         )
