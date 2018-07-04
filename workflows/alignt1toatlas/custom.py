@@ -52,7 +52,7 @@ def nonlinear_register(in_file,base_file):
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
 
     # spawn the 3dQwarp process
-    os.system('3dQwarp -prefix {} -base {} -source {}'.format(
+    os.system('3dQwarp -prefix {} -base /home/vana/afni/linux_ubuntu_16_64/{} -source {}'.format(
         out_file,
         base_file,
         input_file

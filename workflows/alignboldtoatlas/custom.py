@@ -52,7 +52,7 @@ def NwarpApply(in_file,warped_file):
     warped_file = os.path.abspath(shutil.copy2(warped_file,cwd))
 
     # strip filename
-    filename,ext = os.path.splitext(os.path.basename(tfm_file1))
+    filename,ext = os.path.splitext(os.path.basename(in_file))
     while(ext != ''):
         filename,ext = os.path.splitext(filename)
     out_file = '{}_Qwarp.nii.gz'.format(filename)
