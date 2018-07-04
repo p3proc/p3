@@ -47,5 +47,22 @@ class alignboldtoatlasworkflow(workflowgenerator):
             ])
         ])
 
+        # if nonlinear transform set
+        if settings['nonlinear_atlas']:
+            cls.workflow.connect([
+                # apply nonlinear transform
+                (dn.alignepi2atl,dn.applyQwarptransform,[
+                    ('out_file','in_file')
+                ]),
+                (dn.inputnode,dn.applyQwarptransform,[
+                    ('noskull_Qwarp','warped_file')
+                ]),
+
+                # output to output node
+                (dn.applyQwarptransform,dn.outputnode,[
+                    ('out_file','epi_Qwarp')
+                ])
+            ])
+
         # return workflow
         return cls.workflow

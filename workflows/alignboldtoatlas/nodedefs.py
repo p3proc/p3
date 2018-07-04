@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['noskull_at','oblique_transform','t1_2_epi','epi2epi1','tcat'])
+        self.set_input(['noskull_at','noskull_Qwarp','oblique_transform','t1_2_epi','epi2epi1','tcat'])
         self.set_output(['epi_at'])
 
         # Create transform
@@ -44,4 +44,15 @@ class definednodes(basenodedefs):
             ),
             iterfield=['in_matrix','in_file'],
             name='alignepi2atl'
+        )
+
+        # apply nonlinear transform
+        self.applyQwarptransform = MapNode(
+            Function(
+                input_names=['in_file','warped_file'],
+                output_names=['out_file'],
+                function=NwarpApply
+            ),
+            iterfield=['in_file'],
+            name='applyQwarptransform'
         )

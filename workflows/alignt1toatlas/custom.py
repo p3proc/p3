@@ -19,13 +19,13 @@ def register_atlas(in_file,atlas):
     )
 
     # split extension of input file
-    name_nii,_ = os.path.splitext(input_file)
-    filename,_ = os.path.splitext(name_nii)
+    name,ext = os.path.splitext(input_file)
+    while(ext != ''):
+        name,ext = os.path.splitext(name)
+    filename = '{}_at.nii'.format(name)
 
     #  gzip the nifti
-    os.system(
-        'gzip {}'.format('{}_at.nii'.format(filename))
-    )
+    os.system('gzip {}'.format(filename))
 
     # get the out_file
     out_file = os.path.join(os.getcwd(),'{}_at.nii.gz'.format(filename))
@@ -33,3 +33,30 @@ def register_atlas(in_file,atlas):
 
     # return the out_file
     return (out_file,transform_file)
+
+# Qwarp is weird in nipype, writing my own custom function instead
+def nonlinear_register(in_file,base_file):
+    import os
+    import shutil
+
+    # get cwd
+    cwd = os.getcwd()
+
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,cwd))
+
+    # split extension of input file
+    name,ext = os.path.splitext(input_file)
+    while(ext != ''):
+        name,ext = os.path.splitext(name)
+    out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
+
+    # spawn the 3dQwarp process
+    os.system('3dQwarp -prefix {} -base {} -source {}'.format(
+        out_file,
+        base_file,
+        input_file
+    ))
+
+    # return nonlinear transformed file
+    return out_file

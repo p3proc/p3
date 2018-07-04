@@ -17,8 +17,9 @@ def concattransform(in_file,tfm1,tfm2,tfm3):
     tfm_file3 = os.path.abspath(shutil.copy2(tfm3,cwd))
 
     # strip filename
-    name_nii,_ = os.path.splitext(os.path.basename(tfm_file1))
-    filename,_ = os.path.splitext(name_nii)
+    filename,ext = os.path.splitext(os.path.basename(tfm_file1))
+    while(ext != ''):
+        filename,ext = os.path.splitext(filename)
 
     # format string
     format_string = '-ONELINE {}::WARP_DATA -I {} {} -I {}'.format(
@@ -37,3 +38,31 @@ def concattransform(in_file,tfm1,tfm2,tfm3):
 
     # return master transform
     return master_transform
+
+# apply nonlinear transform
+def NwarpApply(in_file,warped_file):
+    import os
+    import shutil
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # copy files to cwd
+    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
+    warped_file = os.path.abspath(shutil.copy2(warped_file,cwd))
+
+    # strip filename
+    filename,ext = os.path.splitext(os.path.basename(tfm_file1))
+    while(ext != ''):
+        filename,ext = os.path.splitext(filename)
+    out_file = '{}_Qwarp.nii.gz'.format(filename)
+
+    # run 3dNwarpApply
+    os.system('3dNwarpApply -nwarp {} -source {} -prefix {}'.format(
+        warped_file,
+        in_file,
+        out_file
+    ))
+
+    # output warped file
+    return out_file

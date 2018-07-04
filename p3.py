@@ -55,6 +55,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
         ]),
         (subworkflows['alignt1toatlas'],subworkflows['alignboldtoatlas'],[
             ('output.noskull_at','input.noskull_at'),
+            ('output.noskull_Qwarp','input.noskull_Qwarp'),
         ]),
         (subworkflows['alignboldtot1'],subworkflows['alignboldtoatlas'],[
             ('output.oblique_transform','input.oblique_transform'),
@@ -153,7 +154,7 @@ def main():
         settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
         settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
         settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
-        settings['set_atlas_transform'] = 'affine' # sets transform type for atlas alignment (can be affine/nonlinear)
+        settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
         settings['atlas'] = 'TT_N27+tlrc' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
         settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
         settings['field_map_correction'] = False # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.

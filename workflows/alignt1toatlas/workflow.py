@@ -27,19 +27,38 @@ class alignt1toatlasworkflow(workflowgenerator):
             ]),
 
             # output to output node
+            (dn.select0T1,dn.outputnode,[
+                ('T1_0','T1_0')
+            ]),
             (dn.register,dn.outputnode,[
                 ('out_file','noskull_at'),
                 ('transform_file','t1_2_atlas_transform')
             ]),
-            (dn.select0T1,dn.outputnode,[
-                ('T1_0','T1_0')
-            ]),
 
-            # output T1 atlas alignment for QC
+            # output T1 atlas alignment to p3 output
             (dn.register,dn.datasink,[
-                ('out_file','QC')
+                ('out_file','p3.@T1_at')
             ])
         ])
+
+        # do nonlinear alignement
+        if settings['nonlinear_atlas']:
+            cls.workflow.connect([
+                # do nonlinear transform
+                (dn.register,dn.Qwarp,[
+                    ('out_file','in_file')
+                ]),
+
+                # output to output node
+                (dn.Qwarp,dn.outputnode,[
+                    ('out_file','noskull_Qwarp'),
+                ]),
+
+                # output T1 atlas nonlinear alignment to p3 output
+                (dn.Qwarp,dn.datasink,[
+                    ('out_file','p3.@T1_Qwarp')
+                ])
+            ])
 
         # return workflow
         return cls.workflow
