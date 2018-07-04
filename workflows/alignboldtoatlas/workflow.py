@@ -64,8 +64,8 @@ class alignboldtoatlasworkflow(workflowgenerator):
                 ]),
 
                 # output to datasink
-                (dn.applyQwarptransform,dn.datasink,[
-                    ('out_file','p3.@epi_Qwarp')
+                (dn.outputnode,dn.datasink,[
+                    ('epi_Qwarp','p3.@epi_Qwarp')
                 ])
             ])
         else:

@@ -55,7 +55,7 @@ def NwarpApply(in_file,warped_file):
     filename,ext = os.path.splitext(os.path.basename(in_file))
     while(ext != ''):
         filename,ext = os.path.splitext(filename)
-    out_file = '{}_Qwarp.nii.gz'.format(filename)
+    out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(filename))
 
     # run 3dNwarpApply
     os.system('3dNwarpApply -nwarp {} -source {} -prefix {}'.format(
