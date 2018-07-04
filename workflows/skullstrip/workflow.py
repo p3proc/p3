@@ -105,7 +105,7 @@ class skullstripworkflow(workflowgenerator):
 
             # save out skullstrip
             (dn.maskop4,dn.datasink,[
-                ('out_file','QC')
+                ('out_file','QC.@skullstrip')
             ])
         ])
 

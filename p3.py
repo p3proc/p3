@@ -55,7 +55,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
         ]),
         (subworkflows['alignt1toatlas'],subworkflows['alignboldtoatlas'],[
             ('output.noskull_at','input.noskull_at'),
-            ('output.noskull_Qwarp','input.noskull_Qwarp'),
+            ('output.nonlin_warp','input.nonlin_warp'),
         ]),
         (subworkflows['alignboldtot1'],subworkflows['alignboldtoatlas'],[
             ('output.oblique_transform','input.oblique_transform'),
@@ -77,17 +77,17 @@ def main():
     """
 
     # print really cool graphic
-    print('\n'
-    '                  ad888888b,\n'
-    '                 d8\"     \"88\n'
-    '                         a8P\n'
-    '    8b,dPPYba,        aad8\"\n'
-    '    88P\'    \"8a       \"\"Y8,\n'
-    '    88       d8          \"8b\n'
-    '    88b,   ,a8\"  Y8,     a88\n'
-    '    88`YbbdP\"\'    \"Y888888P\'\n'
-    '    88\n'
-    '    88\n')
+    # print('\n'
+    # '                  ad888888b,\n'
+    # '                 d8\"     \"88\n'
+    # '                         a8P\n'
+    # '    8b,dPPYba,        aad8\"\n'
+    # '    88P\'    \"8a       \"\"Y8,\n'
+    # '    88       d8          \"8b\n'
+    # '    88b,   ,a8\"  Y8,     a88\n'
+    # '    88`YbbdP\"\'    \"Y888888P\'\n'
+    # '    88\n'
+    # '    88\n')
 
     # get the current directory
     cwd = os.getcwd()

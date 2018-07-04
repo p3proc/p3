@@ -55,12 +55,24 @@ class alignboldtoatlasworkflow(workflowgenerator):
                     ('out_file','in_file')
                 ]),
                 (dn.inputnode,dn.applyQwarptransform,[
-                    ('noskull_Qwarp','warped_file')
+                    ('nonlin_warp','warped_file')
                 ]),
 
                 # output to output node
                 (dn.applyQwarptransform,dn.outputnode,[
                     ('out_file','epi_Qwarp')
+                ]),
+
+                # output to datasink
+                (dn.applyQwarptransform,dn.datasink,[
+                    ('out_file','p3.@epi_Qwarp')
+                ])
+            ])
+        else:
+            cls.workflow.connect([
+                # output to datasink
+                (dn.alignepi2atl,dn.datasink,[
+                    ('out_file','p3.@epi')
                 ])
             ])
 
