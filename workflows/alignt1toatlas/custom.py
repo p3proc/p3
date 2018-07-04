@@ -28,8 +28,8 @@ def register_atlas(in_file,atlas):
     os.system('gzip {}'.format(filename))
 
     # get the out_file
-    out_file = os.path.join(os.getcwd(),'{}_at.nii.gz'.format(filename))
-    transform_file = os.path.join(os.getcwd(),'{}_at.nii.Xaff12.1D'.format(filename))
+    out_file = os.path.join(os.getcwd(),'{}.gz'.format(filename))
+    transform_file = os.path.join(os.getcwd(),'{}.Xaff12.1D'.format(filename))
 
     # return the out_file
     return (out_file,transform_file)
