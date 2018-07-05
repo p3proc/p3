@@ -38,6 +38,7 @@ def register_atlas(in_file,atlas):
 def nonlinear_register(in_file,base_file):
     import os
     import shutil
+    import subprocess
 
     # get cwd
     cwd = os.getcwd()
@@ -52,8 +53,15 @@ def nonlinear_register(in_file,base_file):
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
     warp_file = os.path.join(cwd,'{}_Qwarp_WARP.nii.gz'.format(name))
 
-    # spawn the 3dQwarp process
-    os.system('3dQwarp -prefix {} -base /home/vana/afni/linux_ubuntu_16_64/{} -source {}'.format(
+    # check if the base_file does not exist in the directory given
+    if not os.path.exists(base_file):
+        # assume the base_file is in the afni directory
+        afni_loc = subprocess.run(['which','afni'],stdout=subprocess.PIPE).stdout.decode('utf-8').rstrip()
+        afni_dir = os.path.dirname(afni_loc)
+        base_file = os.path.join(afni_dir,base_file)
+
+    # spawn the 3dQwarp process TODO: use subprocess run so we can raise error if fail
+    os.system('3dQwarp -prefix {} -base {} -source {}'.format(
         out_file,
         base_file,
         input_file
