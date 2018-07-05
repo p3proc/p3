@@ -4,11 +4,12 @@
 """
 import os
 import sys
+import json
 from glob import glob
 from nipype import Workflow,config,logging
 import importlib
 import argparse
-from ppp.base import generate_subworkflows
+from ppp.base import generate_subworkflows,default_settings
 
 # add p3 base files to path
 sys.path.append('p3')
@@ -130,7 +131,15 @@ def main():
 
     # check if generating settings
     if args.generate_settings:
-        print('settings.json was generated in the current directory.')
+        # get settings
+        settings = default_settings()
+        # get cwd
+        cwd = os.getcwd()
+        # write settings to file
+        with open(os.path.join(cwd,'settings.json'),'w') as settings_file:
+            json.dump(settings,settings_file,indent=4,separators=(',',': '))
+        # print nice message and exit
+        print('A settings.json was generated in the current directory.')
         sys.exit()
 
     # check if bids_dir/output_dir is defined
@@ -149,29 +158,16 @@ def main():
 
     # running participant level
     if args.analysis_level == "participant":
-        # define default settings
-        settings = {}
-        settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
-        settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
-        settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
-        settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
-        settings['atlas'] = 'TT_N27+tlrc' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
-        settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
-        settings['field_map_correction'] = False # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
-        settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
-        settings['despiking'] = True # sets whether epi images should be despiked
-        settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own freesurfer data under output freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
-        settings['workflows'] = [ # defines the workflows to import
-                'bidsselector',
-                'freesurfer',
-                'skullstrip',
-                'timeshiftanddespike',
-                'alignt1toatlas',
-                'alignboldtot1',
-                'alignboldtoatlas'
-            ]
-        settings['connections'] = [ # defines the input/output connections between workflows
-        ]
+
+        # get default settings if settings not defined
+        if not args.settings:
+            print('No settings file defined in input. Using default settings...')
+            settings = default_settings()
+        else: # load settings from file
+            with open(args.settings,'r') as settings_file:
+                settings = json.load(settings_file)
+
+        # Set nipype config settings TODO expose these as debug settings
         config.set('logging','workflow_level','DEBUG')
         config.set('logging','workflow_level','DEBUG')
         config.set('execution','hash_method','content')
