@@ -1,5 +1,5 @@
 # Dependencies to run p3
-nipype == 1.0.4
+nipype == 1.1.0
 duecredit == 0.2.2
 pybids == 0.6.3
 pandas == 0.23.1
