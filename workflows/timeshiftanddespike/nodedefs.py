@@ -30,6 +30,12 @@ class definednodes(basenodedefs):
             ('_volreg','_epi2epi')
         ])
 
+        # define datasink regular expression substitutions
+        self.set_resubs([
+            (r'_epi2epi\d{1,3}',''),
+            (r'_epi2epi_before\d{1,3}',''),
+        ])
+
         # extract slice timing so we can pass it to slice time correction
         self.extract_stc = MapNode(
             Function(
@@ -102,8 +108,8 @@ class definednodes(basenodedefs):
             name='stc_despike_pool'
         )
 
-        # Setup basefile for volreg
-        self.firstrunonly = Node( # this will create a list of the first run to feed as a basefile
+        # Setup basefile for volreg (pre slice time correction/despike)
+        self.firstrunonly = Node( # this will grab only the first run to feed as a basefile
             Function(
                 input_names=['epi'],
                 output_names=['epi'],
@@ -111,7 +117,6 @@ class definednodes(basenodedefs):
             ),
             name='retrievefirstrun'
         )
-
         self.extractroi = Node( # get reference frame of first run
             fsl.ExtractROI(
                 t_min=settings['epi_reference'],
@@ -119,6 +124,24 @@ class definednodes(basenodedefs):
                 output_type='NIFTI_GZ'
             ),
             name='extractroi'
+        )
+
+        # Setup basefile for volreg (post slice time correction/despike)
+        self.firstrunonly_post = Node( # this will grab only the first run to feed as a basefile
+            Function(
+                input_names=['epi'],
+                output_names=['epi'],
+                function=lambda epi: epi[0]
+            ),
+            name='retrievefirstrun_post'
+        )
+        self.extractroi_post = Node( # get reference frame of first run
+            fsl.ExtractROI(
+                t_min=settings['epi_reference'],
+                t_size=1,
+                output_type='NIFTI_GZ'
+            ),
+            name='extractroi_post'
         )
 
         # Motion correction (after)

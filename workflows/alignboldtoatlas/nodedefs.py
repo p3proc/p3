@@ -24,6 +24,11 @@ class definednodes(basenodedefs):
         self.set_input(['noskull_at','nonlin_warp','oblique_transform','t1_2_epi','epi2epi1','tcat'])
         self.set_output(['epi_at'])
 
+        # define datasink substitutions
+        self.set_resubs([
+            ('_alignepi2atl\d{1,3}','')
+        ])
+
         # Create transform
         self.transformepi2epi2mpr2atl = MapNode(
             Function(

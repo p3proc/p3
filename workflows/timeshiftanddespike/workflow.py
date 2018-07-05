@@ -23,7 +23,7 @@ class timeshiftanddespikeworkflow(workflowgenerator):
                 ('epi','epi')
             ]),
 
-            ### Setup basefile for motion correction
+            # Setup basefile for motion correction (pre-stc/despike)
             (dn.inputnode,dn.firstrunonly,[
                 ('epi','epi')
             ]),
@@ -39,9 +39,17 @@ class timeshiftanddespikeworkflow(workflowgenerator):
                 ('epi','in_file')
             ]),
 
+            # Setup basefile for motion correction (post-stc/despike)
+            (dn.stc_despike_pool,dn.firstrunonly_post,[
+                ('epi','epi')
+            ]),
+            (dn.firstrunonly_post,dn.extractroi_post,[
+                ('epi','in_file')
+            ]),
+
             ### Do motion correction (after stc/despike)
             # Align to first frame of first run
-            (dn.extractroi,dn.volreg,[
+            (dn.extractroi_post,dn.volreg,[
                 ('roi_file','basefile')
             ]),
             (dn.stc_despike_pool,dn.volreg,[

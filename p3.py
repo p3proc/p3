@@ -69,8 +69,8 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     ])
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
-    p3.run()
-    #p3.run(plugin='MultiProc')
+    #p3.run()
+    p3.run(plugin='MultiProc')
 
 def main():
     """

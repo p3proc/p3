@@ -103,6 +103,10 @@ class basenodedefs:
         # append substitution list to substitutions
         self.datasink.inputs.substitutions.extend(sub_list)
 
+    def set_resubs(self,sub_list):
+        # add regular expression substitution to list
+        self.datasink.inputs.regexp_substitutions = sub_list
+
 class workflowgenerator:
     """ Base class defining a workflow
 

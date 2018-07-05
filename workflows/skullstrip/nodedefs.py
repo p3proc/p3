@@ -25,7 +25,8 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_maskop4','skullstrip')
+            ('_maskop40',''),
+            ('_calc_calc_calc_calc_calc','')
         ])
 
         # 3dAllineate (FSorig)

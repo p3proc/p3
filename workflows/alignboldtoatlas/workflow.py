@@ -44,6 +44,11 @@ class alignboldtoatlasworkflow(workflowgenerator):
             # output to output node
             (dn.alignepi2atl,dn.outputnode,[
                 ('out_file','epi_at')
+            ]),
+
+            # output to datasink
+            (dn.alignepi2atl,dn.datasink,[
+                ('out_file','p3.@epi')
             ])
         ])
 
@@ -66,13 +71,6 @@ class alignboldtoatlasworkflow(workflowgenerator):
                 # output to datasink
                 (dn.outputnode,dn.datasink,[
                     ('epi_Qwarp','p3.@epi_Qwarp')
-                ])
-            ])
-        else:
-            cls.workflow.connect([
-                # output to datasink
-                (dn.alignepi2atl,dn.datasink,[
-                    ('out_file','p3.@epi')
                 ])
             ])
 

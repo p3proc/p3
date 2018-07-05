@@ -26,6 +26,11 @@ class definednodes(basenodedefs):
         self.set_input(['subject'])
         self.set_output(['T1','epi','subject'])
 
+        # define datasink substitutions
+        self.set_resubs([
+            ('_alignT1toT1\d{1,3}','')
+        ])
+
         # parametrize subject for multiple subject processing
         self.inputnode.iterables = ('subject',settings['subject'])
 

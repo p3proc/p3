@@ -24,6 +24,11 @@ class definednodes(basenodedefs):
         self.set_input(['refimg','T1_0'])
         self.set_output(['t1_2_epi','oblique_transform'])
 
+        # define datasink substitutions
+        self.set_subs([
+            ('_roi_masked_calc_resample','_reference_skullstrip')
+        ])
+
         # Skullstrip the EPI image
         self.epi_skullstrip = Node(
             fsl.BET(),

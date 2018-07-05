@@ -53,6 +53,12 @@ def nonlinear_register(in_file,base_file):
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
     warp_file = os.path.join(cwd,'{}_Qwarp_WARP.nii.gz'.format(name))
 
+    # check if files already exist and remove them if they do
+    if os.path.exists(out_file):
+        os.remove(out_file)
+    if os.path.exists(warp_file):
+        os.remove(warp_file)
+
     # check if the base_file does not exist in the directory given
     if not os.path.exists(base_file):
         # assume the base_file is in the afni directory
