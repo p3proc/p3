@@ -57,6 +57,10 @@ def NwarpApply(in_file,warped_file):
         filename,ext = os.path.splitext(filename)
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(filename))
 
+    # check if file already exist and remove it if it does
+    if os.path.exists(out_file):
+        os.remove(out_file)
+
     # run 3dNwarpApply
     os.system('3dNwarpApply -nwarp {} -source {} -prefix {}'.format(
         warped_file,

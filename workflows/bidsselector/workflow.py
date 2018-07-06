@@ -42,10 +42,10 @@ class bidsselectorworkflow(workflowgenerator):
 
                 # output QC
                 (dn.alignT1toT1,dn.datasink,[
-                    ('out_file','QC.@alignT1toT1')
+                    ('out_file','p3_QC.@alignT1toT1')
                 ]),
                 (dn.avgT1,dn.datasink,[
-                    ('avg_T1','QC.@avgT1')
+                    ('avg_T1','p3_QC.@avgT1')
                 ])
             ])
         else: # use only the selected reference frame

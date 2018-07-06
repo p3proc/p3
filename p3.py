@@ -9,7 +9,7 @@ from glob import glob
 from nipype import Workflow,config,logging
 import importlib
 import argparse
-from ppp.base import generate_subworkflows,default_settings
+from ppp.base import generate_subworkflows,default_settings,generate_connections
 
 # add p3 base files to path
 sys.path.append('p3')
@@ -25,52 +25,35 @@ def create_and_run_p3_workflow(imported_workflows,settings):
         Create main workflow
     """
 
+    # Set nipype config settings TODO expose these as debug settings
+    config.set('logging','workflow_level','DEBUG')
+    config.set('logging','workflow_level','DEBUG')
+    config.set('execution','hash_method','content')
+    config.set('execution','stop_on_first_crash','true')
+    logging.update_logging(config)
+
     # define subworkflows from imported workflows
     subworkflows = generate_subworkflows(imported_workflows,settings)
 
     # create a workflow
     p3 = Workflow(name='p3_pipeline',base_dir=settings['tmp_dir'])
-    p3.connect([ # connect nodes
-        (subworkflows['bidsselector'],subworkflows['freesurfer'],[
-            ('output.T1','input.T1'),
-            ('output.subject','input.subject')
-        ]),
-        (subworkflows['bidsselector'],subworkflows['skullstrip'],[
-            ('output.T1','input.T1'),
-        ]),
-        (subworkflows['freesurfer'],subworkflows['skullstrip'],[
-            ('output.orig','input.orig'),
-            ('output.brainmask','input.brainmask')
-        ]),
-        (subworkflows['bidsselector'],subworkflows['timeshiftanddespike'],[
-            ('output.epi','input.epi')
-        ]),
-        (subworkflows['skullstrip'],subworkflows['alignt1toatlas'],[
-            ('output.T1_skullstrip','input.T1_skullstrip')
-        ]),
-        (subworkflows['timeshiftanddespike'],subworkflows['alignboldtot1'],[
-            ('output.refimg','input.refimg')
-        ]),
-        (subworkflows['alignt1toatlas'],subworkflows['alignboldtot1'],[
-            ('output.T1_0','input.T1_0'),
-        ]),
-        (subworkflows['alignt1toatlas'],subworkflows['alignboldtoatlas'],[
-            ('output.noskull_at','input.noskull_at'),
-            ('output.nonlin_warp','input.nonlin_warp'),
-        ]),
-        (subworkflows['alignboldtot1'],subworkflows['alignboldtoatlas'],[
-            ('output.oblique_transform','input.oblique_transform'),
-            ('output.t1_2_epi','input.t1_2_epi')
-        ]),
-        (subworkflows['timeshiftanddespike'],subworkflows['alignboldtoatlas'],[
-            ('output.epi2epi1','input.epi2epi1'),
-            ('output.tcat','input.tcat'),
-        ])
-    ])
+
+    # get connections
+    connections = generate_connections(subworkflows,settings)
+
+    # connect nodes
+    p3.connect(connections)
+
+    # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
-    #p3.run()
-    p3.run(plugin='MultiProc')
+
+    # Run pipeline (check multiproc setting)
+    if settings['multiproc']:
+        p3.run(plugin='MultiProc')
+    else:
+        p3.run()
+
 
 def main():
     """
@@ -125,6 +108,9 @@ def main():
                         'current working directory for use/modification. This option will ignore all other '
                         'arguments.',
                         action='store_true')
+    parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
+                        'is harder to debug when this option is on.',
+                        action='store_true')
 
     # parse command line arguments
     args = parser.parse_args()
@@ -158,7 +144,6 @@ def main():
 
     # running participant level
     if args.analysis_level == "participant":
-
         # get default settings if settings not defined
         if not args.settings:
             print('No settings file defined in input. Using default settings...')
@@ -166,13 +151,6 @@ def main():
         else: # load settings from file
             with open(args.settings,'r') as settings_file:
                 settings = json.load(settings_file)
-
-        # Set nipype config settings TODO expose these as debug settings
-        config.set('logging','workflow_level','DEBUG')
-        config.set('logging','workflow_level','DEBUG')
-        config.set('execution','hash_method','content')
-        config.set('execution','stop_on_first_crash','true')
-        logging.update_logging(config)
 
         # import workflows
         imported_workflows = {}
@@ -184,6 +162,7 @@ def main():
         settings['bids_dir'] = os.path.abspath(args.bids_dir)
         settings['output_dir'] = os.path.abspath(args.output_dir)
         settings['tmp_dir'] = os.path.join(settings['output_dir'],'tmp')
+        settings['multiproc'] = args.multiproc
 
         # make directories if not exist
         os.makedirs(settings['output_dir'],exist_ok=True)

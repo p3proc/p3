@@ -80,7 +80,7 @@ class alignboldtot1workflow(workflowgenerator):
 
             # output to QC datasink
             (dn.resample,dn.datasink,[
-                ('out_file','QC.@epi_skullstrip_resample')
+                ('out_file','p3_QC.@epi_skullstrip_resample')
             ])
         ])
 

@@ -31,6 +31,26 @@ def generate_subworkflows(imported_workflows,settings):
     # return subworkflows
     return subworkflows
 
+def generate_connections(subworkflows,settings):
+    """
+        TODO: document this function
+    """
+
+    # define initial connection list
+    connections = []
+
+    # go through connections in settings and build connections list
+    for connection_entry in settings['connections']:
+        # append to connections list
+        connections.append(( # define tuple
+            subworkflows[connection_entry['source']],
+            subworkflows[connection_entry['destination']],
+            [tuple(link) for link in connection_entry['links']] # convert each entry in links list to tuple
+        ))
+
+    # return connection list
+    return connections
+
 def default_settings():
     """
         TODO: document this function
@@ -57,7 +77,82 @@ def default_settings():
             'alignboldtot1',
             'alignboldtoatlas'
         ]
-    settings['connections'] = [ # defines the input/output connections between workflows TODO
+    settings['connections'] = [ # defines the input/output connections between workflows
+        {
+            'source': 'bidsselector',
+            'destination': 'freesurfer',
+            'links': [
+                ['output.T1','input.T1'],
+                ['output.subject','input.subject']
+            ]
+        },
+        {
+            'source': 'bidsselector',
+            'destination': 'skullstrip',
+            'links': [
+                ['output.T1','input.T1']
+            ]
+        },
+        {
+            'source': 'freesurfer',
+            'destination': 'skullstrip',
+            'links': [
+                ['output.orig','input.orig'],
+                ['output.brainmask','input.brainmask']
+            ]
+        },
+        {
+            'source': 'bidsselector',
+            'destination': 'timeshiftanddespike',
+            'links': [
+                ['output.epi','input.epi']
+            ]
+        },
+        {
+            'source': 'skullstrip',
+            'destination': 'alignt1toatlas',
+            'links': [
+                ['output.T1_skullstrip','input.T1_skullstrip']
+            ]
+        },
+        {
+            'source': 'timeshiftanddespike',
+            'destination': 'alignboldtot1',
+            'links': [
+                ['output.refimg','input.refimg']
+            ]
+        },
+        {
+            'source': 'alignt1toatlas',
+            'destination': 'alignboldtot1',
+            'links': [
+                ['output.T1_0','input.T1_0']
+            ]
+        },
+        {
+            'source': 'alignt1toatlas',
+            'destination': 'alignboldtoatlas',
+            'links': [
+                ['output.noskull_at','input.noskull_at'],
+                ['output.nonlin_warp','input.nonlin_warp']
+            ]
+        },
+        {
+            'source': 'alignboldtot1',
+            'destination': 'alignboldtoatlas',
+            'links': [
+                ['output.oblique_transform','input.oblique_transform'],
+                ['output.t1_2_epi','input.t1_2_epi']
+            ]
+        },
+        {
+            'source': 'timeshiftanddespike',
+            'destination': 'alignboldtoatlas',
+            'links': [
+                ['output.epi2epi1','input.epi2epi1'],
+                ['output.tcat','input.tcat'],
+            ]
+        }
     ]
 
     # return settings
