@@ -18,7 +18,6 @@ def generate_subworkflows(imported_workflows,settings):
     # create sub-workflows
     subworkflows = {}
     # loop over all imported workflows
-
     for name,wf in imported_workflows.items():
         # find the class whos base is the workflowgenerator
         for obj in dir(wf):
@@ -64,7 +63,7 @@ def default_settings():
     settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
     settings['atlas'] = 'TT_N27+tlrc' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
     settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
-    settings['field_map_correction'] = False # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
+    settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
     settings['despiking'] = True # sets whether epi images should be despiked
     settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own freesurfer data under output freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
@@ -73,6 +72,7 @@ def default_settings():
             'freesurfer',
             'skullstrip',
             'timeshiftanddespike',
+            'fieldmapcorrection',
             'alignt1toatlas',
             'alignboldtot1',
             'alignboldtoatlas'
@@ -113,6 +113,20 @@ def default_settings():
             'destination': 'alignt1toatlas',
             'links': [
                 ['output.T1_skullstrip','input.T1_skullstrip']
+            ]
+        },
+        {
+            'source': 'bidsselector',
+            'destination': 'fieldmapcorrection',
+            'links': [
+                ['output.epi','input.epi']
+            ]  
+        },
+        {
+            'source': 'timeshiftanddespike',
+            'destination': 'fieldmapcorrection',
+            'links': [
+                ['output.epi_aligned','input.epi_aligned']
             ]
         },
         {

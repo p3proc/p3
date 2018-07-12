@@ -49,10 +49,11 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     p3.write_graph(graph2use='colored')
 
     # Run pipeline (check multiproc setting)
-    if settings['multiproc']:
-        p3.run(plugin='MultiProc')
-    else:
-        p3.run()
+    if not settings['disable_run']:
+        if settings['multiproc']:
+            p3.run(plugin='MultiProc')
+        else:
+            p3.run()
 
 
 def main():
@@ -111,6 +112,8 @@ def main():
     parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
                         'is harder to debug when this option is on.',
                         action='store_true')
+    parser.add_argument('--disable_run', help='Stop after writing graphs. Does not run pipeline',
+                        action='store_true')
 
     # parse command line arguments
     args = parser.parse_args()
@@ -163,6 +166,7 @@ def main():
         settings['output_dir'] = os.path.abspath(args.output_dir)
         settings['tmp_dir'] = os.path.join(settings['output_dir'],'tmp')
         settings['multiproc'] = args.multiproc
+        settings['disable_run'] = args.disable_run
 
         # make directories if not exist
         os.makedirs(settings['output_dir'],exist_ok=True)

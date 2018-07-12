@@ -66,10 +66,13 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             (dn.stc_despike_pool,dn.outputnode,[
                 ('epi','tcat')
             ]),
+            (dn.volreg,dn.outputnode,[
+                ('out_file','epi_aligned')
+            ]),
 
             # output epi alignments for QC
             (dn.volreg,dn.datasink,[
-                ('out_file','QC')
+                ('out_file','p3_QC')
             ]),
 
             # output motion params to file before/after despike/tshift
