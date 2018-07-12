@@ -122,7 +122,33 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 # Save out unwarped file
                 (dn.warp_epi,dn.datasink,[
                     ('unwarped_file','p3_QC.@unwarped_avg_epi')
+                ]),
+
+                # Make a warp image from field map
+                (dn.avg_epi,dn.make_warp_image,[
+                    ('out_file','in_file')
+                ]),
+                (dn.getmagandphase,dn.make_warp_image,[
+                    ('echospacing','dwell_time')
+                ]),
+                (dn.register_fieldmap,dn.make_warp_image,[
+                    ('out_file','fmap_in_file')
+                ]),
+                (dn.register_mask,dn.make_warp_image,[
+                    ('out_file','mask_file')
+                ]),
+                (dn.warp_epi,dn.convert_warp,[
+                    ('shift_out_file','shift_in_file')
+                ]),
+                (dn.make_warp_image,dn.convert_warp,[
+                    ('unwarped_file','reference')
+                ]),
+
+                # save out space warp
+                (dn.convert_warp,dn.datasink,[
+                    ('out_file','p3_QC.@space_warp')
                 ])
+
             ])
         else:
             # connect the workflow

@@ -162,4 +162,19 @@ class definednodes(basenodedefs):
             name='warp_epi'
         )
 
-        #
+        # Make a warp image from field map
+        self.make_warp_image = MapNode(
+            fsl.FUGUE(
+                output_type='NIFTI_GZ'
+            ),
+            iterfield=['in_file','dwell_time','fmap_in_file','mask_file'],
+            name='make_warp_image'
+        )
+
+        self.convert_warp = MapNode(
+            fsl.ConvertWarp(
+                output_type='NIFTI_GZ'
+            ),
+            iterfield=['reference','shift_in_file'],
+            name='convert_warp'
+        )
