@@ -64,10 +64,10 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # unmask fieldmap image through interpolation
-                (dn.calculate_fieldmap,dn.unmask,[
+                (dn.apply_mask,dn.unmask,[
                     ('out_file','fmap_in_file')
                 ]),
-                (dn.apply_mask,dn.unmask,[
+                (dn.create_mask,dn.unmask,[
                     ('out_file','mask_file')
                 ]),
 
