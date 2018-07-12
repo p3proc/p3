@@ -1,0 +1,164 @@
+{
+    "epi_reference": 4,
+    "T1_reference": 0,
+    "brain_radius": 50,
+    "nonlinear_atlas": true,
+    "atlas": "TT_N27+tlrc",
+    "avgT1s": true,
+    "field_map_correction": false,
+    "slice_time_correction": true,
+    "despiking": true,
+    "run_recon_all": false,
+    "workflows": [
+        "bidsselector",
+        "freesurfer",
+        "skullstrip",
+        "timeshiftanddespike",
+        "fieldmapcorrection",
+        "alignt1toatlas",
+        "alignboldtot1",
+        "alignboldtoatlas"
+    ],
+    "connections": [
+        {
+            "source": "bidsselector",
+            "destination": "freesurfer",
+            "links": [
+                [
+                    "output.T1",
+                    "input.T1"
+                ],
+                [
+                    "output.subject",
+                    "input.subject"
+                ]
+            ]
+        },
+        {
+            "source": "bidsselector",
+            "destination": "skullstrip",
+            "links": [
+                [
+                    "output.T1",
+                    "input.T1"
+                ]
+            ]
+        },
+        {
+            "source": "freesurfer",
+            "destination": "skullstrip",
+            "links": [
+                [
+                    "output.orig",
+                    "input.orig"
+                ],
+                [
+                    "output.brainmask",
+                    "input.brainmask"
+                ]
+            ]
+        },
+        {
+            "source": "bidsselector",
+            "destination": "timeshiftanddespike",
+            "links": [
+                [
+                    "output.epi",
+                    "input.epi"
+                ]
+            ]
+        },
+        {
+            "source": "skullstrip",
+            "destination": "alignt1toatlas",
+            "links": [
+                [
+                    "output.T1_skullstrip",
+                    "input.T1_skullstrip"
+                ]
+            ]
+        },
+        {
+            "source": "bidsselector",
+            "destination": "fieldmapcorrection",
+            "links": [
+                [
+                    "output.epi",
+                    "input.epi"
+                ]
+            ]
+        },
+        {
+            "source": "timeshiftanddespike",
+            "destination": "fieldmapcorrection",
+            "links": [
+                [
+                    "output.epi_aligned",
+                    "input.epi_aligned"
+                ]
+            ]
+        },
+        {
+            "source": "timeshiftanddespike",
+            "destination": "alignboldtot1",
+            "links": [
+                [
+                    "output.refimg",
+                    "input.refimg"
+                ]
+            ]
+        },
+        {
+            "source": "alignt1toatlas",
+            "destination": "alignboldtot1",
+            "links": [
+                [
+                    "output.T1_0",
+                    "input.T1_0"
+                ]
+            ]
+        },
+        {
+            "source": "alignt1toatlas",
+            "destination": "alignboldtoatlas",
+            "links": [
+                [
+                    "output.noskull_at",
+                    "input.noskull_at"
+                ],
+                [
+                    "output.nonlin_warp",
+                    "input.nonlin_warp"
+                ]
+            ]
+        },
+        {
+            "source": "alignboldtot1",
+            "destination": "alignboldtoatlas",
+            "links": [
+                [
+                    "output.oblique_transform",
+                    "input.oblique_transform"
+                ],
+                [
+                    "output.t1_2_epi",
+                    "input.t1_2_epi"
+                ]
+            ]
+        },
+        {
+            "source": "timeshiftanddespike",
+            "destination": "alignboldtoatlas",
+            "links": [
+                [
+                    "output.epi2epi1",
+                    "input.epi2epi1"
+                ],
+                [
+                    "output.tcat",
+                    "input.tcat"
+                ]
+            ]
+        }
+    ]
+}

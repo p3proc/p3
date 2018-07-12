@@ -49,11 +49,11 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     p3.write_graph(graph2use='colored')
 
     # Run pipeline (check multiproc setting)
-    if not settings['disable_run']:
-        if settings['multiproc']:
-            p3.run(plugin='MultiProc')
-        else:
-            p3.run()
+    # if not settings['disable_run']:
+    #     if settings['multiproc']:
+    #         p3.run(plugin='MultiProc')
+    #     else:
+    #         p3.run()
 
 
 def main():

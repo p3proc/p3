@@ -95,7 +95,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 (dn.skullstrip_avg_epi,dn.register_fieldmap,[
                     ('out_file','reference')
                 ]),
-                (dn.apply_mask,dn.register_mask,[ # mask image
+                (dn.create_mask,dn.register_mask,[ # mask image
                     ('out_file','in_file')
                 ]),
                 (dn.register_magnitude,dn.register_mask,[
