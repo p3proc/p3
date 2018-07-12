@@ -6,55 +6,18 @@ import os
 import sys
 import json
 from glob import glob
-from nipype import Workflow,config,logging
 import importlib
 import argparse
-from ppp.base import generate_subworkflows,default_settings,generate_connections
+from ppp.base import create_and_run_p3_workflow,default_settings
 
 # add p3 base files to path
-sys.path.append('p3')
+sys.path.append(os.path.abspath('p3'))
 
 # get default workflows path
-sys.path.append('workflows')
+sys.path.append(os.path.abspath('workflows'))
 
 # get version
 __version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'version')).read()
-
-def create_and_run_p3_workflow(imported_workflows,settings):
-    """
-        Create main workflow
-    """
-
-    # Set nipype config settings TODO expose these as debug settings
-    config.set('logging','workflow_level','DEBUG')
-    config.set('logging','workflow_level','DEBUG')
-    config.set('execution','hash_method','content')
-    config.set('execution','stop_on_first_crash','true')
-    logging.update_logging(config)
-
-    # define subworkflows from imported workflows
-    subworkflows = generate_subworkflows(imported_workflows,settings)
-
-    # create a workflow
-    p3 = Workflow(name='p3_pipeline',base_dir=settings['tmp_dir'])
-
-    # get connections
-    connections = generate_connections(subworkflows,settings)
-
-    # connect nodes
-    p3.connect(connections)
-
-    # Create graph images
-    p3.write_graph(graph2use='flat',simple_form=False)
-    p3.write_graph(graph2use='colored')
-
-    # Run pipeline (check multiproc setting)
-    # if not settings['disable_run']:
-    #     if settings['multiproc']:
-    #         p3.run(plugin='MultiProc')
-    #     else:
-    #         p3.run()
-
 
 def main():
     """
@@ -112,8 +75,12 @@ def main():
     parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
                         'is harder to debug when this option is on.',
                         action='store_true')
-    parser.add_argument('--disable_run', help='Stop after writing graphs. Does not run pipeline',
+    parser.add_argument('--disable_run', help='Stop after writing graphs. Does not run pipeline. Useful '
+                        'for making sure your workflow is connected properly before running.',
                         action='store_true')
+    parser.add_argument('-w','--workflows', help='Other paths p3 should search for workflows. Note that you '
+                        'should have an empty __init__.py so that the directory is importable.',
+                        nargs="+")
 
     # parse command line arguments
     args = parser.parse_args()
@@ -122,8 +89,6 @@ def main():
     if args.generate_settings:
         # get settings
         settings = default_settings()
-        # get cwd
-        cwd = os.getcwd()
         # write settings to file
         with open(os.path.join(cwd,'settings.json'),'w') as settings_file:
             json.dump(settings,settings_file,indent=4,separators=(',',': '))
@@ -136,6 +101,11 @@ def main():
         parser.print_usage()
         print('p3: error: positional arguments bids_dir/output_dir are required.')
         sys.exit(1)
+
+    # check workflows argument; add to path if necessary
+    if args.workflows:
+        for path in args.workflows: # loop over each path
+            sys.path.append(os.path.abspath(path))
 
     # only for a subset of subjects
     if args.participant_label:

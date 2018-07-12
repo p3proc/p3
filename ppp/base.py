@@ -5,10 +5,45 @@ TODO
 """
 import os
 import inspect
-from nipype import Workflow
+from nipype import Workflow,config,logging
 from nipype import Node
 from nipype.interfaces.utility import IdentityInterface
 from nipype.interfaces.io import DataSink
+
+def create_and_run_p3_workflow(imported_workflows,settings):
+    """
+        Create main workflow
+    """
+
+    # Set nipype config settings TODO expose these as debug settings
+    config.set('logging','workflow_level','DEBUG')
+    config.set('logging','workflow_level','DEBUG')
+    config.set('execution','hash_method','content')
+    config.set('execution','stop_on_first_crash','true')
+    logging.update_logging(config)
+
+    # define subworkflows from imported workflows
+    subworkflows = generate_subworkflows(imported_workflows,settings)
+
+    # create a workflow
+    p3 = Workflow(name='p3_pipeline',base_dir=settings['tmp_dir'])
+
+    # get connections
+    connections = generate_connections(subworkflows,settings)
+
+    # connect nodes
+    p3.connect(connections)
+
+    # Create graph images
+    p3.write_graph(graph2use='flat',simple_form=False)
+    p3.write_graph(graph2use='colored')
+
+    # Run pipeline (check multiproc setting)
+    if not settings['disable_run']:
+        if settings['multiproc']:
+            p3.run(plugin='MultiProc')
+        else:
+            p3.run()
 
 def generate_subworkflows(imported_workflows,settings):
     """
@@ -66,102 +101,102 @@ def default_settings():
     settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
     settings['despiking'] = True # sets whether epi images should be despiked
-    settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own freesurfer data under output freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
+    settings['run_recon_all'] = False # sets whether pipeline should run recon-all (if you decide not to you should place your own p3_freesurfer data under output p3_freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
     settings['workflows'] = [ # defines the workflows to import
-            'bidsselector',
-            'freesurfer',
-            'skullstrip',
-            'timeshiftanddespike',
-            'fieldmapcorrection',
-            'alignt1toatlas',
-            'alignboldtot1',
-            'alignboldtoatlas'
+            'p3_bidsselector',
+            'p3_freesurfer',
+            'p3_skullstrip',
+            'p3_timeshiftanddespike',
+            'p3_fieldmapcorrection',
+            'p3_alignt1toatlas',
+            'p3_alignboldtot1',
+            'p3_alignboldtoatlas'
         ]
     settings['connections'] = [ # defines the input/output connections between workflows
         {
-            'source': 'bidsselector',
-            'destination': 'freesurfer',
+            'source': 'p3_bidsselector',
+            'destination': 'p3_freesurfer',
             'links': [
                 ['output.T1','input.T1'],
                 ['output.subject','input.subject']
             ]
         },
         {
-            'source': 'bidsselector',
-            'destination': 'skullstrip',
+            'source': 'p3_bidsselector',
+            'destination': 'p3_skullstrip',
             'links': [
                 ['output.T1','input.T1']
             ]
         },
         {
-            'source': 'freesurfer',
-            'destination': 'skullstrip',
+            'source': 'p3_freesurfer',
+            'destination': 'p3_skullstrip',
             'links': [
                 ['output.orig','input.orig'],
                 ['output.brainmask','input.brainmask']
             ]
         },
         {
-            'source': 'bidsselector',
-            'destination': 'timeshiftanddespike',
+            'source': 'p3_bidsselector',
+            'destination': 'p3_timeshiftanddespike',
             'links': [
                 ['output.epi','input.epi']
             ]
         },
         {
-            'source': 'skullstrip',
-            'destination': 'alignt1toatlas',
+            'source': 'p3_skullstrip',
+            'destination': 'p3_alignt1toatlas',
             'links': [
                 ['output.T1_skullstrip','input.T1_skullstrip']
             ]
         },
         {
-            'source': 'bidsselector',
-            'destination': 'fieldmapcorrection',
+            'source': 'p3_bidsselector',
+            'destination': 'p3_fieldmapcorrection',
             'links': [
                 ['output.epi','input.epi']
-            ]  
+            ]
         },
         {
-            'source': 'timeshiftanddespike',
-            'destination': 'fieldmapcorrection',
+            'source': 'p3_timeshiftanddespike',
+            'destination': 'p3_fieldmapcorrection',
             'links': [
                 ['output.epi_aligned','input.epi_aligned']
             ]
         },
         {
-            'source': 'timeshiftanddespike',
-            'destination': 'alignboldtot1',
+            'source': 'p3_timeshiftanddespike',
+            'destination': 'p3_alignboldtot1',
             'links': [
                 ['output.refimg','input.refimg']
             ]
         },
         {
-            'source': 'alignt1toatlas',
-            'destination': 'alignboldtot1',
+            'source': 'p3_alignt1toatlas',
+            'destination': 'p3_alignboldtot1',
             'links': [
                 ['output.T1_0','input.T1_0']
             ]
         },
         {
-            'source': 'alignt1toatlas',
-            'destination': 'alignboldtoatlas',
+            'source': 'p3_alignt1toatlas',
+            'destination': 'p3_alignboldtoatlas',
             'links': [
                 ['output.noskull_at','input.noskull_at'],
                 ['output.nonlin_warp','input.nonlin_warp']
             ]
         },
         {
-            'source': 'alignboldtot1',
-            'destination': 'alignboldtoatlas',
+            'source': 'p3_alignboldtot1',
+            'destination': 'p3_alignboldtoatlas',
             'links': [
                 ['output.oblique_transform','input.oblique_transform'],
                 ['output.t1_2_epi','input.t1_2_epi']
             ]
         },
         {
-            'source': 'timeshiftanddespike',
-            'destination': 'alignboldtoatlas',
+            'source': 'p3_timeshiftanddespike',
+            'destination': 'p3_alignboldtoatlas',
             'links': [
                 ['output.epi2epi1','input.epi2epi1'],
                 ['output.tcat','input.tcat'],

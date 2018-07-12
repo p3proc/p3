@@ -2,7 +2,6 @@
 An fMRI Preprocessing Pipeline in python based on a 2015 Jonathan Power Pipeline
 
 #### Installing
-To use this pipeline you can do the following:
 
 ##### Docker/Singularity Install
 
@@ -47,7 +46,7 @@ p3.py -h
 usage: p3.py [-h]
              [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]]
              [--skip_bids_validator] [-v] [-s SETTINGS] [-g] [-m]
-             [--disable_run]
+             [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]]
              [bids_dir] [output_dir] [{participant,group}]
 
 p3 processing pipeline
@@ -90,6 +89,11 @@ optional arguments:
                         will ignore all other arguments.
   -m, --multiproc       Runs pipeline in multiprocessing mode. Note that it is
                         harder to debug when this option is on.
-  --disable_run         Stop after writing graphs. Does not run pipeline
-
+  --disable_run         Stop after writing graphs. Does not run pipeline.
+                        Useful for making sure your workflow is connected
+                        properly before running.
+  -w WORKFLOWS [WORKFLOWS ...], --workflows WORKFLOWS [WORKFLOWS ...]
+                        Other paths p3 should search for workflows. Note that
+                        you should have an empty __init__.py so that the
+                        directory is importable.
 ```

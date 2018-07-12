@@ -115,3 +115,6 @@ ENV/
 # miscellaneous output files
 graph.dot
 graph.png
+
+# settings file
+settings.json
