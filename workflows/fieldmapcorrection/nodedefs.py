@@ -29,7 +29,9 @@ class definednodes(basenodedefs):
         # self.set_subs([])
 
         # define datasink regular expression substitutions
-        # self.set_resubs([])
+        self.set_resubs([
+            (r'_warp_epi\d{1,3}','')
+        ])
 
         # get magnitude and phase
         self.getmagandphase = MapNode(
