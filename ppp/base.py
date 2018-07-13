@@ -23,29 +23,29 @@ def output_BIDS_summary(bids_dir):
     subs = layout.get_subjects()
     print('Availiable Subjects:')
     for s in subs:
-        print(s,end=', ')
+        print(s,end=' ')
     print('\n')
 
     # show availiable image types
     types = layout.get(target='type',return_type='id')
     print('Availiable Types:')
     for t in types:
-        print(t,end=', ')
+        print(t,end=' ')
     print('\n')
 
     # get T1s
     anat = layout.get(modality='anat')
     print('Availiable Anatomical Images:')
     for a in anat:
-        print(a.path,end=' ')
-    print('\n')
+        print(a.filename)
+    print('')
 
     # get all functional images
     func = layout.get(modality='func')
     print('Availiable Functional Images:')
     for f in func:
-        print(f.path,end=' ')
-    print('\n')
+        print(f.filename)
+    print('')
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
