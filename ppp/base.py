@@ -9,6 +9,39 @@ from nipype import Workflow,config,logging
 from nipype import Node
 from nipype.interfaces.utility import IdentityInterface
 from nipype.interfaces.io import DataSink
+from bids.grabbids import BIDSLayout
+
+def output_BIDS_summary(bids_dir):
+    """
+        Get a summary of the BIDS dataset input
+    """
+
+    # call pybids
+    layout = BIDSLayout(bids_dir)
+
+    # show availiable subjects
+    subs = layout.get_subjects()
+    print('Availiable Subjects:')
+    print(subs)
+    print('')
+
+    # show availiable image types
+    types = layout.get(target='type',return_type='id')
+    print('Availiable Types:')
+    print(types)
+    print('')
+
+    # get T1s
+    anat = layout.get(type='T1w')
+    print('Availiable T1s:')
+    print(anat)
+    print('')
+
+    # get all functional images
+    anat = layout.get(modality='func')
+    print('Availiable Functional Images:')
+    print(anat)
+    print('')
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """

@@ -8,7 +8,7 @@ import json
 from glob import glob
 import importlib
 import argparse
-from ppp.base import create_and_run_p3_workflow,default_settings
+from ppp.base import create_and_run_p3_workflow,default_settings,output_BIDS_summary
 
 # add p3 base files to path
 sys.path.append(os.path.abspath('p3'))
@@ -81,6 +81,7 @@ def main():
     parser.add_argument('-w','--workflows', help='Other paths p3 should search for workflows. Note that you '
                         'should have an empty __init__.py so that the directory is importable.',
                         nargs="+")
+    parser.add_argument('--summary', help='Get a summary of the BIDS dataset input.', action='store_true')
 
     # parse command line arguments
     args = parser.parse_args()
@@ -95,6 +96,19 @@ def main():
         # print nice message and exit
         print('A settings.json was generated in the current directory.')
         sys.exit()
+
+    # TODO run bids validator here
+
+    # check if summary flag enabled
+    if args.summary:
+        if args.bids_dir:
+            # print summary
+            output_BIDS_summary(os.path.abspath(args.bids_dir))
+            sys.exit()
+        else:
+            # print error
+            print('You must input a path to a valid BIDS dataset here.')
+            sys.exit(1)
 
     # check if bids_dir/output_dir is defined
     if not args.bids_dir or not args.output_dir:
