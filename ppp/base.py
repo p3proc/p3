@@ -62,7 +62,7 @@ def output_BIDS_summary(bids_dir):
         'modality'
         ]
     for k in keys:
-        query = layout.get(target='session',return_type='id')
+        query = layout.get(target=k,return_type='id')
         print('Availiable {}:'.format(k))
         for q in query:
             print(q,end=' ')
