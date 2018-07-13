@@ -195,11 +195,10 @@ def default_settings():
             ]
         },
         {
-            'source': 'p3_timeshiftanddespike',
+            'source': 'p3_fieldmapcorrection',
             'destination': 'p3_alignboldtoatlas',
             'links': [
-                ['output.epi2epi1','input.epi2epi1'],
-                ['output.tcat','input.tcat'],
+                ['output.epi','input.epi'],
             ]
         }
     ]

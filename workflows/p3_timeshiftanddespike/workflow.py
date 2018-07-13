@@ -57,14 +57,8 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             ]),
 
             # output to output node
-            (dn.volreg,dn.outputnode,[
-                ('oned_matrix_save','epi2epi1')
-            ]),
             (dn.extractroi,dn.outputnode,[
                 ('roi_file','refimg')
-            ]),
-            (dn.stc_despike_pool,dn.outputnode,[
-                ('epi','tcat')
             ]),
             (dn.volreg,dn.outputnode,[
                 ('out_file','epi_aligned')

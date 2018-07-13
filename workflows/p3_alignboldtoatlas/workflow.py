@@ -19,22 +19,19 @@ class alignboldtoatlasworkflow(workflowgenerator):
         # connect the workflow
         cls.workflow.connect([ # connect nodes
             # Create Atlas-Registered BOLD Data
-            (dn.inputnode,dn.transformepi2epi2mpr2atl,[
+            (dn.inputnode,dn.transformepi2mpr2atl,[
                 ('noskull_at','in_file')
             ]),
-            (dn.inputnode,dn.transformepi2epi2mpr2atl,[
+            (dn.inputnode,dn.transformepi2mpr2atl,[
                 ('oblique_transform','tfm1')
             ]),
-            (dn.inputnode,dn.transformepi2epi2mpr2atl,[
+            (dn.inputnode,dn.transformepi2mpr2atl,[
                 ('t1_2_epi','tfm2')
             ]),
-            (dn.inputnode,dn.transformepi2epi2mpr2atl,[
-                ('epi2epi1','tfm3')
-            ]),
             (dn.inputnode,dn.alignepi2atl,[
-                ('tcat','in_file')
+                ('epi','in_file')
             ]),
-            (dn.transformepi2epi2mpr2atl,dn.alignepi2atl,[
+            (dn.transformepi2mpr2atl,dn.alignepi2atl,[
                 ('master_transform','in_matrix')
             ]),
             (dn.inputnode,dn.alignepi2atl,[

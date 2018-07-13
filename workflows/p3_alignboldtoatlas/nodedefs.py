@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['noskull_at','nonlin_warp','oblique_transform','t1_2_epi','epi2epi1','tcat'])
+        self.set_input(['noskull_at','nonlin_warp','oblique_transform','t1_2_epi','epi'])
         self.set_output(['epi_at'])
 
         # define datasink substitutions
@@ -30,14 +30,13 @@ class definednodes(basenodedefs):
         ])
 
         # Create transform
-        self.transformepi2epi2mpr2atl = MapNode(
+        self.transformepi2mpr2atl = Node(
             Function(
-                input_names=['in_file','tfm1','tfm2','tfm3'],
+                input_names=['in_file','tfm1','tfm2'],
                 output_names=['master_transform'],
                 function=concattransform
             ),
-            iterfield=['tfm3'],
-            name='transformepi2epi2mpr2atl'
+            name='transformepi2mpr2atl'
         )
 
         # align images
@@ -47,7 +46,7 @@ class definednodes(basenodedefs):
                 overwrite=True,
                 outputtype='NIFTI_GZ'
             ),
-            iterfield=['in_matrix','in_file'],
+            iterfield=['in_file'],
             name='alignepi2atl'
         )
 

@@ -23,7 +23,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['epi','epi_aligned'])
-        self.set_output(['fmc_warp'])
+        self.set_output(['epi'])
 
         # define datasink substitutions
         # self.set_subs([])
