@@ -19,33 +19,53 @@ def output_BIDS_summary(bids_dir):
     # call pybids
     layout = BIDSLayout(bids_dir)
 
-    # show availiable subjects
-    subs = layout.get_subjects()
-    print('Availiable Subjects:')
-    for s in subs:
-        print(s,end=' ')
-    print('\n')
+    # print help message
+    print(
+        '\nThis summary internally uses pybids to show availiable keys to filter on.\n'
+        'If you are using the default p3_bidsselector workflow, you can use the keys\n'
+        'here to specify what images to process. For example, in the settings file:\n'
+        '\n\tbids_query = {'
+        '\n\t\t\'T1\':{'
+        '\n\t\t\t\'type\':\'T1w\''
+        '\n\t\t},'
+        '\n\t\t\'epi\':{'
+        '\n\t\t\t\'modality\':\'func\','
+        '\n\t\t\t\'task\':\'rest\''
+        '\n\t\t}'
+        '\n\t}\n\n'
+        'This will filter all T1 images by type \'T1w\', while epi images will use modality\n'
+        '\'func\' and task \'rest\'.\n\n'
+        'You can filter on specific subjects and runs by using []:\n'
+        '\n\tbids_query = {'
+        '\n\t\t\'T1\':{'
+        '\n\t\t\t\'type\':\'T1w\','
+        '\n\t\t\t\'subject\':\'MSC0[12]\''
+        '\n\t\t},'
+        '\n\t\t\'epi\':{'
+        '\n\t\t\t\'modality\':\'func\','
+        '\n\t\t\t\'task\':\'rest\','
+        '\n\t\t\t\'run\':\'[13]\''
+        '\n\t\t}'
+        '\n\t}\n\n'
+        'This will query will use subjects MSC01 and MSC02 and process epis with runs 1 and 3.\n\n'
+        'Below are some available keys in the dataset to filter on:\n'
+    )
 
-    # show availiable image types
-    types = layout.get(target='type',return_type='id')
-    print('Availiable Types:')
-    for t in types:
-        print(t,end=' ')
-    print('\n')
-
-    # get T1s
-    anat = layout.get(modality='anat')
-    print('Availiable Anatomical Images:')
-    for a in anat:
-        print(a.filename)
-    print('')
-
-    # get all functional images
-    func = layout.get(modality='func')
-    print('Availiable Functional Images:')
-    for f in func:
-        print(f.filename)
-    print('')
+    # show availiable keys
+    keys = [
+        'subject',
+        'session',
+        'run',
+        'type',
+        'task',
+        'modality'
+        ]
+    for k in keys:
+        query = layout.get(target='session',return_type='id')
+        print('Availiable {}:'.format(k))
+        for q in query:
+            print(q,end=' ')
+        print('\n')
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
@@ -129,10 +149,19 @@ def default_settings():
 
     # define default settings
     settings = {}
+    settings = { # bids query
+        'T1':{
+            'type':'T1w'
+            },
+        'epi':{
+            'modality':'func',
+            'task':'rest'
+            }
+        }
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
-    settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
     settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
+    settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['atlas'] = 'TT_N27+tlrc' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
     settings['avgT1s'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
     settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.

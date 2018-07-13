@@ -38,15 +38,7 @@ class definednodes(basenodedefs):
         self.bidsselection = Node(
             BIDSDataGrabber(
                 base_dir=settings['bids_dir'],
-                output_query={
-                    'T1':{
-                        'type':'T1w'
-                        },
-                    'epi':{
-                        'modality':'func',
-                        'task':'rest'
-                        }
-                    }
+                output_query=settings['bids_query']
             ),
             name='bidsselection'
         )
