@@ -5,6 +5,7 @@ TODO
 """
 import os
 import inspect
+import time
 from nipype import Workflow,config,logging
 from nipype import Node
 from nipype.interfaces.utility import IdentityInterface
@@ -67,6 +68,27 @@ def output_BIDS_summary(bids_dir):
             print(q,end=' ')
         print('\n')
 
+def check_query(bids_query,bids_dir):
+    """
+        Check BIDS selection query
+    """
+
+    # get bids layout
+    layout = BIDSLayout(bids_dir)
+
+    # parse bids query
+    output = {}
+    for key in bids_query:
+        # return the query
+        output[key] = layout.get(return_type='filename',**bids_query[key])
+        # print the output of the query
+        print('{}:'.format(key))
+        print(output[key])
+
+    # wait 5 seconds
+    print('Files listed are to be processed. Quit now if they are not the right ones.')
+    time.sleep(5)
+
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
         Create main workflow
@@ -94,6 +116,9 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
+
+    # check files being processed
+    check_query(settings['bids_query'],settings['bids_dir'])
 
     # Run pipeline (check multiproc setting)
     if not settings['disable_run']:

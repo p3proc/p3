@@ -8,7 +8,11 @@ import json
 from glob import glob
 import importlib
 import argparse
-from ppp.base import create_and_run_p3_workflow,default_settings,output_BIDS_summary
+from ppp.base import (
+    create_and_run_p3_workflow,
+    default_settings,
+    output_BIDS_summary
+    )
 
 # add p3 base files to path
 sys.path.append(os.path.abspath('p3'))
