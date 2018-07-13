@@ -22,8 +22,8 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['epi','epi_aligned'])
-        self.set_output(['epi'])
+        self.set_input(['epi','refimg','epi_aligned'])
+        self.set_output(['epi','refimg'])
 
         # define datasink substitutions
         # self.set_subs([])
@@ -152,7 +152,7 @@ class definednodes(basenodedefs):
             name='register_mask'
         )
 
-        # Warp average epi image with fieldmap
+        # Warp epi images with fieldmap
         self.warp_epi = MapNode(
             fsl.FUGUE(
                 save_unmasked_shift=True,
@@ -162,19 +162,21 @@ class definednodes(basenodedefs):
             name='warp_epi'
         )
 
-        # Make a warp image from field map
-        self.make_warp_image = MapNode(
-            fsl.FUGUE(
-                output_type='NIFTI_GZ'
+        # get the values to warp the refimg
+        self.get_refimg_files = Node(
+            Function(
+                input_names=['dwell_time','fmap_in_file','mask_file'],
+                output_names=['dwell_time','fmap_in_file','mask_file'],
+                function=lambda dwell_time,fmap_in_file,mask_file: (dwell_time[0],fmap_in_file[0],mask_file[0])
             ),
-            iterfield=['in_file','dwell_time','fmap_in_file','mask_file'],
-            name='make_warp_image'
+            name='get_refimg_files'
         )
 
-        self.convert_warp = MapNode(
-            fsl.ConvertWarp(
+        # Warp reference image with fieldmap
+        self.warp_refimg = Node(
+            fsl.FUGUE(
+                save_unmasked_shift=True,
                 output_type='NIFTI_GZ'
             ),
-            iterfield=['reference','shift_in_file'],
-            name='convert_warp'
+            name='warp_refimg'
         )

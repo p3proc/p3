@@ -105,7 +105,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('out_file','reference')
                 ]),
 
-                # Warp average epi image with fieldmap
+                # Warp epi images with fieldmap
                 (dn.inputnode,dn.warp_epi,[
                     ('epi_aligned','in_file')
                 ]),
@@ -119,14 +119,43 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('out_file','mask_file')
                 ]),
 
-                # Save out unwarped file
+                # Warp the refimg with fieldmap
+                (dn.getmagandphase,dn.get_refimg_files,[
+                    ('echospacing','dwell_time')
+                ]),
+                (dn.register_fieldmap,dn.get_refimg_files,[
+                    ('out_file','fmap_in_file')
+                ]),
+                (dn.register_mask,dn.get_refimg_files,[
+                    ('out_file','mask_file')
+                ]),
+                (dn.inputnode,dn.warp_refimg,[
+                    ('refimg','in_file')
+                ]),
+                (dn.get_refimg_files,dn.warp_refimg,[
+                    ('dwell_time','dwell_time')
+                ]),
+                (dn.get_refimg_files,dn.warp_refimg,[
+                    ('fmap_in_file','fmap_in_file')
+                ]),
+                (dn.get_refimg_files,dn.warp_refimg,[
+                    ('mask_file','mask_file')
+                ]),
+
+                # Save out unwarped files for QC
                 (dn.warp_epi,dn.datasink,[
                     ('unwarped_file','p3_QC.@unwarped_aligned_epi')
+                ]),
+                (dn.warp_refimg,dn.datasink,[
+                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg')
                 ]),
 
                 # Output unwarped file to output node
                 (dn.warp_epi,dn.outputnode,[
                     ('unwarped_file','epi')
+                ]),
+                (dn.warp_refimg,dn.outputnode,[
+                    ('unwarped_file','refimg')
                 ])
             ])
         else:
@@ -134,7 +163,8 @@ class fieldmapcorrectionworkflow(workflowgenerator):
             cls.workflow.connect([ # connect nodes
                 # skip field map correction
                 (dn.inputnode,dn.outputnode,[
-                    ('epi','epi')
+                    ('epi_aligned','epi'),
+                    ('refimg','refimg'),
                 ])
             ])
 

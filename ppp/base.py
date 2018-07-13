@@ -92,7 +92,7 @@ def default_settings():
 
     # define default settings
     settings = {}
-    settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed.)
+    settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
     settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
     settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
@@ -165,7 +165,7 @@ def default_settings():
             ]
         },
         {
-            'source': 'p3_timeshiftanddespike',
+            'source': 'p3_fieldmapcorrection',
             'destination': 'p3_alignboldtot1',
             'links': [
                 ['output.refimg','input.refimg']
