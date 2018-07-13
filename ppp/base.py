@@ -80,13 +80,14 @@ def check_query(bids_query,bids_dir):
     output = {}
     for key in bids_query:
         # return the query
-        output[key] = layout.get(return_type='filename',**bids_query[key])
+        output[key] = layout.get(**bids_query[key])
         # print the output of the query
         print('{}:'.format(key))
-        print(output[key])
+        for o in output[key]:
+            print(o.filename)
 
     # wait 5 seconds
-    print('Files listed are to be processed. Quit now if they are not the right ones.')
+    print('Files listed are to be processed. Quit now if they are not the right ones...')
     time.sleep(5)
 
 def create_and_run_p3_workflow(imported_workflows,settings):
