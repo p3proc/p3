@@ -119,6 +119,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     p3.write_graph(graph2use='colored')
 
     # check files being processed
+    # TODO: Not really sure if I want to keep this... is p3_bidsselector specific
     check_query(settings['bids_query'],settings['bids_dir'])
 
     # Run pipeline (check multiproc setting)
@@ -253,7 +254,8 @@ def default_settings():
             'source': 'p3_timeshiftanddespike',
             'destination': 'p3_fieldmapcorrection',
             'links': [
-                ['output.epi_aligned','input.epi_aligned']
+                ['output.epi_aligned','input.epi_aligned'],
+                ['output.refimg','input.refimg']
             ]
         },
         {
