@@ -149,7 +149,7 @@ def default_settings():
 
     # define default settings
     settings = {}
-    settings = { # bids query
+    settings['bids_query'] = { # bids query
         'T1':{
             'type':'T1w'
             },
