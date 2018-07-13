@@ -23,7 +23,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['epi','refimg','epi_aligned'])
-        self.set_output(['epi','refimg'])
+        self.set_output(['fmc_shiftmap','refimg'])
 
         # define datasink substitutions
         # self.set_subs([])
@@ -179,4 +179,10 @@ class definednodes(basenodedefs):
                 output_type='NIFTI_GZ'
             ),
             name='warp_refimg'
+        )
+
+        # convert the reference image to a warp file
+        self.convertwarp = Node(
+            fsl.ConvertWarp(),
+            name='convertwarp'
         )

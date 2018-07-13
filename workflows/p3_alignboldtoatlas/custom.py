@@ -3,7 +3,7 @@
 """
 
 # concatenate transform
-def concattransform(in_file,tfm1,tfm2):
+def concattransform(in_file,tfm1,tfm2,tfm3):
     import os
     import shutil
 
@@ -14,6 +14,7 @@ def concattransform(in_file,tfm1,tfm2):
     input_file = os.path.abspath(shutil.copy2(in_file,cwd))
     tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
     tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
+    tfm_file3 = os.path.abspath(shutil.copy2(tfm3,cwd))
 
     # strip filename
     filename,ext = os.path.splitext(os.path.basename(tfm_file1))
@@ -21,18 +22,19 @@ def concattransform(in_file,tfm1,tfm2):
         filename,ext = os.path.splitext(filename)
 
     # format string
-    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I'.format(
+    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I {}'.format(
         in_file,
         tfm_file1,
-        tfm_file2
+        tfm_file2,
+        tfm_file3
     )
 
     # run cat_matvec for transform to ATL space
     os.system('cat_matvec {} > {}'.format(
         format_string,
-        os.path.join(cwd,'{}_XFM_EPI2MPR2ATL.aff12.1D'.format(filename))
+        os.path.join(cwd,'{}_XFM_EPI2EPI2MPR2ATL.aff12.1D'.format(filename))
     ))
-    master_transform = os.path.join(cwd,'{}_XFM_EPI2MPR2ATL.aff12.1D'.format(filename))
+    master_transform = os.path.join(cwd,'{}_XFM_EPI2EPI2MPR2ATL.aff12.1D'.format(filename))
 
     # return master transform
     return master_transform

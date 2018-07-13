@@ -63,6 +63,12 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             (dn.volreg,dn.outputnode,[
                 ('out_file','epi_aligned')
             ]),
+            (dn.volreg,dn.outputnode,[
+                ('oned_matrix_save','epi2epi1')
+            ]),
+            (dn.stc_despike_pool,dn.outputnode,[
+                ('epi','tcat')
+            ]),
 
             # output epi alignments for QC
             (dn.volreg,dn.datasink,[

@@ -147,15 +147,16 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('unwarped_file','p3_QC.@unwarped_aligned_epi')
                 ]),
                 (dn.warp_refimg,dn.datasink,[
-                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg')
+                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg'),
+                    ('shift_out_file','p3_QC.@shift_out_file')
                 ]),
 
-                # Output unwarped file to output node
-                (dn.warp_epi,dn.outputnode,[
-                    ('unwarped_file','epi')
-                ]),
+                # Output unwarp outputs for fmc to output node
                 (dn.warp_refimg,dn.outputnode,[
                     ('unwarped_file','refimg')
+                ]),
+                (dn.warp_refimg,dn.outputnode,[
+                    ('shift_out_file','fmc_shiftmap')
                 ])
             ])
         else:

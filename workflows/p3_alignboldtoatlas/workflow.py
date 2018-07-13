@@ -28,8 +28,11 @@ class alignboldtoatlasworkflow(workflowgenerator):
             (dn.inputnode,dn.transformepi2mpr2atl,[
                 ('t1_2_epi','tfm2')
             ]),
+            (dn.inputnode,dn.transformepi2mpr2atl,[
+                ('epi2epi1','tfm3')
+            ]),
             (dn.inputnode,dn.alignepi2atl,[
-                ('epi','in_file')
+                ('tcat','in_file')
             ]),
             (dn.transformepi2mpr2atl,dn.alignepi2atl,[
                 ('master_transform','in_matrix')

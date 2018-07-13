@@ -58,6 +58,9 @@ class alignt1toatlasworkflow(workflowgenerator):
                 # output T1 atlas nonlinear alignment to p3 output
                 (dn.Qwarp,dn.datasink,[
                     ('out_file','p3.@T1_Qwarp')
+                ]),
+                (dn.Qwarp,dn.datasink,[
+                    ('warp_file','p3_QC.@T1_warp_file')
                 ])
             ])
 

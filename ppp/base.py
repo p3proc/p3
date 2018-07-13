@@ -289,10 +289,18 @@ def default_settings():
             ]
         },
         {
+            'source': 'p3_timeshiftanddespike',
+            'destination': 'p3_alignboldtoatlas',
+            'links': [
+                ['output.tcat','input.tcat'],
+                ['output.epi2epi1','input.epi2epi1']
+            ]
+        },
+        {
             'source': 'p3_fieldmapcorrection',
             'destination': 'p3_alignboldtoatlas',
             'links': [
-                ['output.epi','input.epi'],
+                ['output.fmc_shiftmap','input.fmc_shiftmap']
             ]
         }
     ]
