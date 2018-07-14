@@ -34,10 +34,9 @@ def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
     print(concatenated_warps)
 
     # run 3dNwarpApply
-    os.system('3dNwarpApply -nwarp {} -source {} -master {} -prefix {}'.format(
+    os.system('3dNwarpApply -nwarp {} -source {} -prefix {}'.format(
         concatenated_warps,
         in_file,
-        reference,
         out_file
     ))
 
