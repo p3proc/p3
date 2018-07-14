@@ -38,6 +38,9 @@ class alignt1toatlasworkflow(workflowgenerator):
             # output T1 atlas alignment to p3 output
             (dn.register,dn.datasink,[
                 ('out_file','p3.@T1_at')
+            ]),
+            (dn.register,dn.datasink,[
+                ('transform_file','p3_QC.@t1_2_atlas_transform')
             ])
         ])
 
