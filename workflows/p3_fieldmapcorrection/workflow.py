@@ -143,24 +143,30 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # convert shiftmap to afni format
-                # (dn.warp_refimg,dn.afni_fmc,[
-                #     ('shift_out_file','')
-                # ]),
+                (dn.warp_refimg,dn.afni_fmc,[
+                    ('shift_out_file','in_file')
+                ]),
+                (dn.getmagandphase,dn.afni_fmc,[
+                    ('phasediff','phasediff')
+                ]),
 
                 # Save out unwarped files for QC
                 (dn.warp_epi,dn.datasink,[
                     ('unwarped_file','p3_QC.@unwarped_aligned_epi')
                 ]),
                 (dn.warp_refimg,dn.datasink,[
-                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg'),
+                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg')
+                ]),
+                (dn.afni_fmc,dn.datasink,[
+                    ('out_file','p3_QC.@afni_fmc')
                 ]),
 
                 # Output unwarp outputs for fmc to output node
                 (dn.warp_refimg,dn.outputnode,[
                     ('unwarped_file','refimg')
                 ]),
-                (dn.warp_refimg,dn.outputnode,[
-                    ('shift_out_file','fmc')
+                (dn.afni_fmc,dn.outputnode,[
+                    ('out_file','fmc')
                 ])
             ])
         else:

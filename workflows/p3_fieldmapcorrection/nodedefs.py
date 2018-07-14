@@ -184,9 +184,10 @@ class definednodes(basenodedefs):
         # convert the reference image to a warp file
         self.afni_fmc = Node(
             Function(
-                input_names=[],
-                output_names=[],
-                function=lambda x: x
+                input_names=['in_file','bids_dir','phasediff'],
+                output_names=['out_file'],
+                function=convert_2_afni
             ),
             name='afni_fmc'
         )
+        self.afni_fmc.inputs.bids_dir = settings['bids_dir']
