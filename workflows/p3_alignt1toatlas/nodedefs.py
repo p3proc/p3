@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['T1_skullstrip'])
-        self.set_output(['noskull_at','noskull_Qwarp','nonlin_warp','t1_2_atlas_transform','T1_0'])
+        self.set_output(['noskull_at','nonlin_warp','t1_2_atlas_transform','T1_0'])
 
         # define datasink substitutions
         self.set_subs([

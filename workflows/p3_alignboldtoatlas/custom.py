@@ -2,71 +2,44 @@
     Define Custom Functions and Interfaces
 """
 
-# concatenate transform
-def concattransform(in_file,tfm1,tfm2,tfm3):
+def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
     import os
-    import shutil
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
-
-    # copy files to cwd
-    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
-    tfm_file1 = os.path.abspath(shutil.copy2(tfm1,cwd))
-    tfm_file2 = os.path.abspath(shutil.copy2(tfm2,cwd))
-    tfm_file3 = os.path.abspath(shutil.copy2(tfm3,cwd))
-
-    # strip filename
-    filename,ext = os.path.splitext(os.path.basename(tfm_file1))
-    while(ext != ''):
-        filename,ext = os.path.splitext(filename)
-
-    # format string
-    format_string = '-ONELINE {}::WARP_DATA -I {} {} -I {}'.format(
-        in_file,
-        tfm_file1,
-        tfm_file2,
-        tfm_file3
-    )
-
-    # run cat_matvec for transform to ATL space
-    os.system('cat_matvec {} > {}'.format(
-        format_string,
-        os.path.join(cwd,'{}_XFM_EPI2EPI2MPR2ATL.aff12.1D'.format(filename))
-    ))
-    master_transform = os.path.join(cwd,'{}_XFM_EPI2EPI2MPR2ATL.aff12.1D'.format(filename))
-
-    # return master transform
-    return master_transform
-
-# apply nonlinear transform
-def NwarpApply(in_file,warped_file):
-    import os
-    import shutil
-
-    # save to node folder (go up 2 directories bc of iterfield)
-    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
-
-    # copy files to cwd
-    input_file = os.path.abspath(shutil.copy2(in_file,cwd))
-    warped_file = os.path.abspath(shutil.copy2(warped_file,cwd))
 
     # strip filename
     filename,ext = os.path.splitext(os.path.basename(in_file))
     while(ext != ''):
         filename,ext = os.path.splitext(filename)
-    out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(filename))
+    out_file = os.path.join(cwd,'{}_atlasalign.nii.gz'.format(filename))
 
     # check if file already exist and remove it if it does
     if os.path.exists(out_file):
         os.remove(out_file)
 
+    # check if nonlinear transform defined
+    if not tfm0:
+        tfm = '' # set to empty string
+
+    # check if field map correction disabled
+    if not tfm4:
+        tfm = '' # set to empty string
+
+    # tfm3 is t1 --> epi; invert the warp
+    tfm3 = 'INV({})'.format(tfm3)
+
+    # concatenate warps
+    concatenated_warps = ' '.join([tfm0,tfm1,tfm2,tfm3,tfm4,tfm5])
+    print(concatenated_warps)
+
     # run 3dNwarpApply
-    os.system('3dNwarpApply -nwarp {} -source {} -prefix {}'.format(
-        warped_file,
+    os.system('3dNwarpApply -nwarp {} -source {} -master {} -prefix {}'.format(
+        concatenated_warps,
         in_file,
+        reference,
         out_file
     ))
 
-    # output warped file
+    # return aligned image
     return out_file

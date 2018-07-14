@@ -276,6 +276,7 @@ def default_settings():
             'source': 'p3_alignt1toatlas',
             'destination': 'p3_alignboldtoatlas',
             'links': [
+                ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
                 ['output.noskull_at','input.noskull_at'],
                 ['output.nonlin_warp','input.nonlin_warp']
             ]
@@ -300,7 +301,7 @@ def default_settings():
             'source': 'p3_fieldmapcorrection',
             'destination': 'p3_alignboldtoatlas',
             'links': [
-                ['output.fmc_shiftmap','input.fmc_shiftmap']
+                ['output.fmc','input.fmc']
             ]
         }
     ]

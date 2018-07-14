@@ -19,60 +19,38 @@ class alignboldtoatlasworkflow(workflowgenerator):
         # connect the workflow
         cls.workflow.connect([ # connect nodes
             # Create Atlas-Registered BOLD Data
-            (dn.inputnode,dn.transformepi2mpr2atl,[
-                ('noskull_at','in_file')
+            (dn.inputnode,dn.applymastertransform,[
+                ('nonlin_warp','tfm0')
             ]),
-            (dn.inputnode,dn.transformepi2mpr2atl,[
-                ('oblique_transform','tfm1')
+            (dn.inputnode,dn.applymastertransform,[
+                ('t1_2_atlas_transform','tfm1')
             ]),
-            (dn.inputnode,dn.transformepi2mpr2atl,[
-                ('t1_2_epi','tfm2')
+            (dn.inputnode,dn.applymastertransform,[
+                ('oblique_transform','tfm2')
             ]),
-            (dn.inputnode,dn.transformepi2mpr2atl,[
-                ('epi2epi1','tfm3')
+            (dn.inputnode,dn.applymastertransform,[
+                ('t1_2_epi','tfm3')
             ]),
-            (dn.inputnode,dn.alignepi2atl,[
+            (dn.inputnode,dn.applymastertransform,[
+                ('epi2epi1','tfm5')
+            ]),
+            (dn.inputnode,dn.applymastertransform,[
                 ('tcat','in_file')
             ]),
-            (dn.transformepi2mpr2atl,dn.alignepi2atl,[
-                ('master_transform','in_matrix')
-            ]),
-            (dn.inputnode,dn.alignepi2atl,[
+            (dn.inputnode,dn.applymastertransform,[
                 ('noskull_at','reference')
             ]),
 
             # output to output node
-            (dn.alignepi2atl,dn.outputnode,[
+            (dn.applymastertransform,dn.outputnode,[
                 ('out_file','epi_at')
             ]),
 
             # output to datasink
-            (dn.alignepi2atl,dn.datasink,[
+            (dn.applymastertransform,dn.datasink,[
                 ('out_file','p3.@epi')
             ])
         ])
-
-        # if nonlinear transform set
-        if settings['nonlinear_atlas']:
-            cls.workflow.connect([
-                # apply nonlinear transform
-                (dn.alignepi2atl,dn.applyQwarptransform,[
-                    ('out_file','in_file')
-                ]),
-                (dn.inputnode,dn.applyQwarptransform,[
-                    ('nonlin_warp','warped_file')
-                ]),
-
-                # output to output node
-                (dn.applyQwarptransform,dn.outputnode,[
-                    ('out_file','epi_Qwarp')
-                ]),
-
-                # output to datasink
-                (dn.outputnode,dn.datasink,[
-                    ('epi_Qwarp','p3.@epi_Qwarp')
-                ])
-            ])
 
         # return workflow
         return cls.workflow

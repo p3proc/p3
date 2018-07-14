@@ -31,7 +31,6 @@ class alignt1toatlasworkflow(workflowgenerator):
                 ('T1_0','T1_0')
             ]),
             (dn.register,dn.outputnode,[
-                ('out_file','noskull_at'),
                 ('transform_file','t1_2_atlas_transform')
             ]),
 
@@ -54,7 +53,7 @@ class alignt1toatlasworkflow(workflowgenerator):
 
                 # output to output node
                 (dn.Qwarp,dn.outputnode,[
-                    ('out_file','noskull_Qwarp'),
+                    ('out_file','noskull_at'),
                     ('warp_file','nonlin_warp'),
                 ]),
 
@@ -64,6 +63,12 @@ class alignt1toatlasworkflow(workflowgenerator):
                 ]),
                 (dn.Qwarp,dn.datasink,[
                     ('warp_file','p3_QC.@T1_warp_file')
+                ])
+            ])
+        else: # if nonlinear not enable just output the affine aligned file
+            cls.workflow.connect([
+                (dn.register,dn.outputnode,[
+                    ('out_file','noskull_at')
                 ])
             ])
 

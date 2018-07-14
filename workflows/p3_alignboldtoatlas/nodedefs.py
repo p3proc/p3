@@ -21,43 +21,19 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['noskull_at','nonlin_warp','oblique_transform','t1_2_epi','tcat','epi2epi1','fmc_shiftmap'])
+        self.set_input(['noskull_at','nonlin_warp','t1_2_atlas_transform','oblique_transform','t1_2_epi','fmc','epi2epi1','tcat'])
         self.set_output(['epi_at'])
 
         # define datasink substitutions
-        self.set_resubs([
-            ('_alignepi2atl\d{1,3}','')
-        ])
-
-        # Create transform
-        self.transformepi2mpr2atl = MapNode(
-            Function(
-                input_names=['in_file','tfm1','tfm2','tfm3'],
-                output_names=['master_transform'],
-                function=concattransform
-            ),
-            iterfield=['tfm3'],
-            name='transformepi2mpr2atl'
-        )
-
-        # align images
-        self.alignepi2atl = MapNode(
-            afni.Allineate(
-                args='-mast_dxyz 3',
-                overwrite=True,
-                outputtype='NIFTI_GZ'
-            ),
-            iterfield=['in_file','in_matrix'],
-            name='alignepi2atl'
-        )
+        self.set_resubs([])
 
         # apply nonlinear transform
-        self.applyQwarptransform = MapNode(
+        self.applymastertransform = MapNode(
             Function(
-                input_names=['in_file','warped_file'],
+                input_names=['in_file','reference','tfm0','tfm1','tfm2','tfm3','tfm4','tfm5'],
                 output_names=['out_file'],
                 function=NwarpApply
             ),
             iterfield=['in_file'],
-            name='applyQwarptransform'
+            name='applymastertransform'
         )
