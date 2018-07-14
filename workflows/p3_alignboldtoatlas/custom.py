@@ -20,14 +20,14 @@ def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
 
     # check if nonlinear transform defined
     if not tfm0:
-        tfm = '' # set to empty string
+        tfm0 = '' # set to empty string
 
     # check if field map correction disabled
     if not tfm4:
-        tfm = '' # set to empty string
+        tfm4 = '' # set to empty string
 
     # tfm3 is t1 --> epi; invert the warp
-    tfm3 = 'INV({})'.format(tfm3)
+    tfm3 = '\'INV({})\''.format(tfm3)
 
     # concatenate warps
     concatenated_warps = ' '.join([tfm0,tfm1,tfm2,tfm3,tfm4,tfm5])

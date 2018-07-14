@@ -34,6 +34,6 @@ class definednodes(basenodedefs):
                 output_names=['out_file'],
                 function=NwarpApply
             ),
-            iterfield=['in_file'],
+            iterfield=['in_file','tfm5'],
             name='applymastertransform'
         )
