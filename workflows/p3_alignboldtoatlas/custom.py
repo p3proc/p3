@@ -30,7 +30,7 @@ def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
     tfm3 = '\'INV({})\''.format(tfm3)
 
     # concatenate warps
-    concatenated_warps = ' '.join([tfm5,tfm4,tfm3,tfm2,tfm1,tfm0])
+    concatenated_warps = ' '.join([tfm0,tfm1,tfm2,tfm3,tfm4,tfm5])
     print(concatenated_warps)
 
     # run 3dNwarpApply
