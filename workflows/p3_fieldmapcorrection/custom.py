@@ -69,6 +69,7 @@ def fsl_prepare_fieldmap(phasediff,magnitude,TE):
 def convert_2_afni(in_file,bids_dir,phasediff):
     import os
     import subprocess
+    from bids.grabbids import BIDSLayout
 
     # I'm lazy, so I just pass in the entire phasediff list...
     # just take the first item of the list because thats the fieldmap
@@ -103,16 +104,16 @@ def convert_2_afni(in_file,bids_dir,phasediff):
         else:
             raise ValueError('Invalid Orientation!')
     elif ped[0] == 'j':
-        if orientation[0] == 'A':
+        if orientation[1] == 'A':
             orient_code = 'AP'
-        elif orientation[0] == 'P':
+        elif orientation[1] == 'P':
             orient_code = 'PA'
         else:
             raise ValueError('Invalid Orientation!')
     elif ped[0] == 'k':
-        if orientation[0] == 'I':
+        if orientation[2] == 'I':
             orient_code = 'IS'
-        elif orientation[0] == 'S':
+        elif orientation[2] == 'S':
             orient_code = 'SI'
         else:
             raise ValueError('Invalid Orientation!')
