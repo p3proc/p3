@@ -26,7 +26,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['T1','subject'])
-        self.set_output(['orig','brainmask'])
+        self.set_output(['orig','brainmask','aparc_aseg'])
 
         # get names of t1
         self.t1names = MapNode(

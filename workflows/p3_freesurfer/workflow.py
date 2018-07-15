@@ -52,6 +52,9 @@ class freesurferworkflow(workflowgenerator):
                 (dn.inputnode,dn.reconall,[
                     ('T1','T1_files'),
                     ('subject','subject_id')
+                ]),
+                (dn.reconall,dn.outputnode,[
+                    ('aparc_aseg','aparc_aseg')
                 ])
             ])
 

@@ -102,6 +102,9 @@ class skullstripworkflow(workflowgenerator):
             (dn.maskop4,dn.outputnode,[
                 ('out_file','T1_skullstrip')
             ]),
+            (dn.allineate_orig,dn.outputnode,[
+                ('out_matrix','fs2mpr')
+            ]),
 
             # save out skullstrip
             (dn.maskop4,dn.datasink,[
