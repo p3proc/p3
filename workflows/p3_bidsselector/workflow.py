@@ -72,6 +72,9 @@ class bidsselectorworkflow(workflowgenerator):
             # set outputs
             (dn.bidsselection,dn.outputnode,[
                 ('epi','epi')
+            ]),
+            (dn.inputnode,dn.outputnode,[
+                ('subject','subject')
             ])
         ])
 
