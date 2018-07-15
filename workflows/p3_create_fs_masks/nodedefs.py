@@ -35,10 +35,10 @@ class definednodes(basenodedefs):
         #self.set_output(['']
 
         # define datasink substitutions
-        self.set_subs([])
+        #self.set_subs([])
 
         # define datasink substitutions
-        self.set_resubs([]])
+        #self.set_resubs([]])
 
         # convert freesurfer segmentation
         self.mri_convert = Node(

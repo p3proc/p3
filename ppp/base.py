@@ -204,6 +204,7 @@ def default_settings():
             'p3_alignt1toatlas',
             'p3_alignboldtot1',
             'p3_alignboldtoatlas'
+            'p3_create_fs_masks'
         ]
     settings['connections'] = [ # defines the input/output connections between workflows
         {
