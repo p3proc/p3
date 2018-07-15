@@ -225,8 +225,19 @@ class bidsselectorworkflow(workflowgenerator):
                 ('epi_at','master')
             ]),
 
-            # and finally create images of the TT_N27 atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
-            
+            # and finally create images of the atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
+            (dn.inputnode,dn.epi_resampled,[
+                ('out_file','atlas')
+            ]),
+            (dn.inputnode,dn.epi_resampled,[
+                ('out_file','T1')
+            ]),
+            (dn.aparc_aseg_align,dn.epi_resampled,[
+                ('out_file','aparc_aseg')
+            ]),
+            (dn.inputnode,dn.epi_resampled,[
+                ('epi_at','epi')
+            ])
         ])
 
         # return workflow

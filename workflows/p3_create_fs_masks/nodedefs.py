@@ -29,7 +29,8 @@ class definednodes(basenodedefs):
             'nonlin_warp',
             't1_2_atlas_transform',
             'fs2mpr',
-            'epi_at'
+            'epi_at',
+            'noskull_at'
             ])
         #self.set_output(['']
 
@@ -246,4 +247,14 @@ class definednodes(basenodedefs):
                 resample_mode='NN',
             ),
             name='resample2_gm'
+        )
+
+        # and finally create images of the atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
+        self.epi_resampled = Node(
+            Function(
+                input_names=['atlas','T1','aparc_aseg','epi'],
+                output_names=['atlas_epi','T1_epi','aparc_aseg_epi'],
+                function=resample_2_epi
+            ),
+            name='epi_resampled'
         )
