@@ -2,6 +2,10 @@
 FROM python:3.6.6-slim-stretch
 MAINTAINER Andrew Van <vanandrew@wustl.edu>
 
+# Install wget and curl
+RUN apt-get update && \
+    apt-get install -y wget curl
+
 # Install stuff from neurodebian: fsleyes and afni
 # I use the -allow-unauthenticated tag bc neurodebian needs to update their gpg keys!!!
 # NOTE: I remove the neurodebian source afterwards since I don't verify it
@@ -70,6 +74,6 @@ ENV PATH=${PATH}:/opt/freesurfer/bin:/opt/freesurfer/fsfast/bin:/opt/freesurfer/
 
 # Install Python Stuff
 WORKDIR /
-ADD requirements.txt
+ADD requirements.txt /
 RUN pip install -r requirements.txt && \
     rm requirements.txt
