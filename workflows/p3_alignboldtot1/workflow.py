@@ -85,6 +85,9 @@ class alignboldtot1workflow(workflowgenerator):
             (dn.registert12tcat,dn.datasink,[
                 ('out_matrix','p3_QC.@t1_2_epi')
             ]),
+            (dn.registert12tcat,dn.datasink,[
+                ('out_file','p3_QC.@t1_2_epi_img')
+            ]),
             (dn.warp,dn.datasink,[
                 ('ob_transform','p3_QC.@oblique_transform')
             ]),
