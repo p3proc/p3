@@ -87,7 +87,10 @@ class alignboldtot1workflow(workflowgenerator):
             ]),
             (dn.warp,dn.datasink,[
                 ('ob_transform','p3_QC.@oblique_transform')
-            ])
+            ]),
+            (dn.warp,dn.datasink,[
+                ('out_file','p3_QC.@T1_oblique')
+            ]),
         ])
 
         # return workflow
