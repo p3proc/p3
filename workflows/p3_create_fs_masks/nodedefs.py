@@ -30,7 +30,8 @@ class definednodes(basenodedefs):
             't1_2_atlas_transform',
             'fs2mpr',
             'epi_at',
-            'noskull_at'
+            'noskull_at',
+            'atlas'
             ])
         #self.set_output(['']
 
