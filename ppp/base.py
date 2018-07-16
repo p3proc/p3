@@ -178,6 +178,7 @@ def default_settings():
     settings = {}
     settings['bids_query'] = { # bids query
         'T1':{
+            'modality': 'anat',
             'type':'T1w'
             },
         'epi':{
