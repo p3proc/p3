@@ -20,7 +20,7 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
 
     # if atlas is not already .nii.gz; convert to .nii.gz
     if ext != 'gz':
-        os.system('mri_convert -prefix {} {}'.format(
+        os.system('mri_convert {} {}'.format(
             atlas,
             os.path.join(cwd,'{}.nii.gz'.format(name))
         ))
