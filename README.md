@@ -39,14 +39,10 @@ For more comprehensive usage information, see the [documentation](http://p3.read
 
 See Help
 ```
-p3.py -h
-```
-
-```
 usage: p3.py [-h]
              [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]]
              [--skip_bids_validator] [-v] [-s SETTINGS] [-g] [-m]
-             [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]]
+             [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]] [--summary]
              [bids_dir] [output_dir] [{participant,group}]
 
 p3 processing pipeline
@@ -96,4 +92,5 @@ optional arguments:
                         Other paths p3 should search for workflows. Note that
                         you should have an empty __init__.py so that the
                         directory is importable.
+  --summary             Get a summary of the BIDS dataset input.
 ```

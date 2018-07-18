@@ -1,67 +1,45 @@
 .. p3 documentation master file, created by
-   sphinx-quickstart on Thu Jul 12 12:29:44 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+    sphinx-quickstart on Thu Jul 12 12:29:44 2018.
+    You can adapt this file completely to your liking, but it should at least
+    contain the root `toctree` directive.
 
-Welcome to p3's documentation!
-==============================
+p3 fmri processing pipeline
+===========================
+
+The p3 processing pipeline is extensible preprocessing pipeline that encourages
+experimentation and customization. In addition to providing a BIDS_-compatible preprocessing
+pipeline for users, it also provides a platform to quickly and easily integrate new
+processing methods into an neuroimaging processing stream.
+
+Powered by the nipype_ project, p3 takes advantage of the cross package python interface
+it provides, allowing users to use a variety of neuroimaging software in their pipelines from
+one standard interface. The nipype_ concepts of nodes and workflows allows users to construct
+processing streams in an intuitive manner.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-.. container::
+    usage/usage.rst
 
-    This summary internally uses pybids to show availiable keys to filter on.
-    If you are using the default p3_bidsselector workflow, you can use the keys
-    here to specify what images to process. For example, in the settings file:
+Quick Usage
+-----------
 
-    .. code:: json
+p3 uses the standard BIDS app run command. You can run p3 by simply running:
 
-        {
-            'bids_query':
-            {
-                'T1':
-                {
-                    'type': 'T1w'
-                },
-                'epi':
-                {
-                    'modality': 'func',
-                    'task: 'rest'
-                }
-            }
-        }
+.. code:: bash
 
-    This will filter all T1 images by type T1w, while epi images will use modality
-    'func and task rest.
+    p3.py [BIDS directory] [output directory]
 
-    You can filter on specific subjects and runs by using []:
+This will run the p3 pipeline with the all standard built in settings.
 
-    .. code:: json
+If you are using the docker version of p3. The command is:
 
-        {
-            'bids_query':
-            {
-                'T1':
-                {
-                    'type': 'T1w',
-                    'subject': 'MSC0[12]'
-                },
-                'epi':
-                {
-                    'modality': 'func',
-                    'task': 'rest',
-                    'run': '[13]'
-                }
-            }
-        }
+.. code:: bash
 
-    This will query will use subjects MSC01 and MSC02 and process epis with runs 1 and 3.
+    docker run -it --rm \
+        -v [BIDS directory]:/input \
+        -v [output directory]:/output \
+        vanandrew/p3 /input /output
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. include:: links.rst
