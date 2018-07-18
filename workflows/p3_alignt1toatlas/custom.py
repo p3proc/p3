@@ -7,16 +7,19 @@ def register_atlas(in_file,atlas):
     import os
     import shutil
 
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,os.getcwd()))
+
     # spawn the auto_tlrc process with os.system
     os.system(
         '@auto_tlrc -no_ss -base {} -input {} -pad_input 60'.format(
             atlas,
-            in_file
+            input_file
         )
     )
 
     # split extension of input file
-    name,ext = os.path.splitext(os.path.basename(in_file))
+    name,ext = os.path.splitext(input_file)
     while(ext != ''):
         name,ext = os.path.splitext(name)
     filename = '{}_at.nii'.format(name)
@@ -35,13 +38,15 @@ def register_atlas(in_file,atlas):
 def nonlinear_register(in_file,base_file):
     import os
     import shutil
-    import subprocess
 
     # get cwd
     cwd = os.getcwd()
 
+    # copy file to cwd
+    input_file = os.path.basename(shutil.copy2(in_file,cwd))
+
     # split extension of input file
-    name,ext = os.path.splitext(os.path.basename(in_file))
+    name,ext = os.path.splitext(input_file)
     while(ext != ''):
         name,ext = os.path.splitext(name)
     out_file = os.path.join(cwd,'{}_Qwarp.nii.gz'.format(name))
@@ -57,7 +62,7 @@ def nonlinear_register(in_file,base_file):
     os.system('3dQwarp -prefix {} -base {} -source {}'.format(
         out_file,
         base_file,
-        in_file
+        input_file
     ))
 
     # return nonlinear transformed file
