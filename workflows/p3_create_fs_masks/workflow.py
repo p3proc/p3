@@ -225,19 +225,26 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
                 (dn.epi_firstrun,dn.resample2_gm,[
                     ('epi_at','master')
+                ]),
+
+                # resample aparc_aseg
+                (dn.aparc_aseg_align,dn.epi_resampled,[
+                    ('out_file','aparc_aseg')
+                ]),
+
+                # output data to datasink
+                (dn.epi_resampled,dn.datasink,[
+                    ('aparc_aseg_epi','fs_masks.@aparc_aseg_epi')
                 ])
             ])
 
         cls.workflow.connect([ # connect nodes
             # create images of the atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
             (dn.inputnode,dn.epi_resampled,[
-                ('out_file','atlas')
+                ('atlas','atlas')
             ]),
             (dn.inputnode,dn.epi_resampled,[
-                ('out_file','T1')
-            ]),
-            (dn.aparc_aseg_align,dn.epi_resampled,[
-                ('out_file','aparc_aseg')
+                ('noskull_at','T1')
             ]),
             (dn.inputnode,dn.epi_resampled,[
                 ('epi_at','epi')
@@ -246,8 +253,7 @@ class bidsselectorworkflow(workflowgenerator):
             # output data to datasink
             (dn.epi_resampled,dn.datasink,[
                 ('atlas_epi','fs_masks.@atlas_epi'),
-                ('T1_epi','fs_masks.@T1_epi'),
-                ('aparc_aseg_epi','fs_masks.@aparc_aseg_epi')
+                ('T1_epi','fs_masks.@T1_epi')
             ])
         ])
 

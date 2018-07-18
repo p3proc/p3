@@ -63,6 +63,9 @@ class bidsselectorworkflow(workflowgenerator):
             (dn.inputnode,dn.bidsselection,[
                 ('subject','subject')
             ]),
+            (dn.inputnode,dn.get_atlas,[
+                ('subject','subject')
+            ]),
 
             # select T1 to reference to
             (dn.bidsselection,dn.selectT1,[
@@ -75,6 +78,9 @@ class bidsselectorworkflow(workflowgenerator):
             ]),
             (dn.inputnode,dn.outputnode,[
                 ('subject','subject')
+            ]),
+            (dn.get_atlas,dn.outputnode,[
+                ('base_file','atlas')
             ])
         ])
 

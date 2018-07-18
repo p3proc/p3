@@ -19,38 +19,7 @@ def output_BIDS_summary(bids_dir):
 
     # call pybids
     layout = BIDSLayout(bids_dir)
-
-    # print help message
-    print(
-        '\nThis summary internally uses pybids to show availiable keys to filter on.\n'
-        'If you are using the default p3_bidsselector workflow, you can use the keys\n'
-        'here to specify what images to process. For example, in the settings file:\n'
-        '\n\tbids_query = {'
-        '\n\t\t\'T1\':{'
-        '\n\t\t\t\'type\':\'T1w\''
-        '\n\t\t},'
-        '\n\t\t\'epi\':{'
-        '\n\t\t\t\'modality\':\'func\','
-        '\n\t\t\t\'task\':\'rest\''
-        '\n\t\t}'
-        '\n\t}\n\n'
-        'This will filter all T1 images by type \'T1w\', while epi images will use modality\n'
-        '\'func\' and task \'rest\'.\n\n'
-        'You can filter on specific subjects and runs by using []:\n'
-        '\n\tbids_query = {'
-        '\n\t\t\'T1\':{'
-        '\n\t\t\t\'type\':\'T1w\','
-        '\n\t\t\t\'subject\':\'MSC0[12]\''
-        '\n\t\t},'
-        '\n\t\t\'epi\':{'
-        '\n\t\t\t\'modality\':\'func\','
-        '\n\t\t\t\'task\':\'rest\','
-        '\n\t\t\t\'run\':\'[13]\''
-        '\n\t\t}'
-        '\n\t}\n\n'
-        'This will query will use subjects MSC01 and MSC02 and process epis with runs 1 and 3.\n\n'
-        'Below are some available keys in the dataset to filter on:\n'
-    )
+    print('Below are some available keys in the dataset to filter on:\n')
 
     # show availiable keys
     keys = [
@@ -88,7 +57,7 @@ def check_query(bids_query,bids_dir):
 
     # wait 5 seconds
     print('Files listed are to be processed. Quit now if they are not the right ones...')
-    time.sleep(5)
+    time.sleep(2)
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
@@ -204,7 +173,7 @@ def default_settings():
             'p3_fieldmapcorrection',
             'p3_alignt1toatlas',
             'p3_alignboldtot1',
-            'p3_alignboldtoatlas'
+            'p3_alignboldtoatlas',
             'p3_create_fs_masks'
         ]
     settings['connections'] = [ # defines the input/output connections between workflows
@@ -236,6 +205,13 @@ def default_settings():
             'destination': 'p3_timeshiftanddespike',
             'links': [
                 ['output.epi','input.epi']
+            ]
+        },
+        {
+            'source': 'p3_bidsselector',
+            'destination': 'p3_alignt1toatlas',
+            'links': [
+                ['output.atlas','input.atlas']
             ]
         },
         {
@@ -308,14 +284,14 @@ def default_settings():
         },
         {
             'source': 'p3_freesurfer',
-            'definition': 'p3_create_fs_masks',
+            'destination': 'p3_create_fs_masks',
             'links': [
                 ['output.aparc_aseg','input.aparc_aseg']
             ]
         },
         {
             'source': 'p3_alignt1toatlas',
-            'definition': 'p3_create_fs_masks',
+            'destination': 'p3_create_fs_masks',
             'links': [
                 ['output.nonlin_warp','input.nonlin_warp'],
                 ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
@@ -324,16 +300,23 @@ def default_settings():
         },
         {
             'source': 'p3_alignboldtoatlas',
-            'definition': 'p3_create_fs_masks',
+            'destination': 'p3_create_fs_masks',
             'links': [
                 ['output.epi_at','input.epi_at'],
             ]
         },
         {
             'source': 'p3_skullstrip',
-            'definition': 'p3_create_fs_masks',
+            'destination': 'p3_create_fs_masks',
             'links': [
                 ['output.fs2mpr','input.fs2mpr']
+            ]
+        },
+        {
+            'source': 'p3_bidsselector',
+            'destination': 'p3_create_fs_masks',
+            'links': [
+                ['output.atlas','input.atlas']
             ]
         }
     ]

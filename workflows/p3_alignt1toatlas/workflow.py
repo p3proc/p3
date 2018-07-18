@@ -22,6 +22,9 @@ class alignt1toatlasworkflow(workflowgenerator):
             (dn.inputnode,dn.select0T1,[
                 ('T1_skullstrip','T1_list')
             ]),
+            (dn.inputnode,dn.register,[
+                ('atlas','atlas')
+            ]),
             (dn.select0T1,dn.register,[
                 ('T1_0','in_file')
             ]),
@@ -49,6 +52,9 @@ class alignt1toatlasworkflow(workflowgenerator):
                 # do nonlinear transform
                 (dn.register,dn.Qwarp,[
                     ('out_file','in_file')
+                ]),
+                (dn.inputnode,dn.Qwarp,[
+                    ('atlas','base_file')
                 ]),
 
                 # output to output node

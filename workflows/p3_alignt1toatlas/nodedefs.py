@@ -20,7 +20,7 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['T1_skullstrip'])
+        self.set_input(['T1_skullstrip','atlas'])
         self.set_output(['noskull_at','nonlin_warp','t1_2_atlas_transform','T1_0'])
 
         # define datasink substitutions
@@ -47,7 +47,6 @@ class definednodes(basenodedefs):
             ),
             name='atlasregister'
         )
-        self.register.inputs.atlas = settings['atlas']
 
         self.Qwarp = Node(
             Function(
@@ -57,4 +56,3 @@ class definednodes(basenodedefs):
             ),
             name='Qwarp'
         )
-        self.Qwarp.inputs.base_file = settings['atlas']

@@ -2,7 +2,7 @@
     Define Custom Functions and Interfaces
 """
 
-def resample_2_epi(atlas,T1,aparc_aseg,epi):
+def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     """
         Resample images to epi resolution
     """
@@ -49,19 +49,23 @@ def resample_2_epi(atlas,T1,aparc_aseg,epi):
     ))
     T1_epi = out_file
 
-    # get filename of aparc_aseg
-    name,ext = os.path.splitext(os.path.basename(aparc_aseg))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
+    # ONLY if aparc_aseg defined
+    if aparc_aseg:
+        # get filename of aparc_aseg
+        name,ext = os.path.splitext(os.path.basename(aparc_aseg))
+        while(ext != ''):
+            name,ext = os.path.splitext(os.path.basename(name))
+        out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
 
-    # resample the aparc_aseg
-    os.system('3dresample -rmode NN -master {} -prefix {} -inset {}'.format(
-        epi,
-        out_file,
-        aparc_aseg
-    ))
-    aparc_aseg_epi = out_file
+        # resample the aparc_aseg
+        os.system('3dresample -rmode NN -master {} -prefix {} -inset {}'.format(
+            epi,
+            out_file,
+            aparc_aseg
+        ))
+        aparc_aseg_epi = out_file
+    else: # set to empty
+        aparc_aseg_epi = ''
 
     # return resampled images
     return (atlas_epi,T1_epi,aparc_aseg_epi)

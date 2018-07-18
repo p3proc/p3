@@ -33,7 +33,6 @@ class definednodes(basenodedefs):
             'noskull_at',
             'atlas'
             ])
-        #self.set_output(['']
 
         # define datasink substitutions
         #self.set_subs([])
