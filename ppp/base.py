@@ -308,14 +308,14 @@ def default_settings():
         },
         {
             'source': 'p3_freesurfer',
-            'definition': 'p3_create_fs_masks'
+            'definition': 'p3_create_fs_masks',
             'links': [
                 ['output.aparc_aseg','input.aparc_aseg']
             ]
         },
         {
             'source': 'p3_alignt1toatlas',
-            'definition': 'p3_create_fs_masks'
+            'definition': 'p3_create_fs_masks',
             'links': [
                 ['output.nonlin_warp','input.nonlin_warp'],
                 ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
@@ -324,14 +324,14 @@ def default_settings():
         },
         {
             'source': 'p3_alignboldtoatlas',
-            'definition': 'p3_create_fs_masks'
+            'definition': 'p3_create_fs_masks',
             'links': [
                 ['output.epi_at','input.epi_at'],
             ]
         },
         {
             'source': 'p3_skullstrip',
-            'definition': 'p3_create_fs_masks'
+            'definition': 'p3_create_fs_masks',
             'links': [
                 ['output.fs2mpr','input.fs2mpr']
             ]
