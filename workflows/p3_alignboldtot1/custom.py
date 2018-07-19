@@ -2,82 +2,48 @@
     Define Custom Functions and Interfaces
 """
 
-# Define custom warp command function
-def warp_custom(in_file,card2oblique,args=''):
-    import os
-    import subprocess
-    import shutil
-
-    # save to node folder
-    cwd = os.getcwd()
-
-    # copy file to cwd
-    input_file = os.path.basename(shutil.copy2(in_file,cwd))
-    card_file = os.path.basename(shutil.copy2(card2oblique,cwd))
-
-    # strip filename
-    name_nii,_ = os.path.splitext(input_file)
-    filename,_ = os.path.splitext(name_nii)
-
-    print("3dWarp -verb -card2oblique {} -prefix {}_ob.nii.gz {} -overwrite {}".format(
-        os.path.join(cwd,card_file),
-        os.path.join(cwd,filename),
-        args,
-        os.path.join(cwd,input_file)))
-
-    # spawn the 3dwarp command with the subprocess command
-    warpcmd = subprocess.run(
-        "3dWarp -verb -card2oblique {} -prefix {}_ob.nii.gz {} -overwrite {}".format(
-            os.path.join(cwd,card_file),
-            os.path.join(cwd,filename),
-            args,
-            os.path.join(cwd,input_file)
-        ),
-        stdout=subprocess.PIPE,
-        shell=True
-        )
-    with open(os.path.join(cwd,"{}_obla2e_mat.1D".format(filename)),"w") as text_file:
-        print(warpcmd.stdout.decode('utf-8'),file=text_file)
-
-    # get the out files
-    out_file = os.path.join(cwd,'{}_ob.nii.gz'.format(filename))
-    ob_transform = os.path.join(cwd,'{}_obla2e_mat.1D'.format(filename))
-
-    return (out_file,ob_transform)
-
 # weight mask
-def create_weightmask(in_file,no_skull):
-    import subprocess
+def alignepi2anat(in_file,anat):
     import os
     import shutil
+    import subprocess
 
     # save to node folder
     cwd = os.getcwd()
 
     # copy file to cwd
     input_file = os.path.basename(shutil.copy2(in_file,cwd))
+    anat_file = os.path.basename(shutil.copy2(anat,cwd))
 
-    # strip filename
-    name_nii,_ = os.path.splitext(input_file)
-    filename,_ = os.path.splitext(name_nii)
+    # get filename to output
+    name,ext = os.path.splitext(os.path.basename(input_file))
+    while(ext != ''):
+        name,ext = os.path.splitext(os.path.basename(name))
+    epi_al_mat = os.path.join(cwd,'{}_al_mat.aff12.1D'.format(name))
+    epi_al_orig = os.path.join(cwd,'{}_al.nii.gz'.format(name))
+    # head file to convert
+    epi_al_head = os.path.join(cwd,'{}_al+orig'.format(name))
 
-    rtn = subprocess.run(
-        '3dBrickStat -automask -percentile 90.000000 1 90.000000 {} | tail -n1 | awk \'{{print $2}}\''.format(
-            no_skull
-        ),
-        stdout=subprocess.PIPE,
-        shell=True
+    # get location of align_epi_anat command
+    out = subprocess.run(['which','align_epi_anat.py'],stdout=subprocess.PIPE)
+    script_loc = out.stdout.decode('utf-8').rstrip()
+
+    # run command
+    os.system(
+        'python2 {} -anat {} -anat_has_skull no -epi2anat '
+        '-epi {} -epi_base 0 -epi_strip None -suffix _al -tshift off -volreg off '
+        '-big_move -cmass nocmass -resample on'.format(
+            script_loc,
+            anat_file,
+            input_file
+        )
     )
-    perc = float(rtn.stdout.decode('utf-8'))
-    calc = subprocess.run(
-        '3dcalc -datum float -prefix {}_weighted.nii.gz -a {} -expr \'min(1,(a/\'{}\'))\''.format(
-            os.path.join(cwd,filename),
-            os.path.join(cwd,input_file),
-            perc
-        ),
-        shell=True
-    )
 
-    # return weightmask
-    weightmask = os.path.join(cwd,'{}_weighted.nii.gz'.format(filename))
-    return weightmask
+    # convert to nifti
+    os.system('3dAFNItoNIFTI -prefix {} {} -verb'.format(
+        epi_al_orig,
+        epi_al_head
+    ))
+    raise ValueError
+
+    return(epi_al_mat,epi_al_orig)

@@ -2,7 +2,7 @@
     Define Custom Functions and Interfaces
 """
 
-def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
+def NwarpApply(in_file,reference,tfm1,tfm2,tfm4,tfm0=None,tfm3=None):
     import os
 
     # save to node folder (go up 2 directories bc of iterfield)
@@ -23,14 +23,11 @@ def NwarpApply(in_file,reference,tfm1,tfm2,tfm3,tfm5,tfm0=None,tfm4=None):
         tfm0 = '' # set to empty string
 
     # check if field map correction disabled
-    if not tfm4:
-        tfm4 = '' # set to empty string
-
-    # tfm3 is t1 --> epi; invert the warp
-    tfm3 = '\'INV({})\''.format(tfm3)
+    if not tfm3:
+        tfm3 = '' # set to empty string
 
     # concatenate warps
-    concatenated_warps = ' '.join([tfm0,tfm1,tfm2,tfm3,tfm4,tfm5])
+    concatenated_warps = ' '.join([tfm0,tfm1,tfm2,tfm3,tfm4])
     print(concatenated_warps)
 
     # run 3dNwarpApply

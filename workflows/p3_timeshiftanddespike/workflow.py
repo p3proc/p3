@@ -57,7 +57,7 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             ]),
 
             # output to output node
-            (dn.extractroi,dn.outputnode,[
+            (dn.extractroi_post,dn.outputnode,[
                 ('roi_file','refimg')
             ]),
             (dn.volreg,dn.outputnode,[

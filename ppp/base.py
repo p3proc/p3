@@ -57,7 +57,7 @@ def check_query(bids_query,bids_dir):
 
     # wait 5 seconds
     print('Files listed are to be processed. Quit now if they are not the right ones...')
-    time.sleep(2)
+    #time.sleep(2)
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
@@ -148,11 +148,12 @@ def default_settings():
     settings['bids_query'] = { # bids query
         'T1':{
             'modality': 'anat',
-            'type':'T1w'
+            'type':'T1w',
             },
         'epi':{
             'modality':'func',
-            'task':'rest'
+            'task':'rest',
+            'session': 'func01'
             }
         }
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
@@ -263,8 +264,7 @@ def default_settings():
             'source': 'p3_alignboldtot1',
             'destination': 'p3_alignboldtoatlas',
             'links': [
-                ['output.oblique_transform','input.oblique_transform'],
-                ['output.t1_2_epi','input.t1_2_epi']
+                ['output.epi_2_t1','input.epi_2_t1']
             ]
         },
         {

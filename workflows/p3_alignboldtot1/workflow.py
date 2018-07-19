@@ -35,65 +35,29 @@ class alignboldtot1workflow(workflowgenerator):
                 ('refimg','in_file_c')
             ]),
 
-            # deoblique
-            (dn.epi_3dcalc,dn.warp,[
-                ('out_file','card2oblique')
-            ]),
-            (dn.inputnode,dn.warp,[
-                ('T1_0','in_file')
-            ]),
-
-            # resample the EPIREF to MPRAGE
-            (dn.warp,dn.resample,[
-                ('out_file','master')
-            ]),
-            (dn.epi_3dcalc,dn.resample,[
+            # align epi 2 anat
+            (dn.epi_3dcalc,dn.align_epi_2_anat,[ # skullstripped epi
                 ('out_file','in_file')
             ]),
-
-            # create weightmask
-            (dn.resample,dn.weightmask,[
-                ('out_file','in_file')
-            ]),
-            (dn.epi_3dcalc,dn.weightmask,[
-                ('out_file','no_skull')
-            ]),
-
-            # register mprage to tcat
-            (dn.weightmask,dn.registert12tcat,[
-                ('out_file','weight')
-            ]),
-            (dn.resample,dn.registert12tcat,[
-                ('out_file','reference')
-            ]),
-            (dn.warp,dn.registert12tcat,[
-                ('out_file','in_file')
+            (dn.inputnode,dn.align_epi_2_anat,[ # skullstripped T1
+                ('T1_0','anat')
             ]),
 
             # output to output node
-            (dn.registert12tcat,dn.outputnode,[
-                ('out_matrix','t1_2_epi')
-            ]),
-            (dn.warp,dn.outputnode,[
-                ('ob_transform','oblique_transform')
+            (dn.align_epi_2_anat,dn.outputnode,[
+                ('epi_al_mat','epi_2_t1')
             ]),
 
             # output to QC datasink
-            (dn.resample,dn.datasink,[
-                ('out_file','p3_QC.@epi_skullstrip_resample')
+            (dn.epi_3dcalc,dn.datasink,[
+                ('out_file','p3_QC.@epi_skullstrip')
             ]),
-            (dn.registert12tcat,dn.datasink,[
-                ('out_matrix','p3_QC.@t1_2_epi')
+            (dn.align_epi_2_anat,dn.datasink,[
+                ('epi_al_mat','p3_QC.@epi_2_t1')
             ]),
-            (dn.registert12tcat,dn.datasink,[
-                ('out_file','p3_QC.@t1_2_epi_img')
-            ]),
-            (dn.warp,dn.datasink,[
-                ('ob_transform','p3_QC.@oblique_transform')
-            ]),
-            (dn.warp,dn.datasink,[
-                ('out_file','p3_QC.@T1_oblique')
-            ]),
+            (dn.align_epi_2_anat,dn.datasink,[
+                ('epi_al_orig','p3_QC.@epi_2_t1_img')
+            ])
         ])
 
         # return workflow

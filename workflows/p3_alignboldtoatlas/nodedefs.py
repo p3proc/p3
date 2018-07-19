@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['noskull_at','nonlin_warp','t1_2_atlas_transform','oblique_transform','t1_2_epi','fmc','epi2epi1','tcat'])
+        self.set_input(['noskull_at','nonlin_warp','t1_2_atlas_transform','epi_2_t1','fmc','epi2epi1','tcat'])
         self.set_output(['epi_at'])
 
         # define datasink substitutions
@@ -30,10 +30,19 @@ class definednodes(basenodedefs):
         # apply nonlinear transform
         self.applymastertransform = MapNode(
             Function(
-                input_names=['in_file','reference','tfm0','tfm1','tfm2','tfm3','tfm4','tfm5'],
+                input_names=['in_file','reference','tfm0','tfm1','tfm2','tfm3','tfm4'],
                 output_names=['out_file'],
                 function=NwarpApply
             ),
-            iterfield=['in_file','tfm5'],
+            iterfield=['in_file','tfm4'],
             name='applymastertransform'
+        )
+
+        self.test = Node(
+            Function(
+                input_names=['tfm2'],
+                output_names=[],
+                function=lambda tfm2: print(tfm2)
+            ),
+            name='test'
         )
