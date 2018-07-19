@@ -13,6 +13,9 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     # get cwd
     cwd = os.getcwd()
 
+    # get first epi from list
+    epi = epi[0]
+
     # does the atlas have an extension?
     name,ext = os.path.splitext(os.path.basename(atlas))
     if ext == '': # I'm assuming it's from the atlas directory so we give it the BRIK/HEAD extension
@@ -25,11 +28,12 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     atlas = os.path.basename(shutil.copy2(atlas,cwd))
 
     # get filename of atlas to construct output name
-    name,ext = os.path.splitext(os.path.basename(atlas))
+    root_name,ext = os.path.splitext(os.path.basename(atlas))
     while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
-
+        root_name,ext = os.path.splitext(os.path.basename(root_name))
+    out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(root_name)).replace('+','_')
+    print(out_file)
+    
     # if atlas is not already .nii.gz; convert to .nii.gz
     if atlas[-7:] != '.nii.gz':
         # uncompress gz
@@ -37,14 +41,14 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
             os.system('gzip -d {}'.format(atlas))
             # strip gz from name
             atlas,ext = os.path.splitext(os.path.basename(atlas))
-
+        os.system('ls')
         # convert to .nii.gz
         os.system('mri_convert {} {}'.format(
             atlas,
-            os.path.join(cwd,'{}.nii.gz'.format(name))
+            os.path.join(cwd,'{}.nii.gz'.format(root_name))
         ))
         # set atlas to converted file
-        atlas = os.path.join(cwd,'{}.nii.gz'.format(name))
+        atlas = os.path.join(cwd,'{}.nii.gz'.format(root_name))
 
     # resample the atlas
     os.system('3dresample -rmode Li -master {} -prefix {} -inset {}'.format(
@@ -85,6 +89,6 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
         aparc_aseg_epi = out_file
     else: # set to empty
         aparc_aseg_epi = ''
-
+    
     # return resampled images
     return (atlas_epi,T1_epi,aparc_aseg_epi)
