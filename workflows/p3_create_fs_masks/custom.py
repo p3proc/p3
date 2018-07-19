@@ -12,14 +12,19 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     # get cwd
     cwd = os.getcwd()
 
+    # does the atlas have an extension?
+    name,ext = os.path.splitext(os.path.basename(atlas))
+    if ext == '': # I'm assuming it's from the atlas directory so we give it the BRIK extension
+        atlas = '{}.BRIK.gz'.format(atlas)
+
     # get filename of atlas
     name,ext = os.path.splitext(os.path.basename(atlas))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}.nii.gz'.format(name))
 
     # if atlas is not already .nii.gz; convert to .nii.gz
-    if ext != 'gz':
+    if atlas[-7:] != '.nii.gz'
         os.system('mri_convert {} {}'.format(
             atlas,
             os.path.join(cwd,'{}.nii.gz'.format(name))
