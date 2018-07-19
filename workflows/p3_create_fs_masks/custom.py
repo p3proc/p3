@@ -24,7 +24,13 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     out_file = os.path.join(cwd,'{}.nii.gz'.format(name))
 
     # if atlas is not already .nii.gz; convert to .nii.gz
-    if atlas[-7:] != '.nii.gz'
+    if atlas[-7:] != '.nii.gz':
+        # uncompress gz
+        if atlas[-3:] == '.gz':
+            os.system('gzip -d {}'.format(atlas))
+            # strip gz from name
+            atlas,ext = os.path.splitext(os.path.basename(atlas))
+
         os.system('mri_convert {} {}'.format(
             atlas,
             os.path.join(cwd,'{}.nii.gz'.format(name))
