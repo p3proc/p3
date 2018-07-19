@@ -13,13 +13,13 @@ def resample_2_epi(atlas,T1,epi,aparc_aseg=None):
     # get cwd
     cwd = os.getcwd()
 
-    # copy atlas to local directory
-    atlas = os.path.basename(shutil.copy2(atlas,cwd))
-
     # does the atlas have an extension?
     name,ext = os.path.splitext(os.path.basename(atlas))
     if ext == '': # I'm assuming it's from the atlas directory so we give it the BRIK extension
         atlas = '{}.BRIK.gz'.format(atlas)
+
+    # copy atlas to local directory
+    atlas = os.path.basename(shutil.copy2(atlas,cwd))
 
     # get filename of atlas to construct output name
     name,ext = os.path.splitext(os.path.basename(atlas))
