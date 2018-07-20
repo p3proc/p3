@@ -6,16 +6,25 @@ MAINTAINER Andrew Van <vanandrew@wustl.edu>
 RUN apt-get update && \
     apt-get install -y wget curl
 
-# Install stuff from neurodebian: fsleyes and afni
+# Install stuff from neurodebian: fsleyes (I used to do afni, but it does weird stuff to template file locations...)
 # I use the -allow-unauthenticated tag bc neurodebian needs to update their gpg keys!!!
 # NOTE: I remove the neurodebian source afterwards since I don't verify it
 RUN wget -O- http://neuro.debian.net/lists/stretch.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && \
     apt-get update && \
     export DEBIAN_FRONTEND=noninteractive && \
-    apt-get install -yq --allow-unauthenticated fsleyes afni && \
+    apt-get install -yq --allow-unauthenticated fsleyes && \
     ln -s $(which FSLeyes) /usr/bin/fsleyes && \
     rm /etc/apt/sources.list.d/neurodebian.sources.list
-ENV PATH=${PATH}:/usr/lib/afni/bin
+
+# Get afni
+WORKDIR /
+RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential \
+    mkdir afni && \
+    cd /afni && \
+    curl -O https://afni.nimh.nih.gov/pub/dist/tgz/linux_ubuntu_16_64.tgz && \
+    tar -xvzf linux_ubuntu_16_64.tgz && \
+    rm linux_ubuntu_16_64.tgz
+ENV PATH=${PATH}:/afni/bin/linux_ubuntu_16_64
 
 # Compile and install fsl from source
 # NOTE: I disable mist-clean because it doesn't compile for whatever reason...
