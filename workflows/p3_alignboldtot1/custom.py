@@ -31,7 +31,7 @@ def alignepi2anat(in_file,anat):
     # run command
     os.system(
         'python2 {} -anat {} -anat_has_skull no -epi2anat '
-        '-epi {} -epi_base 0 -epi_strip None -suffix _al -tshift off -volreg off '
+        '-epi {} -epi_base 0 -suffix _al -tshift off -volreg off '
         '-big_move -cmass nocmass -resample on'.format(
             script_loc,
             anat_file,
