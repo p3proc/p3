@@ -31,8 +31,8 @@ def alignepi2anat(in_file,anat):
     # run command
     os.system(
         'python2 {} -anat {} -anat_has_skull no -epi2anat '
-        '-epi {} -epi_base 0 -suffix _al -tshift off -volreg off '
-        '-big_move -cmass nocmass -resample on'.format(
+        '-epi {} -epi_base 0 -epi_strip None -suffix _al -tshift off -volreg off '
+        '-overwrite -big_move -deoblique off'.format(
             script_loc,
             anat_file,
             input_file
@@ -45,5 +45,4 @@ def alignepi2anat(in_file,anat):
         epi_al_head
     ))
     raise ValueError
-
     return(epi_al_mat,epi_al_orig)

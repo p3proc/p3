@@ -9,6 +9,7 @@ from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
 from nipype.interfaces.utility import Function,IdentityInterface
+from nipype.workflows.dmri.fsl.utils import vsm2warp
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -152,16 +153,6 @@ class definednodes(basenodedefs):
             name='register_mask'
         )
 
-        # Warp epi images with fieldmap
-        self.warp_epi = MapNode(
-            fsl.FUGUE(
-                save_unmasked_shift=True,
-                output_type='NIFTI_GZ'
-            ),
-            iterfield=['in_file','dwell_time','fmap_in_file','mask_file'],
-            name='warp_epi'
-        )
-
         # get the values to warp the refimg
         self.get_refimg_files = Node(
             Function(
@@ -175,19 +166,14 @@ class definednodes(basenodedefs):
         # Warp reference image with fieldmap
         self.warp_refimg = Node(
             fsl.FUGUE(
-                save_unmasked_shift=True,
-                output_type='NIFTI_GZ'
+                save_shift=True,
+                output_type='NIFTI_GZ',
+                unwarp_direction='y-'
             ),
             name='warp_refimg'
         )
 
-        # convert the reference image to a warp file
-        self.afni_fmc = Node(
-            Function(
-                input_names=['in_file','bids_dir','phasediff'],
-                output_names=['out_file'],
-                function=convert_2_afni
-            ),
-            name='afni_fmc'
-        )
-        self.afni_fmc.inputs.bids_dir = settings['bids_dir']
+        # create vsm2warp workflow
+        self.vsm2dfm = vsm2warp()
+        self.vsm2dfm.inputs.inputnode.scaling = 4
+        self.vsm2dfm.inputs.inputnode.enc_dir = 'y-'

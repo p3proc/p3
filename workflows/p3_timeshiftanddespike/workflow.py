@@ -71,12 +71,12 @@ class timeshiftanddespikeworkflow(workflowgenerator):
             ]),
 
             # output epi alignments for QC
-            (dn.volreg,dn.datasink,[
-                ('out_file','p3_QC.@epi_aligned')
-            ]),
-            (dn.volreg,dn.datasink,[
-                ('oned_matrix_save','p3_QC.@epi2epi1')
-            ]),
+            #(dn.volreg,dn.datasink,[
+            #    ('out_file','p3_QC.@epi_aligned')
+            #]),
+            #(dn.volreg,dn.datasink,[
+            #    ('oned_matrix_save','p3_QC.@epi2epi1')
+            #]),
 
             # output motion params to file before/after despike/tshift
             (dn.volreg_before,dn.datasink,[ # before

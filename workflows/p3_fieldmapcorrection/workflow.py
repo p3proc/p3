@@ -105,20 +105,6 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('out_file','reference')
                 ]),
 
-                # Warp epi images with fieldmap
-                (dn.inputnode,dn.warp_epi,[
-                    ('epi_aligned','in_file')
-                ]),
-                (dn.getmagandphase,dn.warp_epi,[
-                    ('echospacing','dwell_time')
-                ]),
-                (dn.register_fieldmap,dn.warp_epi,[
-                    ('out_file','fmap_in_file')
-                ]),
-                (dn.register_mask,dn.warp_epi,[
-                    ('out_file','mask_file')
-                ]),
-
                 # Warp the refimg with fieldmap
                 (dn.getmagandphase,dn.get_refimg_files,[
                     ('echospacing','dwell_time')
@@ -142,31 +128,31 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('mask_file','mask_file')
                 ]),
 
-                # convert shiftmap to afni format
-                (dn.warp_refimg,dn.afni_fmc,[
-                    ('shift_out_file','in_file')
+                # use the convinent vsm2warp workflow to get a displacemnt field image
+                (dn.warp_refimg,dn.vsm2dfm,[
+                    ('shift_out_file','inputnode.in_vsm')
                 ]),
-                (dn.getmagandphase,dn.afni_fmc,[
-                    ('phasediff','phasediff')
+                (dn.warp_refimg,dn.vsm2dfm,[
+                    ('unwarped_file','inputnode.in_ref')
                 ]),
 
                 # Save out unwarped files for QC
-                (dn.warp_epi,dn.datasink,[
-                    ('unwarped_file','p3_QC.@unwarped_aligned_epi')
+                (dn.warp_refimg,dn.datasink,[
+                    ('shift_out_file','p3_QC.@shiftmap')
                 ]),
                 (dn.warp_refimg,dn.datasink,[
                     ('unwarped_file','p3_QC.@unwarped_aligned_refimg')
                 ]),
-                (dn.afni_fmc,dn.datasink,[
-                    ('out_file','p3_QC.@afni_fmc')
+                (dn.vsm2dfm,dn.datasink,[
+                    ('outputnode.out_warp','p3_QC.@dfm')
+                ]),
+                (dn.inputnode,dn.datasink,[
+                    ('refimg','p3_QC.@refimg')
                 ]),
 
                 # Output unwarp outputs for fmc to output node
                 (dn.warp_refimg,dn.outputnode,[
                     ('unwarped_file','refimg')
-                ]),
-                (dn.afni_fmc,dn.outputnode,[
-                    ('out_file','fmc')
                 ])
             ])
         else:
