@@ -24,7 +24,7 @@ class definednodes(basenodedefs):
 
         # define output node
         self.set_input(['subject'])
-        self.set_output(['T1','epi','subject'])
+        self.set_output(['anat','func','subject'])
 
         # define datasink substitutions
         self.set_resubs([
@@ -43,41 +43,41 @@ class definednodes(basenodedefs):
             name='bidsselection'
         )
 
-        # select T1 to align to
-        self.selectT1 = Node(
+        # select anat to align to
+        self.selectanat = Node(
             Function(
-                input_names=['T1','refnum'],
-                output_names=['T1_reference','T1_align'],
-                function=lambda T1,refnum: (T1[refnum],[img for idx,img in enumerate(T1) if idx!=refnum])
+                input_names=['anat','refnum'],
+                output_names=['anat_reference','anat_align'],
+                function=lambda anat,refnum: (anat[refnum],[img for idx,img in enumerate(anat) if idx!=refnum])
             ),
-            name='selectT1'
+            name='selectanat'
         )
-        self.selectT1.inputs.refnum = settings['T1_reference']
+        self.selectanat.inputs.refnum = settings['anat_reference']
 
         # create node for aligning multiple T1 images to T1 reference
-        self.alignT1toT1 = MapNode(
+        self.aliganattoanat = MapNode(
             afni.Allineate(
                 outputtype='NIFTI_GZ',
             ),
             iterfield=['in_file'],
-            name='alignT1toT1'
+            name='alignanattoanat'
         )
 
-        # merge T1s into single list
-        self.mergeT1list = Node(
+        # merge anats into single list
+        self.mergeanatlist = Node(
             Merge(
                 numinputs=2,
                 ravel_inputs=True
             ),
-            name='mergeT1list'
+            name='mergeanatlist'
         )
 
-        # avg all T1s
-        self.avgT1 = Node(
+        # avg all anats
+        self.avganat = Node(
             Function(
-                input_names=['T1_list'],
-                output_names=['avg_T1'],
-                function=avgT1s
+                input_names=['anat_list'],
+                output_names=['avg_anat'],
+                function=avganats
             ),
-            name='avgT1'
+            name='avganat'
         )

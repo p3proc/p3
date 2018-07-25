@@ -4,7 +4,6 @@ TODO
 
 """
 from ppp.base import basenodedefs
-from .custom import *
 from nipype import Node
 from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function

@@ -45,8 +45,6 @@ def get_metadata(epi_file,bids_dir):
 
     # replace ped string with correct letter
     ped = ped.replace('i','x').replace('j','y').replace('k','z')
-    print(ped)
-    raise ValueError
 
     # return the magnitude and phase image paths
     return (magnitude,phasediff,TE,echospacing,ped)

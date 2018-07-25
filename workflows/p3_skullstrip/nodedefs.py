@@ -21,7 +21,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['T1','orig','brainmask'])
-        self.set_output(['T1_skullstrip','fs2mpr'])
+        self.set_output(['T1_skullstrip','allineate_freesurfer2anat'])
 
         # define datasink substitutions
         self.set_subs([

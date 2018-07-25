@@ -22,18 +22,12 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['epi'])
-        self.set_output(['refimg','tcat','epi2epi1','epi_aligned'])
+        self.set_input(['func'])
+        self.set_output(['refimg','func_stc_despike','warp_func2refimg','func_aligned'])
 
         # define datasink substitutions
         self.set_subs([
-            ('_volreg','_epi2epi')
-        ])
-
-        # define datasink regular expression substitutions
-        self.set_resubs([
-            (r'_epi2epi\d{1,3}',''),
-            (r'_epi2epi_before\d{1,3}',''),
+            ('MOCOparams','_moco')
         ])
 
         # extract slice timing so we can pass it to slice time correction
@@ -144,35 +138,26 @@ class definednodes(basenodedefs):
             name='extractroi_post'
         )
 
-        # Motion correction (after)
-        self.volreg = MapNode(
-            afni.Volreg(
-                args="-heptic -maxite {}".format(
-                    25
-                ),
-                verbose=True,
-                zpad=10,
-                outputtype="NIFTI_GZ"
-            ),
-            iterfield=['in_file'],
-            name='volreg'
-        )
-
-        # Motion correction (before)
-        self.volreg_before = MapNode(
-            afni.Volreg(
-                args="-heptic -maxite {}".format(
-                    25
-                ),
-                verbose=True,
-                zpad=10,
-                outputtype="NIFTI_GZ"
-            ),
-            iterfield=['in_file'],
-            name='volreg_before'
-        )
-
         # Moco (after)
-        
+        self.moco = MapNode(
+            Function(
+                input_names=['fixed_image','moving_image','transform'],
+                output_names=['warp','mocoparams','warped_img','avg_img'],
+                function=antsMotionCorr
+            ),
+            iterfield=['moving_image'],
+            name='moco'
+        )
+        self.moco.inputs.transform = 'Affine'
 
         # Moco (before)
+        self.moco_before = MapNode(
+            Function(
+                input_names=['fixed_image','moving_image','transform'],
+                output_names=['warp','mocoparams','warped_img','avg_img'],
+                function=antsMotionCorr
+            ),
+            iterfield=['moving_image'],
+            name='moco_before'
+        )
+        self.moco_before.inputs.transform = 'Rigid'

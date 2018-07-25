@@ -23,16 +23,16 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['epi','refimg','epi_aligned'])
+        self.set_input(['func','refimg','func_aligned'])
         self.set_output(['affine_fmc','warp_fmc','refimg'])
 
         # define datasink substitutions
         # self.set_subs([])
 
         # define datasink regular expression substitutions
-        self.set_resubs([
-            (r'_warp_epi\d{1,3}','')
-        ])
+        #self.set_resubs([
+        #    (r'_warp_epi\d{1,3}','')
+        #])
 
         # get magnitude and phase
         self.get_metadata = MapNode(
@@ -174,7 +174,7 @@ class definednodes(basenodedefs):
 
         # align the (NOTE: I'm not sure if this is valid, but it was the only way I could get a ANTS warp compatible FMC)
         self.ants_fmc = Node(
-            ants.RegistationSynQuick(
+            ants.RegistrationSynQuick(
                 num_threads=settings['num_threads']
             ),
             name='ants_fmc'

@@ -22,7 +22,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
             cls.workflow.connect([ # connect nodes
                 # get the magnitude and phase images
                 (dn.inputnode,dn.get_metadata,[
-                    ('epi','epi_file')
+                    ('func','epi_file')
                 ]),
 
                 # skullstrip the magnitude image
@@ -73,7 +73,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
 
                 # avg epi image and skullstrip
                 (dn.inputnode,dn.avg_epi,[
-                    ('epi_aligned','in_file')
+                    ('func_aligned','in_file')
                 ]),
                 (dn.avg_epi,dn.skullstrip_avg_epi,[
                     ('out_file','in_file')
@@ -135,16 +135,19 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # Use ants registration to get the transforms from refimg to unwarped refimg
-                (dn.warp_refimg,dn.ants_fmc[
-                    ('warped_file','fixed_image')
+                (dn.warp_refimg,dn.ants_fmc,[
+                    ('unwarped_file','fixed_image')
                 ]),
-                (dn.inputnode,dn.ants_fmc[
+                (dn.inputnode,dn.ants_fmc,[
                     ('refimg','moving_image')
                 ]),
 
                 # Save out unwarped files for QC
                 (dn.ants_fmc,dn.datasink,[
-                    ('warped_image','p3_QC.fieldmapcorrection.@unwarped_aligned_refimg')
+                    ('warped_image','p3_QC.fieldmapcorrection.@refimg_unwarped')
+                ]),
+                (dn.warp_refimg,dn.datasink,[
+                    ('unwarped_file','p3_QC.fieldmapcorrection.@refimg_unwarped_fsl')
                 ]),
                 (dn.inputnode,dn.datasink,[
                     ('refimg','p3_QC.fieldmapcorrection.@refimg')
@@ -166,7 +169,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
             cls.workflow.connect([ # connect nodes
                 # skip field map correction
                 (dn.inputnode,dn.outputnode,[
-                    ('epi_aligned','epi'),
+                    ('func_aligned','func_aligned'),
                     ('refimg','refimg'),
                 ])
             ])

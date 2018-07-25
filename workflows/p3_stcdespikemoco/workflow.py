@@ -2,8 +2,8 @@ from nipype import Workflow
 from .nodedefs import definednodes
 from ppp.base import workflowgenerator
 
-class timeshiftanddespikeworkflow(workflowgenerator):
-    """ Defines the time shift and despike workflow
+class stcdespikemocoworkflow(workflowgenerator):
+    """ Defines the slice time correction, despike, motion correction workflow
 
         TODO
 
@@ -20,23 +20,23 @@ class timeshiftanddespikeworkflow(workflowgenerator):
         cls.workflow.connect([ # connect nodes
             ### Extract Slice timing info + TR
             (dn.inputnode,dn.extract_stc,[
-                ('epi','epi')
+                ('func','epi')
             ]),
 
             # Setup basefile for motion correction (pre-stc/despike)
             (dn.inputnode,dn.firstrunonly,[
-                ('epi','epi')
+                ('func','epi')
             ]),
             (dn.firstrunonly,dn.extractroi,[
                 ('epi','in_file')
             ]),
 
             # do motion correction (before stc/despike)
-            (dn.extractroi,dn.volreg_before,[
-                ('roi_file','basefile')
+            (dn.extractroi,dn.moco_before,[
+                ('roi_file','fixed_image')
             ]),
-            (dn.inputnode,dn.volreg_before,[
-                ('epi','in_file')
+            (dn.inputnode,dn.moco_before,[
+                ('func','moving_image')
             ]),
 
             # Setup basefile for motion correction (post-stc/despike)
@@ -49,49 +49,43 @@ class timeshiftanddespikeworkflow(workflowgenerator):
 
             ### Do motion correction (after stc/despike)
             # Align to first frame of first run
-            (dn.extractroi_post,dn.volreg,[
-                ('roi_file','basefile')
+            (dn.extractroi_post,dn.moco,[
+                ('roi_file','fixed_image')
             ]),
-            (dn.stc_despike_pool,dn.volreg,[
-                ('epi','in_file')
+            (dn.stc_despike_pool,dn.moco,[
+                ('epi','moving_image')
             ]),
 
             # output to output node
             (dn.extractroi_post,dn.outputnode,[
                 ('roi_file','refimg')
             ]),
-            (dn.volreg,dn.outputnode,[
-                ('out_file','epi_aligned')
-            ]),
-            (dn.volreg,dn.outputnode,[
-                ('oned_matrix_save','epi2epi1')
-            ]),
             (dn.stc_despike_pool,dn.outputnode,[
-                ('epi','tcat')
+                ('epi','stc_despike_func')
+            ]),
+            (dn.moco,dn.outputnode,[
+                ('warp','warp_func2refimg')
+            ]),
+            (dn.moco,dn.outputnode,[
+                ('warped_img','func_aligned')
             ]),
 
             # output epi alignments for QC
-            #(dn.volreg,dn.datasink,[
-            #    ('out_file','p3_QC.@epi_aligned')
-            #]),
-            #(dn.volreg,dn.datasink,[
-            #    ('oned_matrix_save','p3_QC.@epi2epi1')
-            #]),
-
-            # output motion params to file before/after despike/tshift
-            (dn.volreg_before,dn.datasink,[ # before
-                ('oned_file','p3.@mocobefore')
+            (dn.moco,dn.datasink,[
+               ('warped_img','p3_QC.stcdespikemoco.@epi_aligned')
             ]),
-            (dn.volreg,dn.datasink,[ # after
-                ('oned_file','p3.@mocoafter')
-            ])
+
+            # output rigid body transform motion params to file before despike/tshift
+            (dn.moco_before,dn.datasink,[ # before
+                ('mocoparams','p3.@mocobefore')
+            ]),
         ])
 
         # Conditionals for Time Shift/Despiking
         if settings['despiking']:
             cls.workflow.connect([
                 (dn.inputnode,dn.despike,[ # despike
-                    ('epi','in_file')
+                    ('func','in_file')
                 ]),
                 (dn.despike,dn.despike_pool,[
                     ('out_file','epi')
@@ -100,7 +94,7 @@ class timeshiftanddespikeworkflow(workflowgenerator):
         else:
             cls.workflow.connect([
                 (dn.inputnode,dn.skip_despike,[ # skip despike
-                    ('epi','epi')
+                    ('func','epi')
                 ]),
                 (dn.skip_despike,dn.despike_pool,[
                     ('epi','epi')

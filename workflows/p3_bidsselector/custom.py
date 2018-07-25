@@ -2,7 +2,7 @@
     Define Custom Functions and Interfaces
 """
 
-def avgT1s(T1_list):
+def avganats(anat_list):
     import os
 
     # get current path
@@ -12,7 +12,7 @@ def avgT1s(T1_list):
     filelist = ' '.join(T1_list)
 
     # get filename of first file
-    name,ext = os.path.splitext(os.path.basename(T1_list[0]))
+    name,ext = os.path.splitext(os.path.basename(anat_list[0]))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))
     outfile = '{}_avg.nii.gz'.format(name)
@@ -22,5 +22,5 @@ def avgT1s(T1_list):
         filelist
     ))
 
-    # return avg T1
+    # return avg anat
     return os.path.join(path,outfile)

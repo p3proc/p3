@@ -2,8 +2,8 @@ from nipype import Workflow
 from .nodedefs import definednodes
 from ppp.base import workflowgenerator
 
-class alignt1toatlasworkflow(workflowgenerator):
-    """ Defines the align t1 to atlas workflow
+class alignanattoatlasworkflow(workflowgenerator):
+    """ Defines the align anatomy image to atlas workflow
 
         TODO
 
@@ -27,14 +27,13 @@ class alignt1toatlasworkflow(workflowgenerator):
             (dn.register,dn.outputnode,[
                 ('out_matrix','affine_t1_2_atlas')
             ]),
-
             (dn.register,dn.outputnode,[
                 ('forward_warp_field','warp_t1_2_atlas')
             ]),
 
             # output T1 atlas alignment to p3 output
             (dn.register,dn.datasink,[
-                ('out_file','p3.alignt1toatlas.@T1_at')
+                ('warped_image','p3.@T1_at')
             ])
         ])
 

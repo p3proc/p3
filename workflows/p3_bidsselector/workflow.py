@@ -16,44 +16,44 @@ class bidsselectorworkflow(workflowgenerator):
         # create node definitions from settings
         dn = definednodes(settings)
 
-        # avg over all T1s if enabled
-        if settings['avgT1s']:
+        # avg over all anats if enabled
+        if settings['avganats']:
             # connect the workflow
             cls.workflow.connect([ # connect nodes
-                # align T1s to each other
-                (dn.selectT1,dn.alignT1toT1,[
-                    ('T1_reference','reference'),
-                    ('T1_align','in_file')
+                # align anats to each other
+                (dn.selectanat,dn.alignanattoanat,[
+                    ('anat_reference','reference'),
+                    ('anat_align','in_file')
                 ]),
-                (dn.selectT1,dn.mergeT1list,[
-                    ('T1_reference','in1'),
+                (dn.selectanat,dn.mergeanatlist,[
+                    ('anat_reference','in1'),
                 ]),
-                (dn.alignT1toT1,dn.mergeT1list,[
+                (dn.alignanattoanat,dn.mergeanatlist,[
                     ('out_file','in2'),
                 ]),
-                (dn.mergeT1list,dn.avgT1,[
-                    ('out','T1_list'),
+                (dn.mergeanatlist,dn.avganat,[
+                    ('out','anat_list'),
                 ]),
 
                 # output to output node
-                (dn.avgT1,dn.outputnode,[
-                    ('avg_T1','T1')
+                (dn.avganat,dn.outputnode,[
+                    ('avg_anat','anat')
                 ]),
 
                 # output QC
-                (dn.alignT1toT1,dn.datasink,[
-                    ('out_file','p3_QC.@alignT1toT1')
+                (dn.alignanattoanat,dn.datasink,[
+                    ('out_file','p3_QC.bidsselector.@alignanattoanat')
                 ]),
-                (dn.avgT1,dn.datasink,[
-                    ('avg_T1','p3_QC.@avgT1')
+                (dn.avganat,dn.datasink,[
+                    ('avg_anat','p3_QC.bidsselector.@avganat')
                 ])
             ])
         else: # use only the selected reference frame
             # connect the workflow
             cls.workflow.connect([ # connect nodes
                 # output to output node
-                (dn.selectT1,dn.outputnode,[
-                    ('T1_reference','T1')
+                (dn.selectanat,dn.outputnode,[
+                    ('anat_reference','anat')
                 ])
             ])
 
@@ -63,18 +63,15 @@ class bidsselectorworkflow(workflowgenerator):
             (dn.inputnode,dn.bidsselection,[
                 ('subject','subject')
             ]),
-            (dn.inputnode,dn.get_atlas,[
-                ('subject','subject')
-            ]),
 
-            # select T1 to reference to
-            (dn.bidsselection,dn.selectT1,[
-                ('T1','T1')
+            # select anat to reference to
+            (dn.bidsselection,dn.selectanat,[
+                ('anat','anat')
             ]),
 
             # set outputs
             (dn.bidsselection,dn.outputnode,[
-                ('epi','epi')
+                ('func','func')
             ]),
             (dn.inputnode,dn.outputnode,[
                 ('subject','subject')

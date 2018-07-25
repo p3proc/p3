@@ -146,11 +146,11 @@ def default_settings():
     # define default settings
     settings = {}
     settings['bids_query'] = { # bids query
-        'T1':{
+        'anat':{
             'modality': 'anat',
             'type':'T1w',
             },
-        'epi':{
+        'func':{
             'modality':'func',
             'task':'rest',
             'session': 'func01'
@@ -159,9 +159,9 @@ def default_settings():
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
     settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
     settings['num_threads'] = 4 # sets the number of threads for ANTS registration
-    settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
+    settings['anat_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['atlas'] = '/home/vana/Projects/p3/templates/MNI152.nii.gz' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
-    settings['avgT1s'] = False # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
+    settings['avganats'] = False # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
     settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
     settings['despiking'] = True # sets whether epi images should be despiked
@@ -170,9 +170,9 @@ def default_settings():
             'p3_bidsselector',
             'p3_freesurfer',
             'p3_skullstrip',
-            'p3_timeshiftanddespike',
+            'p3_stcdespikemoco',
             'p3_fieldmapcorrection',
-            'p3_alignt1toatlas',
+            'p3_alignanattoatlas',
             'p3_alignboldtot1',
             'p3_alignboldtoatlas',
             'p3_create_fs_masks'
@@ -182,7 +182,7 @@ def default_settings():
             'source': 'p3_bidsselector',
             'destination': 'p3_freesurfer',
             'links': [
-                ['output.T1','input.T1'],
+                ['output.anat','input.T1'],
                 ['output.subject','input.subject']
             ]
         },
@@ -190,7 +190,7 @@ def default_settings():
             'source': 'p3_bidsselector',
             'destination': 'p3_skullstrip',
             'links': [
-                ['output.T1','input.T1']
+                ['output.anat','input.T1']
             ]
         },
         {
@@ -203,21 +203,14 @@ def default_settings():
         },
         {
             'source': 'p3_bidsselector',
-            'destination': 'p3_timeshiftanddespike',
+            'destination': 'p3_stcdespikemoco',
             'links': [
-                ['output.epi','input.epi']
-            ]
-        },
-        {
-            'source': 'p3_bidsselector',
-            'destination': 'p3_alignt1toatlas',
-            'links': [
-                ['output.atlas','input.atlas']
+                ['output.func','input.func']
             ]
         },
         {
             'source': 'p3_skullstrip',
-            'destination': 'p3_alignt1toatlas',
+            'destination': 'p3_alignanattoatlas',
             'links': [
                 ['output.T1_skullstrip','input.T1_skullstrip']
             ]
@@ -226,93 +219,94 @@ def default_settings():
             'source': 'p3_bidsselector',
             'destination': 'p3_fieldmapcorrection',
             'links': [
-                ['output.epi','input.epi']
+                ['output.func','input.func']
             ]
         },
         {
-            'source': 'p3_timeshiftanddespike',
+            'source': 'p3_stcdespikemoco',
             'destination': 'p3_fieldmapcorrection',
             'links': [
-                ['output.epi_aligned','input.epi_aligned'],
+                ['output.func_aligned','input.func_aligned'],
                 ['output.refimg','input.refimg']
             ]
         },
-        {
-            'source': 'p3_fieldmapcorrection',
-            'destination': 'p3_alignboldtot1',
-            'links': [
-                ['output.refimg','input.refimg']
-            ]
-        },
-        {
-            'source': 'p3_skullstrip',
-            'destination': 'p3_alignboldtot1',
-            'links': [
-                ['output.T1_skullstrip','input.T1_skullstrip']
-            ]
-        },
-        {
-            'source': 'p3_alignt1toatlas',
-            'destination': 'p3_alignboldtoatlas',
-            'links': [
-                ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
-                ['output.noskull_at','input.noskull_at'],
-                ['output.nonlin_warp','input.nonlin_warp']
-            ]
-        },
-        {
-            'source': 'p3_alignboldtot1',
-            'destination': 'p3_alignboldtoatlas',
-            'links': [
-                ['output.epi_2_t1','input.epi_2_t1']
-            ]
-        },
-        {
-            'source': 'p3_timeshiftanddespike',
-            'destination': 'p3_alignboldtoatlas',
-            'links': [
-                ['output.tcat','input.tcat'],
-                ['output.epi2epi1','input.epi2epi1']
-            ]
-        },
-        {
-            'source': 'p3_fieldmapcorrection',
-            'destination': 'p3_alignboldtoatlas',
-            'links': [
-                ['output.fmc','input.fmc']
-            ]
-        },
-        {
-            'source': 'p3_freesurfer',
-            'destination': 'p3_create_fs_masks',
-            'links': [
-                ['output.aparc_aseg','input.aparc_aseg']
-            ]
-        },
-        {
-            'source': 'p3_alignt1toatlas',
-            'destination': 'p3_create_fs_masks',
-            'links': [
-                ['output.nonlin_warp','input.nonlin_warp'],
-                ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
-                ['output.noskull_at','input.noskull_at']
-            ]
-        },
-        {
-            'source': 'p3_alignboldtoatlas',
-            'destination': 'p3_create_fs_masks',
-            'links': [
-                ['output.epi_at','input.epi_at'],
-            ]
-        },
-        {
-            'source': 'p3_skullstrip',
-            'destination': 'p3_create_fs_masks',
-            'links': [
-                ['output.fs2mpr','input.fs2mpr']
-            ]
-        }
     ]
+
+    # {
+    #     'source': 'p3_fieldmapcorrection',
+    #     'destination': 'p3_alignboldtot1',
+    #     'links': [
+    #         ['output.refimg','input.refimg']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_skullstrip',
+    #     'destination': 'p3_alignboldtot1',
+    #     'links': [
+    #         ['output.T1_skullstrip','input.T1_skullstrip']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_alignt1toatlas',
+    #     'destination': 'p3_alignboldtoatlas',
+    #     'links': [
+    #         ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
+    #         ['output.noskull_at','input.noskull_at'],
+    #         ['output.nonlin_warp','input.nonlin_warp']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_alignboldtot1',
+    #     'destination': 'p3_alignboldtoatlas',
+    #     'links': [
+    #         ['output.epi_2_t1','input.epi_2_t1']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_timeshiftanddespike',
+    #     'destination': 'p3_alignboldtoatlas',
+    #     'links': [
+    #         ['output.tcat','input.tcat'],
+    #         ['output.epi2epi1','input.epi2epi1']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_fieldmapcorrection',
+    #     'destination': 'p3_alignboldtoatlas',
+    #     'links': [
+    #         ['output.fmc','input.fmc']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_freesurfer',
+    #     'destination': 'p3_create_fs_masks',
+    #     'links': [
+    #         ['output.aparc_aseg','input.aparc_aseg']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_alignt1toatlas',
+    #     'destination': 'p3_create_fs_masks',
+    #     'links': [
+    #         ['output.nonlin_warp','input.nonlin_warp'],
+    #         ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
+    #         ['output.noskull_at','input.noskull_at']
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_alignboldtoatlas',
+    #     'destination': 'p3_create_fs_masks',
+    #     'links': [
+    #         ['output.epi_at','input.epi_at'],
+    #     ]
+    # },
+    # {
+    #     'source': 'p3_skullstrip',
+    #     'destination': 'p3_create_fs_masks',
+    #     'links': [
+    #         ['output.fs2mpr','input.fs2mpr']
+    #     ]
+    # }
 
     # return settings
     return settings
