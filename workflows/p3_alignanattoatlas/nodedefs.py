@@ -3,7 +3,7 @@
 TODO
 
 """
-from ppp.base import basenodedefs
+from ppp.base import basenodedefs,get_basename
 from nipype import Node
 from nipype.interfaces import ants
 
@@ -26,6 +26,16 @@ class definednodes(basenodedefs):
         self.set_subs([
             ('_calc_calc_calc_calc_calc_at','_atlas')
         ])
+
+        # create the output name for the registration
+        self.create_outputname = Node(
+            Function(
+                input_names=['filename'],
+                output_names=['basename'],
+                function=lambda filename: '{}_'.format(get_basename(filename))
+            ),
+            name='create_outputname'
+        )
 
         # Register to Atlas
         self.register = Node(

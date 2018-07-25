@@ -12,6 +12,17 @@ from nipype.interfaces.utility import IdentityInterface
 from nipype.interfaces.io import DataSink
 from bids.grabbids import BIDSLayout
 
+def get_basename(filename):
+    import os # import os here for function interfaces
+
+    # strip filename extension
+    name,ext = os.path.splitext(os.path.basename(filename))
+    while(ext != ''):
+        name,ext = os.path.splitext(os.path.basename(name))
+
+    # return the basename
+    return name
+
 def output_BIDS_summary(bids_dir):
     """
         Get a summary of the BIDS dataset input

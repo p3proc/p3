@@ -4,7 +4,7 @@ TODO
 
 """
 import os
-from ppp.base import basenodedefs
+from ppp.base import basenodedefs,get_basename
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl,ants
@@ -170,6 +170,16 @@ class definednodes(basenodedefs):
                 output_type='NIFTI_GZ'
             ),
             name='warp_refimg'
+        )
+
+        # create the output name for the registration
+        self.create_outputname = Node(
+            Function(
+                input_names=['filename'],
+                output_names=['basename'],
+                function=lambda filename: '{}_'.format(get_basename(filename))
+            ),
+            name='create_outputname'
         )
 
         # align the (NOTE: I'm not sure if this is valid, but it was the only way I could get a ANTS warp compatible FMC)

@@ -134,7 +134,15 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                     ('ped','unwarp_direction')
                 ]),
 
+                # create the basename
+                (dn.warp_refimg,dn.create_outputname,[
+                    ('unwarped_file','filename')
+                ]),
+
                 # Use ants registration to get the transforms from refimg to unwarped refimg
+                (dn.create_outputname,dn.warp_refimg,[
+                    ('basename','output_prefix')
+                ]),
                 (dn.warp_refimg,dn.ants_fmc,[
                     ('unwarped_file','fixed_image')
                 ]),
