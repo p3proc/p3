@@ -171,3 +171,8 @@ class definednodes(basenodedefs):
             iterfield=['in_file'],
             name='volreg_before'
         )
+
+        # Moco (after)
+        
+
+        # Moco (before)

@@ -7,7 +7,7 @@ import os
 from ppp.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
-from nipype.interfaces import afni,fsl
+from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function,IdentityInterface
 from nipype.workflows.dmri.fsl.utils import vsm2warp
 
@@ -24,7 +24,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['epi','refimg','epi_aligned'])
-        self.set_output(['fmc','refimg'])
+        self.set_output(['affine_fmc','warp_fmc','refimg'])
 
         # define datasink substitutions
         # self.set_subs([])
@@ -35,16 +35,16 @@ class definednodes(basenodedefs):
         ])
 
         # get magnitude and phase
-        self.getmagandphase = MapNode(
+        self.get_metadata = MapNode(
             Function(
                 input_names=['epi_file','bids_dir'],
-                output_names=['magnitude','phasediff','TE','echospacing'],
-                function=get_magnitude_phase_TE
+                output_names=['magnitude','phasediff','TE','echospacing','ped'],
+                function=get_metadata
             ),
             iterfield=['epi_file'],
-            name='getmagandphase'
+            name='get_metadata'
         )
-        self.getmagandphase.inputs.bids_dir = settings['bids_dir']
+        self.get_metadata.inputs.bids_dir = settings['bids_dir']
 
         # get skullstrip of magnitude image
         self.skullstrip_magnitude = MapNode(
@@ -153,12 +153,12 @@ class definednodes(basenodedefs):
             name='register_mask'
         )
 
-        # get the values to warp the refimg
+        # get the values to warp the refimg (the refimg is indexed at 0)
         self.get_refimg_files = Node(
             Function(
-                input_names=['dwell_time','fmap_in_file','mask_file'],
-                output_names=['dwell_time','fmap_in_file','mask_file'],
-                function=lambda dwell_time,fmap_in_file,mask_file: (dwell_time[0],fmap_in_file[0],mask_file[0])
+                input_names=['dwell_time','fmap_in_file','mask_file','ped'],
+                output_names=['dwell_time','fmap_in_file','mask_file','ped'],
+                function=lambda dwell_time,fmap_in_file,mask_file,ped: (dwell_time[0],fmap_in_file[0],mask_file[0],ped[0])
             ),
             name='get_refimg_files'
         )
@@ -167,13 +167,15 @@ class definednodes(basenodedefs):
         self.warp_refimg = Node(
             fsl.FUGUE(
                 save_shift=True,
-                output_type='NIFTI_GZ',
-                unwarp_direction='y-'
+                output_type='NIFTI_GZ'
             ),
             name='warp_refimg'
         )
 
-        # create vsm2warp workflow
-        self.vsm2dfm = vsm2warp()
-        self.vsm2dfm.inputs.inputnode.scaling = 4
-        self.vsm2dfm.inputs.inputnode.enc_dir = 'y-'
+        # align the (NOTE: I'm not sure if this is valid, but it was the only way I could get a ANTS warp compatible FMC)
+        self.ants_fmc = Node(
+            ants.RegistationSynQuick(
+                num_threads=settings['num_threads']
+            ),
+            name='ants_fmc'
+        )

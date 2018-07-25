@@ -158,7 +158,7 @@ def default_settings():
         }
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
     settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
-    settings['nonlinear_atlas'] = True # do nonlinear transform for atlas alignment using 3dQwarp
+    settings['num_threads'] = 4 # sets the number of threads for ANTS registration
     settings['T1_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['atlas'] = '/home/vana/Projects/p3/templates/MNI152.nii.gz' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
     settings['avgT1s'] = False # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
@@ -245,10 +245,10 @@ def default_settings():
             ]
         },
         {
-            'source': 'p3_alignt1toatlas',
+            'source': 'p3_skullstrip',
             'destination': 'p3_alignboldtot1',
             'links': [
-                ['output.T1_0','input.T1_0']
+                ['output.T1_skullstrip','input.T1_skullstrip']
             ]
         },
         {
@@ -310,13 +310,6 @@ def default_settings():
             'destination': 'p3_create_fs_masks',
             'links': [
                 ['output.fs2mpr','input.fs2mpr']
-            ]
-        },
-        {
-            'source': 'p3_bidsselector',
-            'destination': 'p3_create_fs_masks',
-            'links': [
-                ['output.atlas','input.atlas']
             ]
         }
     ]

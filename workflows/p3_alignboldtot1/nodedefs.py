@@ -6,7 +6,7 @@ TODO
 from ppp.base import basenodedefs
 from .custom import *
 from nipype import Node
-from nipype.interfaces import afni,fsl
+from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
@@ -21,8 +21,8 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['refimg','T1_0'])
-        self.set_output(['epi_2_t1'])
+        self.set_input(['refimg','T1_skullstrip'])
+        self.set_output(['affine_epi_2_t1','warp_epi_2_t1'])
 
         # define datasink substitutions
         self.set_subs([
@@ -52,10 +52,8 @@ class definednodes(basenodedefs):
 
         # align epi to t1
         self.align_epi_2_anat = Node(
-            Function(
-                input_names=['in_file','anat'],
-                output_names=['epi_al_mat','epi_al_orig'],
-                function=alignepi2anat
+            ants.RegistrationSynQuick(
+                num_threads=settings['num_threads']
             ),
             name='align_epi_2_anat'
         )

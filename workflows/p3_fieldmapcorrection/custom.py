@@ -2,7 +2,7 @@
     Define Custom Functions and Interfaces
 """
 
-def get_magnitude_phase_TE(epi_file,bids_dir):
+def get_metadata(epi_file,bids_dir):
     """
         This function requires the "IntendedFor" field in the json sidecar of the field map to be defined.
         (See section 8.3.5 of the BIDS spec)
@@ -40,8 +40,16 @@ def get_magnitude_phase_TE(epi_file,bids_dir):
     # get the echospacing for the epi image
     echospacing = layout.get_metadata(epi_file)['EffectiveEchoSpacing']
 
+    # get the phase encoding direction
+    ped = layout.get_metadata(epi_file)['PhaseEncodingDirection']
+
+    # replace ped string with correct letter
+    ped = ped.replace('i','x').replace('j','y').replace('k','z')
+    print(ped)
+    raise ValueError
+
     # return the magnitude and phase image paths
-    return (magnitude,phasediff,TE,echospacing)
+    return (magnitude,phasediff,TE,echospacing,ped)
 
 def fsl_prepare_fieldmap(phasediff,magnitude,TE):
     import os
@@ -64,79 +72,4 @@ def fsl_prepare_fieldmap(phasediff,magnitude,TE):
     ))
 
     # return the fieldmap file
-    return out_file
-
-def convert_2_afni(in_file,bids_dir,phasediff):
-    import os
-    import subprocess
-    from bids.grabbids import BIDSLayout
-
-    # I'm lazy, so I just pass in the entire phasediff list...
-    # just take the first item of the list because thats the fieldmap
-    # for the refimg
-    phasediff = phasediff[0]
-
-    # get cwd
-    cwd = os.getcwd()
-
-    # get filename to output
-    name,ext = os.path.splitext(os.path.basename(phasediff))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_afni.nii.gz'.format(name))
-
-    # get bids layout
-    layout = BIDSLayout(bids_dir)
-
-    # determine the phase encoding direction
-    ped = layout.get_metadata(phasediff)['PhaseEncodingDirection']
-
-    # determine image orientation
-    output = subprocess.run(['3dinfo','-orient',phasediff],stdout=subprocess.PIPE)
-    orientation = output.stdout.decode('utf-8').rstrip()
-
-    # choose orientation based on ped
-    if ped[0] == 'i':
-        if orientation[0] == 'R':
-            orient_code = 'RL'
-        elif orientation[0] == 'L':
-            orient_code = 'LR'
-        else:
-            raise ValueError('Invalid Orientation!')
-    elif ped[0] == 'j':
-        if orientation[1] == 'A':
-            orient_code = 'AP'
-        elif orientation[1] == 'P':
-            orient_code = 'PA'
-        else:
-            raise ValueError('Invalid Orientation!')
-    elif ped[0] == 'k':
-        if orientation[2] == 'I':
-            orient_code = 'IS'
-        elif orientation[2] == 'S':
-            orient_code = 'SI'
-        else:
-            raise ValueError('Invalid Orientation!')
-    else:
-        raise ValueError('Invalid Phhase Encoding Direction Parsed!')
-
-    # reverse the orientation if ped was negative
-    if ped[1] == '-':
-        orient_code = orient_code[::-1]
-
-    # get the voxel size of the image
-    output = subprocess.run(['3dinfo','-ad{}'.format(ped[0]),phasediff],stdout=subprocess.PIPE)
-    voxel_size = output.stdout.decode('utf-8').rstrip()
-
-    # convert to shiftmap to afni readable format
-    command = '3dNwarpCat -warp1 {}:{}:{} -prefix {}'.format(
-        orient_code,
-        voxel_size,
-        in_file,
-        out_file
-    )
-    print(command)
-    os.system(command)
-
-    # return afni shiftmap
     return out_file

@@ -98,17 +98,22 @@ class skullstripworkflow(workflowgenerator):
                 ('T1','in_file_c')
             ]),
 
-            # output to output node
-            (dn.maskop4,dn.outputnode,[
-                ('out_file','T1_skullstrip')
+            # convert T1 list to string
+            (dn.maskop4,dn.select0T1,[
+                ('out_file','T1_list')
             ]),
-            (dn.allineate_orig,dn.outputnode,[
+            
+            # output to output node
+            (dn.select0T1,dn.outputnode,[
+                ('T1_0','T1_skullstrip')
+            ]),
+            (dn.allineate_orig,dn.outputnode,[ # for creating fs masks
                 ('out_matrix','fs2mpr')
             ]),
 
             # save out skullstrip
-            (dn.maskop4,dn.datasink,[
-                ('out_file','p3_QC.@skullstrip')
+            (dn.select0T1,dn.datasink,[
+                ('T1_0','p3_QC.skullstrip.@skullstrip')
             ])
         ])
 

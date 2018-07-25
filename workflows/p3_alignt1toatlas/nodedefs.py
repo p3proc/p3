@@ -20,39 +20,19 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output node
-        self.set_input(['T1_skullstrip','atlas'])
-        self.set_output(['noskull_at','nonlin_warp','t1_2_atlas_transform','T1_0'])
+        self.set_input(['T1_skullstrip'])
+        self.set_output(['warp_t1_2_atlas','affine_t1_2_atlas'])
 
         # define datasink substitutions
         self.set_subs([
             ('_calc_calc_calc_calc_calc_at','_atlas')
         ])
 
-        # Convert from list to string input
-        self.select0T1 = Node(
-            Function(
-                input_names=['T1_list'],
-                output_names=['T1_0'],
-                function=lambda T1_list: T1_list[0]
-            ),
-            name='select0T1'
-        )
-
         # Register to Atlas
         self.register = Node(
-            Function(
-                input_names=['in_file','atlas'],
-                output_names=['out_file','transform_file'],
-                function=register_atlas
+            ants.RegistrationSynQuick(
+                num_threads=settings['num_threads']
             ),
             name='atlasregister'
         )
-
-        self.Qwarp = Node(
-            Function(
-                input_names=['in_file','base_file'],
-                output_names=['out_file','warp_file'],
-                function=nonlinear_register
-            ),
-            name='Qwarp'
-        )
+        self.register.inputs.fixed_image = settings['atlas'] # get atlas image

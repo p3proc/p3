@@ -24,7 +24,7 @@ class definednodes(basenodedefs):
 
         # define output node
         self.set_input(['subject'])
-        self.set_output(['atlas','T1','epi','subject'])
+        self.set_output(['T1','epi','subject'])
 
         # define datasink substitutions
         self.set_resubs([
@@ -81,14 +81,3 @@ class definednodes(basenodedefs):
             ),
             name='avgT1'
         )
-
-        # get atlas image
-        self.get_atlas = Node(
-            Function(
-                input_names=['base_file','subject'], # we add subject here so that this only executes when a subject is provided
-                output_names=['base_file'],
-                function=get_atlas_image
-            ),
-            name='get_atlas'
-        )
-        self.get_atlas.inputs.base_file = settings['atlas']

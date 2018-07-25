@@ -132,3 +132,13 @@ class definednodes(basenodedefs):
             iterfield=['in_file_a','in_file_b','in_file_c'],
             name='maskop4'
         )
+
+        # Convert from list to string input
+        self.select0T1 = Node(
+            Function(
+                input_names=['T1_list'],
+                output_names=['T1_0'],
+                function=lambda T1_list: T1_list[0]
+            ),
+            name='select0T1'
+        )

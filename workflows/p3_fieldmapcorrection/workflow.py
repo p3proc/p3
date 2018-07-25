@@ -21,12 +21,12 @@ class fieldmapcorrectionworkflow(workflowgenerator):
             # connect the workflow
             cls.workflow.connect([ # connect nodes
                 # get the magnitude and phase images
-                (dn.inputnode,dn.getmagandphase,[
+                (dn.inputnode,dn.get_metadata,[
                     ('epi','epi_file')
                 ]),
 
                 # skullstrip the magnitude image
-                (dn.getmagandphase,dn.skullstrip_magnitude,[
+                (dn.get_metadata,dn.skullstrip_magnitude,[
                     ('magnitude','in_file')
                 ]),
 
@@ -47,7 +47,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # create fieldmap image
-                (dn.getmagandphase,dn.calculate_fieldmap,[
+                (dn.get_metadata,dn.calculate_fieldmap,[
                     ('phasediff','phasediff'),
                     ('TE','TE')
                 ]),
@@ -106,7 +106,7 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # Warp the refimg with fieldmap
-                (dn.getmagandphase,dn.get_refimg_files,[
+                (dn.get_metadata,dn.get_refimg_files,[
                     ('echospacing','dwell_time')
                 ]),
                 (dn.register_fieldmap,dn.get_refimg_files,[
@@ -114,6 +114,9 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
                 (dn.register_mask,dn.get_refimg_files,[
                     ('out_file','mask_file')
+                ]),
+                (dn.get_metadata,dn.get_refimg_files,[
+                    ('ped','ped')
                 ]),
                 (dn.inputnode,dn.warp_refimg,[
                     ('refimg','in_file')
@@ -127,32 +130,35 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 (dn.get_refimg_files,dn.warp_refimg,[
                     ('mask_file','mask_file')
                 ]),
-
-                # use the convinent vsm2warp workflow to get a displacemnt field image
-                (dn.warp_refimg,dn.vsm2dfm,[
-                    ('shift_out_file','inputnode.in_vsm')
+                (dn.get_refimg_files,dn.warp_refimg,[
+                    ('ped','unwarp_direction')
                 ]),
-                (dn.warp_refimg,dn.vsm2dfm,[
-                    ('unwarped_file','inputnode.in_ref')
+
+                # Use ants registration to get the transforms from refimg to unwarped refimg
+                (dn.warp_refimg,dn.ants_fmc[
+                    ('warped_file','fixed_image')
+                ]),
+                (dn.inputnode,dn.ants_fmc[
+                    ('refimg','moving_image')
                 ]),
 
                 # Save out unwarped files for QC
-                (dn.warp_refimg,dn.datasink,[
-                    ('shift_out_file','p3_QC.@shiftmap')
-                ]),
-                (dn.warp_refimg,dn.datasink,[
-                    ('unwarped_file','p3_QC.@unwarped_aligned_refimg')
-                ]),
-                (dn.vsm2dfm,dn.datasink,[
-                    ('outputnode.out_warp','p3_QC.@dfm')
+                (dn.ants_fmc,dn.datasink,[
+                    ('warped_image','p3_QC.fieldmapcorrection.@unwarped_aligned_refimg')
                 ]),
                 (dn.inputnode,dn.datasink,[
-                    ('refimg','p3_QC.@refimg')
+                    ('refimg','p3_QC.fieldmapcorrection.@refimg')
                 ]),
 
                 # Output unwarp outputs for fmc to output node
-                (dn.warp_refimg,dn.outputnode,[
-                    ('unwarped_file','refimg')
+                (dn.ants_fmc,dn.outputnode,[
+                    ('warped_image','refimg')
+                ]),
+                (dn.ants_fmc,dn.outputnode,[
+                    ('out_matrix','affine_fmc')
+                ]),
+                (dn.ants_fmc,dn.outputnode,[
+                    ('forward_warp_field','warp_fmc')
                 ])
             ])
         else:

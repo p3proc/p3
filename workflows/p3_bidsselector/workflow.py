@@ -78,9 +78,6 @@ class bidsselectorworkflow(workflowgenerator):
             ]),
             (dn.inputnode,dn.outputnode,[
                 ('subject','subject')
-            ]),
-            (dn.get_atlas,dn.outputnode,[
-                ('base_file','atlas')
             ])
         ])
 

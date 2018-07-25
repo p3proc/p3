@@ -37,29 +37,26 @@ class alignboldtot1workflow(workflowgenerator):
 
             # align epi 2 anat
             (dn.epi_3dcalc,dn.align_epi_2_anat,[ # skullstripped epi
-                ('out_file','in_file')
+                ('out_file','moving_image')
             ]),
-            #(dn.inputnode,dn.align_epi_2_anat,[ # unskullstripped epi
-            #    ('refimg','in_file')
-            #]),
             (dn.inputnode,dn.align_epi_2_anat,[ # skullstripped T1
-                ('T1_0','anat')
+                ('T1_skullstrip','fixed_image')
             ]),
 
             # output to output node
             (dn.align_epi_2_anat,dn.outputnode,[
-                ('epi_al_mat','epi_2_t1')
+                ('out_matrix','affine_epi_2_t1')
+            ]),
+            (dn.align_epi_2_anat,dn.outputnode,[
+                ('forward_warp_field','warp_epi_2_t1')
             ]),
 
             # output to QC datasink
             (dn.epi_3dcalc,dn.datasink,[
-                ('out_file','p3_QC.@epi_skullstrip')
+                ('out_file','p3_QC.alignboldtot1.@epi_skullstrip')
             ]),
             (dn.align_epi_2_anat,dn.datasink,[
-                ('epi_al_mat','p3_QC.@epi_2_t1')
-            ]),
-            (dn.align_epi_2_anat,dn.datasink,[
-                ('epi_al_orig','p3_QC.@epi_2_t1_img')
+                ('warped_image','p3_QC.alignboldtot1.@epi_aligned_t1')
             ])
         ])
 
