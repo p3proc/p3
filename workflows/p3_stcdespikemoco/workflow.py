@@ -61,7 +61,7 @@ class stcdespikemocoworkflow(workflowgenerator):
                 ('roi_file','refimg')
             ]),
             (dn.stc_despike_pool,dn.outputnode,[
-                ('epi','stc_despike_func')
+                ('epi','func_stc_despike')
             ]),
             (dn.moco,dn.outputnode,[
                 ('warp','warp_func_2_refimg')
