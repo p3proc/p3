@@ -40,7 +40,7 @@ class definednodes(basenodedefs):
             iterfield=['epi'],
             name='extract_slicetime'
         )
-        self.extract_stc.inputs.bids_dir = os.path.join(settings['bids_dir'])
+        self.extract_stc.inputs.bids_dir = settings['bids_dir']
 
         # Despike epi data (create 2 for permutations with slice time correction)
         self.despike = MapNode(

@@ -256,6 +256,13 @@ def default_settings():
             ]
         },
         {
+            'source': 'p3_bidsselector',
+            'destination': 'p3_alignfunctoatlas',
+            'links': [
+                ['output.func','input.func'],
+            ]
+        },
+        {
             'source': 'p3_stcdespikemoco',
             'destination': 'p3_alignfunctoatlas',
             'links': [
