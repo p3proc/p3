@@ -76,12 +76,12 @@ def antsMotionCorr(fixed_image,moving_image,transform):
             1, # metric weight
             32, # number of bins
             'Regular', # sampling Strategy
-            0.2, # sampling percentage
+            0.15, # sampling percentage
             transform,
             0.1, # gradient step
             '1x0', # smoothing sigmas
             '2x1', # shrink factors
-            '20x10', # iterations
+            '20x5', # iterations
         )
     print(command) # print command before running
 
