@@ -18,13 +18,13 @@ RUN wget -O- http://neuro.debian.net/lists/stretch.us-ca.full | tee /etc/apt/sou
 
 # Get afni
 WORKDIR /
-RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential \
+RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential && \
     mkdir afni && \
     cd /afni && \
     curl -O https://afni.nimh.nih.gov/pub/dist/tgz/linux_ubuntu_16_64.tgz && \
     tar -xvzf linux_ubuntu_16_64.tgz && \
     rm linux_ubuntu_16_64.tgz
-ENV PATH=${PATH}:/afni/bin/linux_ubuntu_16_64
+ENV PATH=${PATH}:/afni/linux_ubuntu_16_64
 
 # Compile and install fsl from source
 # NOTE: I disable mist-clean because it doesn't compile for whatever reason...
@@ -80,6 +80,14 @@ ENV FMRI_ANALYSIS_DIR=/opt/freesurfer/fsfast
 ENV PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
 ENV MNI_PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
 ENV PATH=${PATH}:/opt/freesurfer/bin:/opt/freesurfer/fsfast/bin:/opt/freesurfer/tktools:/opt/freesurfer/mni/bin
+
+# Install ANTS
+RUN curl -O https://cmake.org/files/v3.12/cmake-3.12.0.tar.gz && \
+    tar xvf cmake-3.12.0.tar.gz && rm cmake-3.12.0.tar.gz && \
+    apt-get install -y git build-essential && \
+    cd cmake-3.12.0 && ./bootstrap && make && make install && cd .. && rm -r cmake-3.12.0 && \
+    git clone https://github.com/ANTsX/ANTs.git && \
+    mkdir ants && cd ants && cmake ../ANTs && make -j 4
 
 # Install Python Stuff
 WORKDIR /

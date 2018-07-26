@@ -55,7 +55,7 @@ class definednodes(basenodedefs):
         self.selectanat.inputs.refnum = settings['anat_reference']
 
         # create node for aligning multiple T1 images to T1 reference
-        self.aliganattoanat = MapNode(
+        self.alignanattoanat = MapNode(
             afni.Allineate(
                 outputtype='NIFTI_GZ',
             ),
