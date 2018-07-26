@@ -9,7 +9,7 @@ def avganats(anat_list):
     path = os.getcwd()
 
     # join list into string
-    filelist = ' '.join(T1_list)
+    filelist = ' '.join(anat_list)
 
     # get filename of first file
     name,ext = os.path.splitext(os.path.basename(anat_list[0]))
