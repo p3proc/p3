@@ -59,7 +59,7 @@ class alignfunctoanatworkflow(workflowgenerator):
 
             # output to QC datasink
             (dn.epi_3dcalc,dn.datasink,[
-                ('out_file','p3_QC.alignfunc2anat.@epi_skullstrip')
+                ('out_file','p3_QC.alignfunctoanat.@epi_skullstrip')
             ]),
             (dn.align_func_2_anat,dn.datasink,[
                 ('warped_image','p3_QC.alignfunctoanat.@epi_aligned_t1')
