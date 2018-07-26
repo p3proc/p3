@@ -3,6 +3,8 @@
 """
 
 def applytransforms(in_file,reference,warp_func_2_refimg,affine_func_2_anat,warp_func_2_anat,affine_anat_2_atlas,warp_anat_2_atlas,affine_fmc=None,warp_fmc=None):
+    import os
+
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
