@@ -2,8 +2,8 @@ from nipype import Workflow
 from .nodedefs import definednodes
 from ppp.base import workflowgenerator
 
-class alignboldtot1workflow(workflowgenerator):
-    """ Defines the time shift and despike workflow
+class alignfunctoanatworkflow(workflowgenerator):
+    """ Defines the functional alignment to anatomy alignment workflow
 
         TODO
 
@@ -35,27 +35,33 @@ class alignboldtot1workflow(workflowgenerator):
                 ('refimg','in_file_c')
             ]),
 
-            # align epi 2 anat
-            (dn.epi_3dcalc,dn.align_epi_2_anat,[ # skullstripped epi
+            # align func 2 anat
+            (dn.epi_3dcalc,dn.create_prefix,[
+                ('out_file','filename')
+            ]),
+            (dn.create_prefix,dn.align_func_2_anat,[ # set output prefix
+                ('basename','output_prefix')
+            ]),
+            (dn.epi_3dcalc,dn.align_func_2_anat,[ # skullstripped epi
                 ('out_file','moving_image')
             ]),
-            (dn.inputnode,dn.align_epi_2_anat,[ # skullstripped T1
+            (dn.inputnode,dn.align_func_2_anat,[ # skullstripped T1
                 ('T1_skullstrip','fixed_image')
             ]),
 
             # output to output node
-            (dn.align_epi_2_anat,dn.outputnode,[
-                ('out_matrix','affine_epi_2_t1')
+            (dn.align_func_2_anat,dn.outputnode,[
+                ('out_matrix','affine_func_2_anat')
             ]),
-            (dn.align_epi_2_anat,dn.outputnode,[
-                ('forward_warp_field','warp_epi_2_t1')
+            (dn.align_func_2_anat,dn.outputnode,[
+                ('forward_warp_field','warp_func_2_anat')
             ]),
 
             # output to QC datasink
             (dn.epi_3dcalc,dn.datasink,[
                 ('out_file','p3_QC.alignboldtot1.@epi_skullstrip')
             ]),
-            (dn.align_epi_2_anat,dn.datasink,[
+            (dn.align_func_2_anat,dn.datasink,[
                 ('warped_image','p3_QC.alignboldtot1.@epi_aligned_t1')
             ])
         ])

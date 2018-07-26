@@ -7,6 +7,7 @@ from ppp.base import basenodedefs
 from nipype import Node
 from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function
+from .custom import *
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -21,7 +22,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['refimg','T1_skullstrip'])
-        self.set_output(['affine_epi_2_t1','warp_epi_2_t1'])
+        self.set_output(['affine_func_2_t1','warp_func_2_t1'])
 
         # define datasink substitutions
         self.set_subs([
@@ -49,8 +50,18 @@ class definednodes(basenodedefs):
             name='epi_3dcalc'
         )
 
-        # align epi to t1
-        self.align_epi_2_anat = Node(
+        # create the output name for the registration
+        self.create_prefix = Node(
+            Function(
+                input_names=['filename'],
+                output_names=['basename'],
+                function=get_prefix
+            ),
+            name='create_prefix'
+        )
+
+        # align func to anat
+        self.align_func_2_anat = Node(
             ants.RegistrationSynQuick(
                 num_threads=settings['num_threads']
             ),
