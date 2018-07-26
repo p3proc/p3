@@ -64,7 +64,7 @@ class stcdespikemocoworkflow(workflowgenerator):
                 ('epi','stc_despike_func')
             ]),
             (dn.moco,dn.outputnode,[
-                ('warp','warp_func2refimg')
+                ('warp','warp_func_2_refimg')
             ]),
             (dn.moco,dn.outputnode,[
                 ('warped_img','func_aligned')

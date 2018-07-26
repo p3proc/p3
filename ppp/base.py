@@ -185,7 +185,7 @@ def default_settings():
             'p3_fieldmapcorrection',
             'p3_alignanattoatlas',
             'p3_alignfunctoanat',
-            'p3_alignboldtoatlas',
+            'p3_alignfunctoatlas',
             'p3_create_fs_masks'
         ]
     settings['connections'] = [ # defines the input/output connections between workflows
@@ -255,40 +255,45 @@ def default_settings():
                 ['output.T1_skullstrip','input.T1_skullstrip']
             ]
         },
+        {
+            'source': 'p3_stcdespikemoco',
+            'destination': 'p3_alignfunctoatlas',
+            'links': [
+                ['output.func_stc_despike','input.func_stc_despike'],
+                ['output.warp_func_2_refimg','input.warp_func_2_refimg']
+            ]
+        },
+        {
+            'source': 'p3_fieldmapcorrection',
+            'destination': 'p3_alignfunctoatlas',
+            'links': [
+                ['output.affine_fmc','input.affine_fmc'],
+                ['output.warp_fmc','input.warp_fmc'],
+                ['output.refimg','input.refimg']
+            ]
+        },
+        {
+            'source': 'p3_alignfunctoanat',
+            'destination': 'p3_alignfunctoatlas',
+            'links': [
+                ['output.affine_func_2_anat','input.affine_func_2_anat'],
+                ['output.warp_func_2_anat','input.warp_func_2_anat']
+            ]
+        },
+        {
+            'source': 'p3_alignanattoatlas',
+            'destination': 'p3_alignfunctoatlas',
+            'links': [
+                ['output.affine_anat_2_atlas','input.affine_anat_2_atlas'],
+                ['output.warp_anat_2_atlas','input.warp_anat_2_atlas']
+            ]
+        },
     ]
 
 
-    # {
-    #     'source': 'p3_alignt1toatlas',
-    #     'destination': 'p3_alignboldtoatlas',
-    #     'links': [
-    #         ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
-    #         ['output.noskull_at','input.noskull_at'],
-    #         ['output.nonlin_warp','input.nonlin_warp']
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_alignboldtot1',
-    #     'destination': 'p3_alignboldtoatlas',
-    #     'links': [
-    #         ['output.epi_2_t1','input.epi_2_t1']
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_timeshiftanddespike',
-    #     'destination': 'p3_alignboldtoatlas',
-    #     'links': [
-    #         ['output.tcat','input.tcat'],
-    #         ['output.epi2epi1','input.epi2epi1']
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_fieldmapcorrection',
-    #     'destination': 'p3_alignboldtoatlas',
-    #     'links': [
-    #         ['output.fmc','input.fmc']
-    #     ]
-    # },
+
+
+
     # {
     #     'source': 'p3_freesurfer',
     #     'destination': 'p3_create_fs_masks',
@@ -306,7 +311,7 @@ def default_settings():
     #     ]
     # },
     # {
-    #     'source': 'p3_alignboldtoatlas',
+    #     'source': 'p3_alignfunctoatlas',
     #     'destination': 'p3_create_fs_masks',
     #     'links': [
     #         ['output.epi_at','input.epi_at'],

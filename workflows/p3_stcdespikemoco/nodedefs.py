@@ -23,7 +23,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['func'])
-        self.set_output(['refimg','func_stc_despike','warp_func2refimg','func_aligned'])
+        self.set_output(['refimg','func_stc_despike','warp_func_2_refimg','func_aligned'])
 
         # define datasink substitutions
         self.set_subs([

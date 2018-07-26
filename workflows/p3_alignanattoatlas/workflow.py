@@ -31,10 +31,10 @@ class alignanattoatlasworkflow(workflowgenerator):
 
             # output to output node
             (dn.register,dn.outputnode,[
-                ('out_matrix','affine_t1_2_atlas')
+                ('out_matrix','affine_anat_2_atlas')
             ]),
             (dn.register,dn.outputnode,[
-                ('forward_warp_field','warp_t1_2_atlas')
+                ('forward_warp_field','warp_anat_2_atlas')
             ]),
 
             # output T1 atlas alignment to p3 output

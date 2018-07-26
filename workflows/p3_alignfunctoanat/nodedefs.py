@@ -22,11 +22,11 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['refimg','T1_skullstrip'])
-        self.set_output(['affine_func_2_t1','warp_func_2_t1'])
+        self.set_output(['affine_func_2_anat','warp_func_2_anat'])
 
         # define datasink substitutions
         self.set_subs([
-            ('_despike_tshift_roi_unwarped_masked_calc','_reference_skullstrip'), # name the skullstripped refimg
+            ('_masked_calc','_reference_skullstrip'), # name the skullstripped refimg
         ])
 
         # Skullstrip the EPI image
