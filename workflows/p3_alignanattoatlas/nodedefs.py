@@ -22,7 +22,7 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['T1_skullstrip'])
-        self.set_output(['affine_anat_2_atlas','warp_anat_2_atlas'])
+        self.set_output(['affine_anat_2_atlas','warp_anat_2_atlas','anat_atlas'])
 
         # define datasink substitutions
         self.set_subs([

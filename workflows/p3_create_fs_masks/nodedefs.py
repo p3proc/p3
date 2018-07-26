@@ -26,12 +26,11 @@ class definednodes(basenodedefs):
         # define input and output nodes
         self.set_input([
             'aparc_aseg',
-            'nonlin_warp',
-            't1_2_atlas_transform',
-            'fs2mpr',
-            'epi_at',
-            'noskull_at',
-            'atlas'
+            'affine_anat_2_atlas',
+            'warp_anat_2_atlas',
+            'anat_atlas',
+            'func_atlas',
+            'allineate_freesurfer2anat',
             ])
 
         # define datasink substitutions

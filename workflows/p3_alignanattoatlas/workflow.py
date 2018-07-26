@@ -36,6 +36,9 @@ class alignanattoatlasworkflow(workflowgenerator):
             (dn.register,dn.outputnode,[
                 ('forward_warp_field','warp_anat_2_atlas')
             ]),
+            (dn.register,dn.outputnode,[
+                ('warped_image','anat_atlas')
+            ]),
 
             # output T1 atlas alignment to p3 output
             (dn.register,dn.datasink,[

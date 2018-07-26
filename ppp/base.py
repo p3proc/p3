@@ -295,42 +295,40 @@ def default_settings():
                 ['output.warp_anat_2_atlas','input.warp_anat_2_atlas']
             ]
         },
+        # {
+        #     'source': 'p3_freesurfer',
+        #     'destination': 'p3_create_fs_masks',
+        #     'links': [
+        #         ['output.aparc_aseg','input.aparc_aseg']
+        #     ]
+        # },
+        # {
+        #     'source': 'p3_alignanattoatlas',
+        #     'destination': 'p3_create_fs_masks',
+        #     'links': [
+        #         ['output.affine_anat_2_atlas','input.affine_anat_2_atlas'],
+        #         ['output.warp_anat_2_atlas','input.warp_anat_2_atlas'],
+        #         ['output.anat_atlas','input.anat_atlas']
+        #     ]
+        # },
+        # {
+        #     'source': 'p3_alignfunctoatlas',
+        #     'destination': 'p3_create_fs_masks',
+        #     'links': [
+        #         ['output.func_atlas','input.func_atlas'],
+        #     ]
+        # },
+        # {
+        #     'source': 'p3_skullstrip',
+        #     'destination': 'p3_create_fs_masks',
+        #     'links': [
+        #         ['output.allineate_freesurfer2anat','input.allineate_freesurfer2anat']
+        #     ]
+        # }
     ]
 
 
 
-
-
-    # {
-    #     'source': 'p3_freesurfer',
-    #     'destination': 'p3_create_fs_masks',
-    #     'links': [
-    #         ['output.aparc_aseg','input.aparc_aseg']
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_alignt1toatlas',
-    #     'destination': 'p3_create_fs_masks',
-    #     'links': [
-    #         ['output.nonlin_warp','input.nonlin_warp'],
-    #         ['output.t1_2_atlas_transform','input.t1_2_atlas_transform'],
-    #         ['output.noskull_at','input.noskull_at']
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_alignfunctoatlas',
-    #     'destination': 'p3_create_fs_masks',
-    #     'links': [
-    #         ['output.epi_at','input.epi_at'],
-    #     ]
-    # },
-    # {
-    #     'source': 'p3_skullstrip',
-    #     'destination': 'p3_create_fs_masks',
-    #     'links': [
-    #         ['output.fs2mpr','input.fs2mpr']
-    #     ]
-    # }
 
     # return settings
     return settings
