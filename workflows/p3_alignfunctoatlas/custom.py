@@ -77,7 +77,7 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,warp_func_2_anat
     os.system(command)
 
     # replicate the combined transform
-    print('Replicating the combined transfrom into 4D...')
+    print('Replicating the combined transform into 4D...')
     command = 'ImageMath 3 {} ReplicateDisplacement {} {} {} 0'.format(
         combined_transforms4D,
         combined_transforms,
