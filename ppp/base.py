@@ -13,7 +13,9 @@ from nipype.interfaces.io import DataSink
 from bids.grabbids import BIDSLayout
 
 def get_basename(filename):
-    import os # import os here for function interfaces
+    """
+        Just a conveinent function for getting the filename without extension
+    """
 
     # strip filename extension
     name,ext = os.path.splitext(os.path.basename(filename))

@@ -95,5 +95,8 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     # run antsMotionCorr
     os.system(command)
 
+    # remove the InverseWarp image to save space
+    os.system('rm {}'.format(os.path.join(cwd,'*InverseWarp.nii.gz')))
+
     # return the outputs
     return(output_warp,output_mocoparams,output_warpedimg,output_avgimg)
