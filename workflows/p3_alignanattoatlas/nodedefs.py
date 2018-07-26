@@ -6,6 +6,8 @@ TODO
 from ppp.base import basenodedefs,get_basename
 from nipype import Node
 from nipype.interfaces import ants
+from nipype.interfaces.utility import Function
+from .custom import *
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -24,17 +26,17 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_calc_calc_calc_calc_calc_at','_atlas')
+            ('_calc_calc_calc_calc_calc_Warped','_atlas')
         ])
 
         # create the output name for the registration
-        self.create_outputname = Node(
+        self.create_prefix = Node(
             Function(
                 input_names=['filename'],
                 output_names=['basename'],
-                function=lambda filename: '{}_'.format(get_basename(filename))
+                function=get_prefix
             ),
-            name='create_outputname'
+            name='create_prefix'
         )
 
         # Register to Atlas

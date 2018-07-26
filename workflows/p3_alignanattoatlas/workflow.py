@@ -19,8 +19,11 @@ class alignanattoatlasworkflow(workflowgenerator):
         # connect the workflow
         cls.workflow.connect([ # connect nodes
             # Register the (1st) final skullstripped mprage to atlas
-            (dn.inputnode,dn.register,[
-                ('T1_skullstrip','output_prefix')
+            (dn.inputnode,dn.create_prefix,[
+                ('T1_skullstrip','filename')
+            ]),
+            (dn.create_prefix,dn.register,[
+                ('basename','output_prefix')
             ]),
             (dn.inputnode,dn.register,[
                 ('T1_skullstrip','moving_image')

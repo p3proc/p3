@@ -28,21 +28,12 @@ class definednodes(basenodedefs):
         self.set_resubs([])
 
         # apply nonlinear transform
-        self.applymastertransform = MapNode(
-            Function(
-                input_names=['in_file','reference','tfm0','tfm1','tfm2','tfm3','tfm4'],
-                output_names=['out_file'],
-                function=NwarpApply
-            ),
-            iterfield=['in_file','tfm4'],
-            name='applymastertransform'
-        )
-
-        self.test = Node(
-            Function(
-                input_names=['tfm2'],
-                output_names=[],
-                function=lambda tfm2: print(tfm2)
-            ),
-            name='test'
-        )
+        #self.applymastertransform = MapNode(
+        #    Function(
+        #        input_names=['in_file','reference','tfm0','tfm1','tfm2','tfm3','tfm4'],
+        #        output_names=['out_file'],
+        #        function=NwarpApply
+        #    ),
+        #    iterfield=['in_file','tfm4'],
+        #    name='applymastertransform'
+        #)

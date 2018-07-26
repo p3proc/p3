@@ -62,7 +62,7 @@ def antsMotionCorr(fixed_image,moving_image,transform):
     output_basename = os.path.join(cwd,name) # set the output basename
     output_mocoparams = os.path.join(cwd,'{}MOCOparams.csv'.format(name))
     output_warp = os.path.join(cwd,'{}Warp.nii.gz'.format(name))
-    output_warpedimg = os.path.join(cwd,'{}.nii.gz'.format(name))
+    output_warpedimg = os.path.join(cwd,'{}_Warped.nii.gz'.format(name))
     output_avgimg = os.path.join(cwd,'{}_avg.nii.gz'.format(name))
 
     # setup commandline execution
