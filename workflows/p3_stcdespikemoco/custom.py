@@ -49,7 +49,7 @@ class ExtendedDespike(afni.Despike):
     output_spec = ExtendedDespikeOutputSpec
 
 # define a custom function for the antsMotionCorr
-def antsMotionCorr(fixed_image,moving_image,transform):
+def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     import os
 
     # save to node folder (go up 2 directories bc of iterfield)
@@ -65,9 +65,15 @@ def antsMotionCorr(fixed_image,moving_image,transform):
     output_warpedimg = os.path.join(cwd,'{}_Warped.nii.gz'.format(name))
     output_avgimg = os.path.join(cwd,'{}_avg.nii.gz'.format(name))
 
+    # check write warp boolean
+    if writewarp:
+        writewarp = 1
+    else:
+        writewarp = 0
+
     # setup commandline execution
     command = 'antsMotionCorr -d 3 -o [{},{},{}] -m MI[{},{},{},{},{},{}] -t {}[{}] -u 1 -e 1 ' \
-        '-s {} -f {} -i {} -w 1 -v'.format(
+        '-s {} -f {} -i {} -w {} -v'.format(
             output_basename,
             output_warpedimg,
             output_avgimg,
@@ -81,7 +87,8 @@ def antsMotionCorr(fixed_image,moving_image,transform):
             0.1, # gradient step
             '1x0', # smoothing sigmas
             '2x1', # shrink factors
-            '20x5', # iterations
+            '20x5', # iterations,
+            writewarp # set flag for writing warps
         )
     print(command) # print command before running
 

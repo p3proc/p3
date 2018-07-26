@@ -141,7 +141,7 @@ class definednodes(basenodedefs):
         # Moco (after)
         self.moco = MapNode(
             Function(
-                input_names=['fixed_image','moving_image','transform'],
+                input_names=['fixed_image','moving_image','transform','writewarp'],
                 output_names=['warp','mocoparams','warped_img','avg_img'],
                 function=antsMotionCorr
             ),
@@ -149,11 +149,12 @@ class definednodes(basenodedefs):
             name='moco'
         )
         self.moco.inputs.transform = 'Affine'
+        self.moco.inputs.writewarp = True
 
         # Moco (before)
         self.moco_before = MapNode(
             Function(
-                input_names=['fixed_image','moving_image','transform'],
+                input_names=['fixed_image','moving_image','transform','writewarp'],
                 output_names=['warp','mocoparams','warped_img','avg_img'],
                 function=antsMotionCorr
             ),
@@ -161,3 +162,4 @@ class definednodes(basenodedefs):
             name='moco_before'
         )
         self.moco_before.inputs.transform = 'Rigid'
+        self.moco_before.inputs.writewarp = False
