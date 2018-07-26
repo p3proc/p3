@@ -11,16 +11,17 @@ def format_reference(func,reference,bids_dir):
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(in_file))
+    name,ext = os.path.splitext(os.path.basename(func))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))
     formatted_reference = os.path.join(cwd,'{}_format4D.nii.gz'.format(name))
 
     # get dim 4 and TR of input image
-    dim4 = nibabel.load(in_file).header.get_data_shape()[3] # get the 4th dim
+    dim4 = nibabel.load(func).header.get_data_shape()[3] # get the 4th dim
     TR = BIDSLayout(bids_dir).get_metadata(func)['RepetitionTime'] # get the TR
 
     # make the reference image the same dims as the input
+    print('Formatting reference image...')
     command = 'ImageMath 3 {} ReplicateImage {} {} {} 0'.format(
         formatted_reference,
         reference,
@@ -39,6 +40,7 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,warp_func_2_anat
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
+    print(func)
     name,ext = os.path.splitext(os.path.basename(func))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))

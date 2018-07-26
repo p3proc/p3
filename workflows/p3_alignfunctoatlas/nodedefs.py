@@ -51,7 +51,7 @@ class definednodes(basenodedefs):
         self.format_reference.inputs.bids_dir = settings['bids_dir']
 
         # combine 3D transforms and replicate to 4D
-        self.combinetransforms = Node(
+        self.combinetransforms = MapNode(
            Function(
                input_names=[
                     'func',
@@ -68,7 +68,7 @@ class definednodes(basenodedefs):
                output_names=['combined_transforms4D'],
                function=combinetransforms
            ),
-           iterfield=['dim4','TR'],
+           iterfield=['func','dim4','TR'],
            name='combinetransforms'
         )
 
@@ -79,6 +79,6 @@ class definednodes(basenodedefs):
                output_names=['out_file'],
                function=applytransforms
            ),
-           iterfield=['in_file','warp_func_2_refimg'],
+           iterfield=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg'],
            name='applytransforms'
         )

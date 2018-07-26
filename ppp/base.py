@@ -171,7 +171,7 @@ def default_settings():
     settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
     settings['num_threads'] = 4 # sets the number of threads for ANTS registration
     settings['anat_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
-    settings['atlas'] = 'templates/MNI152.nii.gz' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
+    settings['atlas'] = '/home/vana/Projects/p3/templates/MNI152.nii.gz' # sets the atlas align target (you can use `cat ${AFNI_DIR}/AFNI_atlas_spaces.niml` (where ${AFNI_DIR} is your afni directory) to show availiable atlas align targets)
     settings['avganats'] = False # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
     settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
