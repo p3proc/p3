@@ -251,8 +251,8 @@ class definednodes(basenodedefs):
         # and finally create images of the atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
         self.epi_resampled = Node(
             Function(
-                input_names=['atlas','T1','epi','aparc_aseg'],
-                output_names=['atlas_epi','T1_epi','aparc_aseg_epi'],
+                input_names=['T1','epi','aparc_aseg'],
+                output_names=['T1_epi','aparc_aseg_epi'],
                 function=resample_2_epi
             ),
             name='epi_resampled'
