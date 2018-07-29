@@ -148,7 +148,7 @@ class definednodes(basenodedefs):
             iterfield=['moving_image'],
             name='moco'
         )
-        self.moco.inputs.transform = 'Affine'
+        self.moco.inputs.transform = 'Rigid'
         self.moco.inputs.writewarp = True
 
         # Moco (before)

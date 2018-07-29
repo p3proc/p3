@@ -40,7 +40,7 @@ class alignfunctoanatworkflow(workflowgenerator):
                 ('out_file','filename')
             ]),
             (dn.create_prefix,dn.align_func_2_anat,[ # set output prefix
-                ('basename','output_prefix')
+                ('basename','output_transform_prefix')
             ]),
             (dn.epi_3dcalc,dn.align_func_2_anat,[ # skullstripped epi
                 ('out_file','moving_image')
@@ -51,10 +51,7 @@ class alignfunctoanatworkflow(workflowgenerator):
 
             # output to output node
             (dn.align_func_2_anat,dn.outputnode,[
-                ('out_matrix','affine_func_2_anat')
-            ]),
-            (dn.align_func_2_anat,dn.outputnode,[
-                ('forward_warp_field','warp_func_2_anat')
+                ('composite_transform','affine_func_2_anat')
             ]),
 
             # output to QC datasink

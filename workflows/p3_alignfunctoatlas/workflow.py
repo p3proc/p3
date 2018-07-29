@@ -22,16 +22,10 @@ class alignfunctoatlasworkflow(workflowgenerator):
             (dn.inputnode,dn.format_reference,[
                 ('func','func')
             ]),
-            (dn.inputnode,dn.format_reference,[
-                ('refimg','reference')
-            ]),
 
             # combine transforms
             (dn.inputnode,dn.combinetransforms,[
                 ('func','func')
-            ]),
-            (dn.inputnode,dn.combinetransforms,[
-                ('refimg','reference')
             ]),
             (dn.format_reference,dn.combinetransforms,[
                 ('dim4','dim4')
@@ -47,9 +41,6 @@ class alignfunctoatlasworkflow(workflowgenerator):
             ]),
             (dn.inputnode,dn.combinetransforms,[
                 ('affine_func_2_anat','affine_func_2_anat')
-            ]),
-            (dn.inputnode,dn.combinetransforms,[
-                ('warp_func_2_anat','warp_func_2_anat')
             ]),
             (dn.inputnode,dn.combinetransforms,[
                 ('affine_anat_2_atlas','affine_anat_2_atlas')

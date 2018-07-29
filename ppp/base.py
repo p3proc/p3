@@ -14,7 +14,7 @@ from bids.grabbids import BIDSLayout
 
 def get_basename(filename):
     """
-        Just a conveinent function for getting the filename without extension
+        Just a convenient function for getting the filename without extension
     """
 
     # strip filename extension
@@ -285,8 +285,7 @@ def default_settings():
             'source': 'p3_alignfunctoanat',
             'destination': 'p3_alignfunctoatlas',
             'links': [
-                ['output.affine_func_2_anat','input.affine_func_2_anat'],
-                ['output.warp_func_2_anat','input.warp_func_2_anat']
+                ['output.affine_func_2_anat','input.affine_func_2_anat']
             ]
         },
         {
@@ -328,9 +327,6 @@ def default_settings():
         #     ]
         # }
     ]
-
-
-
 
     # return settings
     return settings

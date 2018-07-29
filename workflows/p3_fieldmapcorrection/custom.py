@@ -10,7 +10,9 @@ def get_metadata(epi_file,bids_dir):
 
     import re
     import os
+    import subprocess
     from bids.grabbids import BIDSLayout
+    
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
@@ -43,8 +45,41 @@ def get_metadata(epi_file,bids_dir):
     # get the phase encoding direction
     ped = layout.get_metadata(epi_file)['PhaseEncodingDirection']
 
-    # replace ped string with correct letter
-    ped = ped.replace('i','x').replace('j','y').replace('k','z')
+    # determine image orientation
+    output = subprocess.run(['3dinfo','-orient',phasediff],stdout=subprocess.PIPE)
+    orientation = output.stdout.decode('utf-8').rstrip()
+
+    if ped[0] == 'i':
+        # choose orientation based on ped
+        if orientation[0] == 'R':
+            orient_code = 'RL'
+        elif orientation[0] == 'L':
+            orient_code = 'LR'
+        else:
+            raise ValueError('Invalid Orientation!')
+    elif ped[0] == 'j':
+        if orientation[1] == 'A':
+            orient_code = 'AP'
+        elif orientation[1] == 'P':
+            orient_code = 'PA'
+        else:
+            raise ValueError('Invalid Orientation!')
+    elif ped[0] == 'k':
+        if orientation[2] == 'I':
+            orient_code = 'IS'
+        elif orientation[2] == 'S':
+            orient_code = 'SI'
+        else:
+            raise ValueError('Invalid Orientation!')
+    else:
+        raise ValueError('Invalid Phhase Encoding Direction Parsed!')
+
+    # reverse the orientation if ped was negative
+    if ped[1] == '-':
+        orient_code = orient_code[::-1]
+
+    # Using the orient code to find the equivalent FSL ped
+    ped = {'RL':'x','LR':'x-','AP':'y','PA':'y-','SI':'z','IS':'z-'}[orient_code]
 
     # return the magnitude and phase image paths
     return (magnitude,phasediff,TE,echospacing,ped)
@@ -74,4 +109,4 @@ def fsl_prepare_fieldmap(phasediff,magnitude,TE):
 
 def get_prefix(filename):
     from ppp.base import get_basename
-    return '{}_'.format(get_basename(filename)) 
+    return '{}_'.format(get_basename(filename))

@@ -49,6 +49,7 @@ class definednodes(basenodedefs):
             name='format_reference'
         )
         self.format_reference.inputs.bids_dir = settings['bids_dir']
+        self.format_reference.inputs.reference = '/home/vana/Projects/p3/templates/MNI152_444.nii.gz'
 
         # combine 3D transforms and replicate to 4D
         self.combinetransforms = MapNode(
@@ -71,6 +72,7 @@ class definednodes(basenodedefs):
            iterfield=['func','dim4','TR'],
            name='combinetransforms'
         )
+        self.combinetransforms.inputs.reference = '/home/vana/Projects/p3/templates/MNI152_444.nii.gz'
 
         # apply nonlinear transform
         self.applytransforms = MapNode(

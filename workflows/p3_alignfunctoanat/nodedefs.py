@@ -62,8 +62,29 @@ class definednodes(basenodedefs):
 
         # align func to anat
         self.align_func_2_anat = Node(
-            ants.RegistrationSynQuick(
-                num_threads=settings['num_threads']
+            ants.Registration(
+                num_threads=settings['num_threads'],
+                collapse_output_transforms=False,
+                initial_moving_transform_com=1,
+                write_composite_transform=True,
+                initialize_transforms_per_stage=True,
+                transforms=['Rigid','Affine'],
+                transform_parameters=[(0.1,),(0.1,)],
+                metric=['MI','MI'],
+                metric_weight=[1,1],
+                radius_or_number_of_bins=[32,32],
+                sampling_strategy=['Regular','Regular'],
+                sampling_percentage=[0.25,0.25],
+                convergence_threshold=[1.e-6,1.e-8],
+                convergence_window_size=[10,10],
+                smoothing_sigmas=[[3,2,1,0],[2,1,0]],
+                sigma_units=['vox','vox'],
+                shrink_factors=[[8,4,2,1],[4,2,1]],
+                number_of_iterations=[[1000,500,250,100],[500,250,100]],
+                use_estimate_learning_rate_once=[False,True],
+                use_histogram_matching=False,
+                verbose=True,
+                output_warped_image=True
             ),
-            name='align_epi_2_anat'
+            name='align_func_2_anat'
         )
