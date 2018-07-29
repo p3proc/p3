@@ -18,14 +18,30 @@ class alignfunctoatlasworkflow(workflowgenerator):
 
         # connect the workflow
         cls.workflow.connect([ # connect nodes
+            # get the resolution of the refimg
+            (dn.inputnode,dn.get_resolution,[
+                ('refimg','reference')
+            ]),
+
+            # resample the atlas
+            (dn.get_resolution,dn.resample,[
+                ('resolution','apply_isoxfm')
+            ]),
+
             # format the reference
             (dn.inputnode,dn.format_reference,[
                 ('func','func')
+            ]),
+            (dn.resample,dn.format_reference,[
+                ('out_file','reference')
             ]),
 
             # combine transforms
             (dn.inputnode,dn.combinetransforms,[
                 ('func','func')
+            ]),
+            (dn.resample,dn.combinetransforms,[
+                ('out_file','reference')
             ]),
             (dn.format_reference,dn.combinetransforms,[
                 ('dim4','dim4')
@@ -71,6 +87,9 @@ class alignfunctoatlasworkflow(workflowgenerator):
             # output to datasink
             (dn.applytransforms,dn.datasink,[
                ('out_file','p3.@func_aligned')
+            ]),
+            (dn.resample,dn.datasink,[
+               ('out_file','p3.@atlas_resampled')
             ])
         ])
 

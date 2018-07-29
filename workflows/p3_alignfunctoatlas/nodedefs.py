@@ -6,7 +6,7 @@ TODO
 from ppp.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
-from nipype.interfaces import afni
+from nipype.interfaces import afni,fsl
 from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
@@ -38,7 +38,27 @@ class definednodes(basenodedefs):
         # define datasink substitutions
         self.set_resubs([])
 
-        # format the reference image
+        # grab the resolution of the refimg
+        self.get_resolution = Node(
+            Function(
+                input_names=['reference'],
+                output_names=['resolution'],
+                function=get_resolution
+            ),
+            name='get_resolution'
+        )
+
+        # resample atlas to epi space so we can use it as a reference
+        self.resample = Node(
+            fsl.FLIRT(
+                no_search=True
+            ),
+            name='resample'
+        )
+        self.resample.inputs.in_file = settings['atlas']
+        self.resample.inputs.reference = settings['atlas']
+
+        # format the reference image (which should be the resampled atlas)
         self.format_reference = MapNode(
             Function(
                 input_names=['func','reference','bids_dir'],
@@ -49,7 +69,6 @@ class definednodes(basenodedefs):
             name='format_reference'
         )
         self.format_reference.inputs.bids_dir = settings['bids_dir']
-        self.format_reference.inputs.reference = '/home/vana/Projects/p3/templates/MNI152_444.nii.gz'
 
         # combine 3D transforms and replicate to 4D
         self.combinetransforms = MapNode(
@@ -72,7 +91,6 @@ class definednodes(basenodedefs):
            iterfield=['func','dim4','TR'],
            name='combinetransforms'
         )
-        self.combinetransforms.inputs.reference = '/home/vana/Projects/p3/templates/MNI152_444.nii.gz'
 
         # apply nonlinear transform
         self.applytransforms = MapNode(

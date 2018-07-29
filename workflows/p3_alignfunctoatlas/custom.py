@@ -2,6 +2,14 @@
     Define Custom Functions and Interfaces
 """
 
+def get_resolution(reference):
+    import subprocess
+
+    # get resolution of voxel so we can resample it
+    resolution = subprocess.run(['3dinfo','-adi',reference],stdout=subprocess.PIPE)
+    
+    return resolution
+
 def format_reference(func,reference,bids_dir):
     import os
     import nibabel
