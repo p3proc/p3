@@ -81,12 +81,12 @@ class alignfunctoatlasworkflow(workflowgenerator):
 
             # output to output node
             (dn.applytransforms,dn.outputnode,[
-               ('out_file','func_aligned')
+               ('out_file','func_atlas')
             ]),
 
             # output to datasink
             (dn.applytransforms,dn.datasink,[
-               ('out_file','p3.@func_aligned')
+               ('out_file','p3.@func_atlas')
             ]),
             (dn.resample,dn.datasink,[
                ('out_file','p3.@atlas_resampled')

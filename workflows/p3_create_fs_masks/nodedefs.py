@@ -6,7 +6,7 @@ TODO
 import os
 from ppp.base import basenodedefs
 from .custom import *
-from nipype.interfaces import afni,freesurfer
+from nipype.interfaces import afni,freesurfer,ants
 from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import Merge,Function
 from nipype import Node,MapNode
@@ -26,15 +26,18 @@ class definednodes(basenodedefs):
         # define input and output nodes
         self.set_input([
             'aparc_aseg',
+            'orig',
             'affine_anat_2_atlas',
             'warp_anat_2_atlas',
             'anat_atlas',
             'func_atlas',
-            'allineate_freesurfer2anat',
+            'T1'
             ])
 
         # define datasink substitutions
-        #self.set_subs([])
+        self.set_subs([
+            ('_calc_calc_calc_calc_calc_Warped','_atlas')
+        ])
 
         # define datasink substitutions
         #self.set_resubs([]])
@@ -47,23 +50,56 @@ class definednodes(basenodedefs):
             name='mri_convert'
         )
 
+        # align freesurfer to anat
+        self.align_fs_2_anat = Node(
+            ants.Registration(
+                num_threads=settings['num_threads'],
+                collapse_output_transforms=False,
+                initial_moving_transform_com=1,
+                write_composite_transform=True,
+                initialize_transforms_per_stage=True,
+                transforms=['Rigid','Affine'],
+                transform_parameters=[(0.1,),(0.1,)],
+                metric=['MI','MI'],
+                metric_weight=[1,1],
+                radius_or_number_of_bins=[32,32],
+                sampling_strategy=['Regular','Regular'],
+                sampling_percentage=[0.25,0.25],
+                convergence_threshold=[1.e-6,1.e-8],
+                convergence_window_size=[10,10],
+                smoothing_sigmas=[[3,2,1,0],[2,1,0]],
+                sigma_units=['vox','vox'],
+                shrink_factors=[[8,4,2,1],[4,2,1]],
+                number_of_iterations=[[1000,500,250,100],[500,250,100]],
+                use_estimate_learning_rate_once=[False,True],
+                use_histogram_matching=False,
+                verbose=True,
+                output_warped_image=True
+            ),
+            name='align_fs_2_anat'
+        )
+
         # join warps (leave defaults for nonlinear warp)
         self.join_warps = Node(
             Function(
-                input_names=['nonlin_warp','t1_2_atlas_transform','fs2mpr'],
-                output_names=['concat_warp'],
-                function=lambda nonlin_warp,t1_2_atlas_transform,fs2mpr: ' '.join([nonlin_warp,t1_2_atlas_transform,fs2mpr])
+                input_names=['refernce','affine_fs_2_anat','affine_anat_2_atlas','warp_anat_2_atlas'],
+                output_names=['fs_concat_transform'],
+                function=join_warps
             ),
             name='join_warps'
         )
+        self.join_warps.inputs.reference = settings['atlas']
 
         # apply atlas alignment to aparc+aseg
-        self.aparc_aseg_align = Node(
-            afni.NwarpApply(
-                # use a custom function afni interface sucks...
+        self.apply_warp = Node(
+            Function(
+                input_names=['in_file','reference','transform'],
+                output_names=['out_file'],
+                function=apply_warp
             ),
-            name='aparc_aseg_align'
+            name='apply_warp'
         )
+        self.join_warps.inputs.reference = settings['atlas']
 
         # get the first run
         self.epi_firstrun = Node(

@@ -26,7 +26,10 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_masked_calc','_reference_skullstrip'), # name the skullstripped refimg
+            ('_roi','_reference'),
+            ('_unwarped_Warped','_unwarped'),
+            ('_masked_calc','_skullstrip'),
+            ('_Warped','_anat'),
         ])
 
         # Skullstrip the EPI image

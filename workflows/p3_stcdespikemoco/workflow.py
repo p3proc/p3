@@ -33,10 +33,10 @@ class stcdespikemocoworkflow(workflowgenerator):
 
             # do motion correction (before stc/despike)
             (dn.extractroi,dn.moco_before,[
-                ('roi_file','fixed_image')
+                ('roi_file','basefile')
             ]),
             (dn.inputnode,dn.moco_before,[
-                ('func','moving_image')
+                ('func','in_file')
             ]),
 
             # Setup basefile for motion correction (post-stc/despike)
@@ -77,7 +77,7 @@ class stcdespikemocoworkflow(workflowgenerator):
 
             # output rigid body transform motion params to file before despike/tshift
             (dn.moco_before,dn.datasink,[ # before
-                ('mocoparams','p3.@mocobefore')
+                ('oned_file','p3.@mocobefore')
             ]),
         ])
 

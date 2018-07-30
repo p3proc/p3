@@ -6,16 +6,6 @@ MAINTAINER Andrew Van <vanandrew@wustl.edu>
 RUN apt-get update && \
     apt-get install -y wget curl
 
-# Install stuff from neurodebian: fsleyes (I used to do afni, but it does weird stuff to template file locations...)
-# I use the -allow-unauthenticated tag bc neurodebian needs to update their gpg keys!!!
-# NOTE: I remove the neurodebian source afterwards since I don't verify it
-RUN wget -O- http://neuro.debian.net/lists/stretch.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && \
-    apt-get update && \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt-get install -yq --allow-unauthenticated fsleyes && \
-    ln -s $(which FSLeyes) /usr/bin/fsleyes && \
-    rm /etc/apt/sources.list.d/neurodebian.sources.list
-
 # Get afni
 WORKDIR /
 RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential && \
@@ -44,8 +34,7 @@ RUN curl -O https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-sources.tar.gz &&
     sed -i '22s/c++/c++ -std=c++03/' ${FSLDIR}/config/${FSLMACHTYPE}/systemvars.mk && \
 	sed -i "3s/LIBXMLXX_CFLAGS=\"/LIBXMLXX_CFLAGS=\"-std=c++03 /" ${FSLDIR}/extras/src/libxml++-2.34.0/fslconfigure && \
     cd ${FSLDIR} && ./build && \
-    rm -r ${FSLDIR}/LICENCE ${FSLDIR}/README ${FSLDIR}/build ${FSLDIR}/build.log ${FSLDIR}/config ${FSLDIR}/extras ${FSLDIR}/include ${FSLDIR}/lib ${FSLDIR}/refdoc ${FSLDIR}/src && \
-    apt-get remove -y build-essential && apt-get autoremove -y
+    rm -r ${FSLDIR}/LICENCE ${FSLDIR}/README ${FSLDIR}/build ${FSLDIR}/build.log ${FSLDIR}/config ${FSLDIR}/extras ${FSLDIR}/include ${FSLDIR}/lib ${FSLDIR}/refdoc ${FSLDIR}/src
 ENV FSLOUTPUTTYPE=NIFTI_GZ FSLMULTIFILEQUIT=TRUE FSLTCLSH=${FSLDIR}/bin/fsltclsh FSLWISH=${FSLDIR}/fslwish PATH=${PATH}:${FSLDIR}/bin
 
 # Install freesurfer and configure environment
@@ -63,34 +52,28 @@ RUN wget -qO- https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/frees
     --exclude='freesurfer/average/mult-comp-cor' \
     --exclude='freesurfer/lib/cuda' \
     --exclude='freesurfer/lib/qt'
-ENV POSSUMDIR=${FSLDIR}
-ENV OS=Linux
-ENV FS_OVERRIDE=0
-ENV FIX_VERTEX_AREA=
-ENV SUBJECTS_DIR=/opt/freesurfer/subjects
-ENV FSF_OUTPUT_FORMAT=nii.gz
-ENV MNI_DIR=/opt/freesurfer/mni
-ENV LOCAL_DIR=/opt/freesurfer/local
-ENV FREESURFER_HOME=/opt/freesurfer
-ENV FSFAST_HOME=/opt/freesurfer/fsfast
-ENV MINC_BIN_DIR=/opt/freesurfer/mni/bin
-ENV MINC_LIB_DIR=/opt/freesurfer/mni/lib
-ENV MNI_DATAPATH=/opt/freesurfer/mni/data
-ENV FMRI_ANALYSIS_DIR=/opt/freesurfer/fsfast
-ENV PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
-ENV MNI_PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
-ENV PATH=${PATH}:/opt/freesurfer/bin:/opt/freesurfer/fsfast/bin:/opt/freesurfer/tktools:/opt/freesurfer/mni/bin
+ENV POSSUMDIR=${FSLDIR} OS=Linux FS_OVERRIDE=0 SUBJECTS_DIR=/opt/freesurfer/subjects FSF_OUTPUT_FORMAT=nii.gz \
+    MNI_DIR=/opt/freesurfer/mni LOCAL_DIR=/opt/freesurfer/local FREESURFER_HOME=/opt/freesurfer \
+    FSFAST_HOME=/opt/freesurfer/fsfast MINC_BIN_DIR=/opt/freesurfer/mni/bin \
+    MINC_LIB_DIR=/opt/freesurfer/mni/lib MNI_DATAPATH=/opt/freesurfer/mni/data \
+    FMRI_ANALYSIS_DIR=/opt/freesurfer/fsfast PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5 \
+    MNI_PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5 \
+    PATH=${PATH}:/opt/freesurfer/bin:/opt/freesurfer/fsfast/bin:/opt/freesurfer/tktools:/opt/freesurfer/mni/bin
 
 # Install ANTS
+WORKDIR /
 RUN curl -O https://cmake.org/files/v3.12/cmake-3.12.0.tar.gz && \
     tar xvf cmake-3.12.0.tar.gz && rm cmake-3.12.0.tar.gz && \
     apt-get install -y git build-essential && \
     cd cmake-3.12.0 && ./bootstrap && make && make install && cd .. && rm -r cmake-3.12.0 && \
-    git clone https://github.com/ANTsX/ANTs.git && \
-    mkdir ants && cd ants && cmake ../ANTs && make -j 4
+    git clone https://github.com/ANTsX/ANTs.git /ANTs-source && \
+    mkdir ANTs && cd ANTs && cmake ../ANTs-source && make -j 6 && \
+    cp -r ../ANTs-source/Scripts ./ && cd .. && rm -r ANTs-source
+ENV ANTSPATH=/ANTs/bin
+ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
 # Install Python Stuff
-WORKDIR /
 ADD requirements.txt /
-RUN pip install -r requirements.txt && \
-    rm requirements.txt
+
+# Set entrypoint
+#ENTRYPOINT ['']

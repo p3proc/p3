@@ -30,6 +30,11 @@ class definednodes(basenodedefs):
             ('MOCOparams','_moco')
         ])
 
+         # define datasink regular expression substitutions
+        self.set_resubs([
+            (r'_moco_before\d{1,3}','')
+        ])
+
         # extract slice timing so we can pass it to slice time correction
         self.extract_stc = MapNode(
             Function(
@@ -153,13 +158,14 @@ class definednodes(basenodedefs):
 
         # Moco (before)
         self.moco_before = MapNode(
-            Function(
-                input_names=['fixed_image','moving_image','transform','writewarp'],
-                output_names=['warp','mocoparams','warped_img','avg_img'],
-                function=antsMotionCorr
+            afni.Volreg(
+                args="-heptic -maxite {}".format(
+                    25
+                ),
+                verbose=True,
+                zpad=10,
+                outputtype="NIFTI_GZ"
             ),
-            iterfield=['moving_image'],
+            iterfield=['in_file'],
             name='moco_before'
         )
-        self.moco_before.inputs.transform = 'Rigid'
-        self.moco_before.inputs.writewarp = False

@@ -6,8 +6,9 @@ def get_resolution(reference):
     import subprocess
 
     # get resolution of voxel so we can resample it
-    resolution = subprocess.run(['3dinfo','-adi',reference],stdout=subprocess.PIPE)
-    
+    out = subprocess.run(['3dinfo','-adi',reference],stdout=subprocess.PIPE)
+    resolution = float(out.stdout.decode('utf-8').rstrip())
+
     return resolution
 
 def format_reference(func,reference,bids_dir):
@@ -48,7 +49,6 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    print(func)
     name,ext = os.path.splitext(os.path.basename(func))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))

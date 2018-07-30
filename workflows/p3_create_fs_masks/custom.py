@@ -2,6 +2,58 @@
     Define Custom Functions and Interfaces
 """
 
+def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas):
+    """
+        join warps to align freesurfer output to atlas
+    """
+    import os
+
+    # get the current working directory
+    cwd = os.getcwd()
+
+    # just set the output name for the freesurfer concatenated transform
+    fs_concat_transforms = os.path.join(cwd,'fs_concat_transform.nii.gz')
+
+    # setup command for execution
+    command = 'antsApplyTransforms -d 3 -o [{},1] -t {} -t {} -t {} -r {} -v'.format(
+        fs_concat_transform,
+        warp_anat_2_atlas,
+        affine_anat_2_atlas,
+        affine_fs_2_anat,
+        reference
+    )
+    print(command)
+
+    # run concat transforms
+    os.system(command)
+
+    # return the combined tranform
+    return fs_concat_transform
+
+def apply_warp(in_file,reference,transform):
+    import os
+
+    # get filename to output
+    name,ext = os.path.splitext(os.path.basename(in_file))
+    while(ext != ''):
+        name,ext = os.path.splitext(os.path.basename(name))
+    out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(name))
+
+    # set up command to run
+    command = 'antsApplyTransforms -d 3 -i {} -r {} -o {} -t {} -v'.format(
+        in_file,
+        reference,
+        out_file,
+        transform
+    )
+    print(command)
+
+    # run transform
+    os.system(command)
+
+    # return output
+    return out_file
+
 def resample_2_epi(T1,epi,aparc_aseg=None):
     """
         Resample images to epi resolution
@@ -20,7 +72,7 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
     name,ext = os.path.splitext(os.path.basename(T1))
     while(ext != ''):
         name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(name))
 
     # resample the T1
     os.system('3dresample -rmode Li -master {} -prefix {} -inset {}'.format(
@@ -36,7 +88,7 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
         name,ext = os.path.splitext(os.path.basename(aparc_aseg))
         while(ext != ''):
             name,ext = os.path.splitext(os.path.basename(name))
-        out_file = os.path.join(cwd,'{}_epi.nii.gz'.format(name))
+        out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(name))
 
         # resample the aparc_aseg
         os.system('3dresample -rmode NN -master {} -prefix {} -inset {}'.format(

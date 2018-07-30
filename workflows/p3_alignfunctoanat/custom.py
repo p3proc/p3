@@ -4,4 +4,4 @@
 
 def get_prefix(filename):
     from ppp.base import get_basename
-    return '{}_'.format(get_basename(filename)) 
+    return '{}'.format(get_basename(filename)) 

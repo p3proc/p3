@@ -33,10 +33,15 @@ class definednodes(basenodedefs):
             'affine_anat_2_atlas',
             'warp_anat_2_atlas'
             ])
-        self.set_output(['func_aligned'])
+        self.set_output(['func_atlas'])
 
         # define datasink substitutions
-        self.set_resubs([])
+        self.set_subs([
+            ('_flirt','_funcres')
+        ])
+
+        # define datasink substitutions
+        #self.set_resubs([]])
 
         # grab the resolution of the refimg
         self.get_resolution = Node(

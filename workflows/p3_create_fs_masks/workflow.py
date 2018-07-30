@@ -25,25 +25,33 @@ class bidsselectorworkflow(workflowgenerator):
                     ('aparc_aseg','in_file')
                 ]),
 
-                # concatenate warps and warp aparc+aseg
+                # align freesurfer to anat image
+                (dn.inputnode,dn.align_fs_2_anat,[
+                    ('T1','fixed_image'),
+                    ('orig','moving_image')
+                ]),
+
+                # concatenate warps and align aparc+aseg to atlas
+                (dn.align_fs_2_anat,dn.join_warps,[
+                    ('composite_transform','affine_fs_2_anat')
+                ]),
                 (dn.inputnode,dn.join_warps,[
-                    ('nonlin_warp','nonlin_warp'),
-                    ('t1_2t1_2_atlas_transform','t1_2_atlas_transform'),
-                    ('fs2mpr','fs2mpr')
+                    ('affine_anat_2_atlas','affine_anat_2_atlas'),
+                    ('warp_anat_2_atlas','warp_anat_2_atlas')
                 ]),
-                (dn.join_warps,dn.aparc_aseg_align,[
-                    ('concat_warp','warp')
+                (dn.join_warps,dn.apply_warp,[
+                    ('fs_concat_transform','transform')
                 ]),
-                (dn.mri_convert,dn.aparc_aseg_align,[
+                (dn.mri_convert,dn.apply_warp,[
                     ('out_file','in_file')
                 ]),
 
                 # do stuff to the freesurfer masks...
-                (dn.aparc_aseg_align,dn.calc1,[
+                (dn.apply_warp,dn.calc1,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.inputnode,dn.epi_firstrun,[
-                    ('epi_at','epi_at')
+                    ('func_atlas','epi_at')
                 ]),
                 (dn.calc1,dn.resample1,[
                     ('out_file','in_file')
@@ -52,9 +60,8 @@ class bidsselectorworkflow(workflowgenerator):
                     ('epi_at','master')
                 ]),
 
-                # TODO I need to add the first run epi
                 # the major WM compartments, with 4 erosions at the T1 resolution followed by resampling to the BOLD resolution
-                (dn.aparc_aseg_align,dn.calc2_wm,[
+                (dn.apply_warp,dn.calc2_wm,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_wm,dn.calc3_wm[0],[
@@ -101,7 +108,7 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # the major CSF compartments, with 4 erosions at the T1 resolution followed by resampling to the BOLD resolution
-                (dn.aparc_aseg_align,dn.calc2_csf,[
+                (dn.apply_warp,dn.calc2_csf,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_csf,dn.calc3_csf[0],[
@@ -148,7 +155,7 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # the gray matter ribbon (amygdala and hippocampus need to be added - 17 18 53 54
-                (dn.aparc_aseg_align,dn.calc2_gmr,[
+                (dn.apply_warp,dn.calc2_gmr,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_gmr,dn.resample2_gmr,[
@@ -159,7 +166,7 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # the cerebellum
-                (dn.aparc_aseg_align,dn.calc2_cb,[
+                (dn.apply_warp,dn.calc2_cb,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_cb,dn.calc3_cb[0],[
@@ -188,7 +195,7 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # the subcortical nuclei
-                (dn.aparc_aseg_align,dn.calc2_scn,[
+                (dn.apply_warp,dn.calc2_scn,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_scn,dn.calc3_scn[0],[
@@ -217,7 +224,7 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # all gray matter
-                (dn.aparc_aseg_align,dn.calc2_gm,[
+                (dn.apply_warp,dn.calc2_gm,[
                     ('out_file','in_file_a')
                 ]),
                 (dn.calc2_gm,dn.resample2_gm,[
@@ -228,32 +235,28 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # resample aparc_aseg
-                (dn.aparc_aseg_align,dn.epi_resampled,[
+                (dn.apply_warp,dn.epi_resampled,[
                     ('out_file','aparc_aseg')
                 ]),
 
                 # output data to datasink
                 (dn.epi_resampled,dn.datasink,[
-                    ('aparc_aseg_epi','fs_masks.@aparc_aseg_epi')
+                    ('aparc_aseg_epi','p3.@aparc_aseg_epi')
                 ])
             ])
 
         cls.workflow.connect([ # connect nodes
             # create images of the atlas and the MPRAGE and the FS segmentation, resampled to BOLD resolution
             (dn.inputnode,dn.epi_resampled,[
-                ('atlas','atlas')
+                ('anat_atlas','T1')
             ]),
             (dn.inputnode,dn.epi_resampled,[
-                ('noskull_at','T1')
-            ]),
-            (dn.inputnode,dn.epi_resampled,[
-                ('epi_at','epi')
+                ('func_atlas','epi')
             ]),
 
             # output data to datasink
             (dn.epi_resampled,dn.datasink,[
-                ('atlas_epi','fs_masks.@atlas_epi'),
-                ('T1_epi','fs_masks.@T1_epi')
+                ('T1_epi','p3.@T1_epi')
             ])
         ])
 

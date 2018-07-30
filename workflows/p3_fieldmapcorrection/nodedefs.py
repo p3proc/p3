@@ -27,12 +27,10 @@ class definednodes(basenodedefs):
         self.set_output(['affine_fmc','warp_fmc','refimg'])
 
         # define datasink substitutions
-        # self.set_subs([])
-
-        # define datasink regular expression substitutions
-        #self.set_resubs([
-        #    (r'_warp_epi\d{1,3}','')
-        #])
+        self.set_subs([
+            ('_roi','_reference'),
+            ('_Warped','_ANTs'),
+        ])
 
         # get magnitude and phase
         self.get_metadata = MapNode(
