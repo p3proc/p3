@@ -51,19 +51,17 @@ class ExtendedDespike(afni.Despike):
 # define a custom function for the antsMotionCorr
 def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     import os
+    from ppp.base import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # strip filename extension
-    name,ext = os.path.splitext(os.path.basename(moving_image))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
+    name = get_basename(moving_image)
     output_basename = os.path.join(cwd,name) # set the output basename
     output_mocoparams = os.path.join(cwd,'{}MOCOparams.csv'.format(name))
     output_warp = os.path.join(cwd,'{}Warp.nii.gz'.format(name))
     output_warpedimg = os.path.join(cwd,'{}_Warped.nii.gz'.format(name))
-    output_avgimg = os.path.join(cwd,'{}_avg.nii.gz'.format(name))
 
     # check write warp boolean
     if writewarp:
@@ -72,17 +70,16 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
         writewarp = 0
 
     # setup commandline execution
-    command = 'antsMotionCorr -d 3 -o [{},{},{}] -m MI[{},{},{},{},{},{}] -t {}[{}] -u 1 -e 1 ' \
+    command = 'antsMotionCorr -d 3 -o [{},{}] -m MI[{},{},{},{},{},{}] -t {}[{}] -u 1 -e 1 ' \
         '-s {} -f {} -i {} -w {} -v'.format(
             output_basename,
             output_warpedimg,
-            output_avgimg,
             fixed_image,
             moving_image,
             1, # metric weight
             32, # number of bins
             'Regular', # sampling Strategy
-            0.15, # sampling percentage
+            0.2, # sampling percentage
             transform,
             0.1, # gradient step
             '1x0', # smoothing sigmas
@@ -99,4 +96,4 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     os.system('rm {}'.format(os.path.join(cwd,'*InverseWarp.nii.gz')))
 
     # return the outputs
-    return(output_warp,output_mocoparams,output_warpedimg,output_avgimg)
+    return(output_warp,output_mocoparams,output_warpedimg)

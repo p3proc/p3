@@ -14,16 +14,14 @@ def get_resolution(reference):
 def format_reference(func,reference,bids_dir):
     import os
     import nibabel
+    from ppp.base import get_basename
     from bids.grabbids import BIDSLayout
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(func))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    formatted_reference = os.path.join(cwd,'{}_format4D.nii.gz'.format(name))
+    formatted_reference = os.path.join(cwd,'{}_format4D.nii.gz'.format(get_basename(func)))
 
     # get dim 4 and TR of input image
     dim4 = nibabel.load(func).header.get_data_shape()[3] # get the 4th dim
@@ -44,14 +42,13 @@ def format_reference(func,reference,bids_dir):
 
 def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_atlas,affine_fmc=None,warp_fmc=None):
     import os
+    from ppp.base import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(func))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
+    name = get_basename(func)
     combined_transforms = os.path.join(cwd,'{}_combined_transforms.nii.gz'.format(name))
     combined_transforms4D = os.path.join(cwd,'{}_combined_transforms4D.nii.gz'.format(name))
 
@@ -98,15 +95,13 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
 
 def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg):
     import os
+    from ppp.base import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(in_file))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_moco_atlas.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}_moco_atlas.nii.gz'.format(get_basename(func)))
 
     # set up command to run
     command = 'antsApplyTransforms -d 4 -i {} -r {} -o {} -t {} -t {} -v'.format(

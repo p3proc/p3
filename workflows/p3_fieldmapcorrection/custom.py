@@ -12,7 +12,7 @@ def get_metadata(epi_file,bids_dir):
     import os
     import subprocess
     from bids.grabbids import BIDSLayout
-    
+
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
@@ -86,15 +86,13 @@ def get_metadata(epi_file,bids_dir):
 
 def fsl_prepare_fieldmap(phasediff,magnitude,TE):
     import os
+    from ppp.base import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(phasediff))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_fieldmap.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}_fieldmap.nii.gz'.format(get_basename(phasediff)))
 
     # run prepare field map
     os.system('fsl_prepare_fieldmap SIEMENS {} {} {} {}'.format(

@@ -147,7 +147,7 @@ class definednodes(basenodedefs):
         self.moco = MapNode(
             Function(
                 input_names=['fixed_image','moving_image','transform','writewarp'],
-                output_names=['warp','mocoparams','warped_img','avg_img'],
+                output_names=['warp','mocoparams','warped_img'],
                 function=antsMotionCorr
             ),
             iterfield=['moving_image'],

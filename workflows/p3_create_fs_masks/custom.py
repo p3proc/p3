@@ -32,12 +32,10 @@ def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas)
 
 def apply_warp(in_file,reference,transform):
     import os
+    from ppp.base import get_basename
 
     # get filename to output
-    name,ext = os.path.splitext(os.path.basename(in_file))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(get_basename(in_file)))
 
     # set up command to run
     command = 'antsApplyTransforms -d 3 -i {} -r {} -o {} -t {} -v'.format(
@@ -58,9 +56,9 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
     """
         Resample images to epi resolution
     """
-
     import os
     import shutil
+    from ppp.base import get_basename
 
     # get cwd
     cwd = os.getcwd()
@@ -69,10 +67,7 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
     epi = epi[0]
 
     # get filename of T1
-    name,ext = os.path.splitext(os.path.basename(T1))
-    while(ext != ''):
-        name,ext = os.path.splitext(os.path.basename(name))
-    out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(name))
+    out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(get_basename(T1)))
 
     # resample the T1
     os.system('3dresample -rmode Li -master {} -prefix {} -inset {}'.format(
@@ -85,10 +80,7 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
     # ONLY if aparc_aseg defined
     if aparc_aseg:
         # get filename of aparc_aseg
-        name,ext = os.path.splitext(os.path.basename(aparc_aseg))
-        while(ext != ''):
-            name,ext = os.path.splitext(os.path.basename(name))
-        out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(name))
+        out_file = os.path.join(cwd,'{}_funcres.nii.gz'.format(get_basename(aparc_aseg)))
 
         # resample the aparc_aseg
         os.system('3dresample -rmode NN -master {} -prefix {} -inset {}'.format(
