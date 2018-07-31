@@ -101,7 +101,7 @@ def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
 
     # get filename to output
-    out_file = os.path.join(cwd,'{}_moco_atlas.nii.gz'.format(get_basename(func)))
+    out_file = os.path.join(cwd,'{}_moco_atlas.nii.gz'.format(get_basename(in_file)))
 
     # set up command to run
     command = 'antsApplyTransforms -d 4 -i {} -r {} -o {} -t {} -t {} -v'.format(

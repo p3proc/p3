@@ -12,7 +12,7 @@ def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas)
     cwd = os.getcwd()
 
     # just set the output name for the freesurfer concatenated transform
-    fs_concat_transforms = os.path.join(cwd,'fs_concat_transform.nii.gz')
+    fs_concat_transform = os.path.join(cwd,'fs_concat_transform.nii.gz')
 
     # setup command for execution
     command = 'antsApplyTransforms -d 3 -o [{},1] -t {} -t {} -t {} -r {} -v'.format(
@@ -33,6 +33,9 @@ def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas)
 def apply_warp(in_file,reference,transform):
     import os
     from ppp.base import get_basename
+
+    # get cwd
+    cwd = os.getcwd()
 
     # get filename to output
     out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(get_basename(in_file)))

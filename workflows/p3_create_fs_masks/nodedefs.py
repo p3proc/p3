@@ -36,11 +36,32 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_calc_calc_calc_calc_calc_Warped','_atlas')
+            ('_calc_calc_calc_calc_calc_Warped','_atlas'),
+            ('_out',''),
+            ('_resample','_funcres'),
+            ('_calc_calc_calc_calc_calc','_erode4'),
+            ('_calc_calc_calc_calc','_erode3'),
+            ('_calc_calc_calc','_erode2'),
+            ('_calc_calc','_erode1'),
+            ('_calc','_erode0'),
         ])
 
         # define datasink substitutions
         #self.set_resubs([]])
+
+        # nipype reconall returns:
+        # - aparc,DKTatlas+aseg.mgz
+        # - aparc.a2009s+aseg.mgz
+        # - aparc_aseg.mgz
+        # get the 3rd file
+        self.get_aparc_aseg = Node(
+            Function(
+                input_names=['aparc_aseg'],
+                output_names=['out_file'],
+                function=lambda aparc_aseg: aparc_aseg[2]
+            ),
+            name='get_aparc_aseg'
+        )
 
         # convert freesurfer segmentation
         self.mri_convert = Node(
@@ -82,7 +103,7 @@ class definednodes(basenodedefs):
         # join warps (leave defaults for nonlinear warp)
         self.join_warps = Node(
             Function(
-                input_names=['refernce','affine_fs_2_anat','affine_anat_2_atlas','warp_anat_2_atlas'],
+                input_names=['reference','affine_fs_2_anat','affine_anat_2_atlas','warp_anat_2_atlas'],
                 output_names=['fs_concat_transform'],
                 function=join_warps
             ),
@@ -99,14 +120,14 @@ class definednodes(basenodedefs):
             ),
             name='apply_warp'
         )
-        self.join_warps.inputs.reference = settings['atlas']
+        self.apply_warp.inputs.reference = settings['atlas']
 
         # get the first run
         self.epi_firstrun = Node(
             Function(
                 input_names=['epi_at'],
                 output_names=['epi_at'],
-                function=lambda x: x[0]
+                function=lambda epi_at: epi_at[0]
             ),
             name='epi_firstrun'
         )

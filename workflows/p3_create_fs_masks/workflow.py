@@ -21,8 +21,11 @@ class bidsselectorworkflow(workflowgenerator):
             # connect the workflow
             cls.workflow.connect([ # connect nodes
                 # convert aparc+aseg to nii.gz
-                (dn.inputnode,dn.mri_convert,[
-                    ('aparc_aseg','in_file')
+                (dn.inputnode,dn.get_aparc_aseg,[
+                    ('aparc_aseg','aparc_aseg')
+                ]),
+                (dn.get_aparc_aseg,dn.mri_convert,[
+                    ('out_file','in_file')
                 ]),
 
                 # align freesurfer to anat image
@@ -240,8 +243,70 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # output data to datasink
+                # white matter
+                (dn.resample2_wm[0],dn.datasink,[
+                    ('out_file','fs_masks.wm.@wm0')
+                ]),
+                (dn.resample2_wm[1],dn.datasink,[
+                    ('out_file','fs_masks.wm.@wm1')
+                ]),
+                (dn.resample2_wm[2],dn.datasink,[
+                    ('out_file','fs_masks.wm.@wm2')
+                ]),
+                (dn.resample2_wm[3],dn.datasink,[
+                    ('out_file','fs_masks.wm.@wm3')
+                ]),
+                (dn.resample2_wm[4],dn.datasink,[
+                    ('out_file','fs_masks.wm.@wm4')
+                ]),
+                # CSF
+                (dn.resample2_csf[0],dn.datasink,[
+                    ('out_file','fs_masks.csf.@csf0')
+                ]),
+                (dn.resample2_csf[1],dn.datasink,[
+                    ('out_file','fs_masks.csf.@csf1')
+                ]),
+                (dn.resample2_csf[2],dn.datasink,[
+                    ('out_file','fs_masks.csf.@csf2')
+                ]),
+                (dn.resample2_csf[3],dn.datasink,[
+                    ('out_file','fs_masks.csf.@csf3')
+                ]),
+                (dn.resample2_csf[4],dn.datasink,[
+                    ('out_file','fs_masks.csf.@csf4')
+                ]),
+                # Gray Matter Ribbon
+                (dn.resample2_gmr,dn.datasink,[
+                    ('out_file','fs_masks.gmr.@gmr')
+                ]),
+                # Cerebellum
+                (dn.resample2_cb[0],dn.datasink,[
+                    ('out_file','fs_masks.cb.@cb0')
+                ]),
+                (dn.resample2_cb[1],dn.datasink,[
+                    ('out_file','fs_masks.cb.@cb1')
+                ]),
+                (dn.resample2_cb[2],dn.datasink,[
+                    ('out_file','fs_masks.cb.@cb2')
+                ]),
+                # Subcortical Nuclei
+                # Cerebellum
+                (dn.resample2_scn[0],dn.datasink,[
+                    ('out_file','fs_masks.scn.@scn0')
+                ]),
+                (dn.resample2_scn[1],dn.datasink,[
+                    ('out_file','fs_masks.scn.@scn1')
+                ]),
+                (dn.resample2_scn[2],dn.datasink,[
+                    ('out_file','fs_masks.scn.@scn2')
+                ]),
+                # All gray matter
+                (dn.resample2_gm,dn.datasink,[
+                    ('out_file','fs_masks.gm.@gm')
+                ]),
+                # aparc+aseg
                 (dn.epi_resampled,dn.datasink,[
-                    ('aparc_aseg_epi','p3.@aparc_aseg_epi')
+                    ('aparc_aseg_epi','fs_masks.aparc_aseg.@aparc_aseg_epi')
                 ])
             ])
 
