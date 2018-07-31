@@ -8,17 +8,15 @@ import json
 from glob import glob
 import importlib
 import argparse
-from ppp.base import (
+from p3.base import (
     create_and_run_p3_workflow,
     default_settings,
     output_BIDS_summary
     )
-
-# add p3 base files to path
-sys.path.append(os.path.abspath('p3'))
+from p3 import workflows
 
 # get default workflows path
-sys.path.append(os.path.abspath('workflows'))
+sys.path.append(os.path.abspath(os.path.dirname(workflows.__file__)))
 
 # get version
 __version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'version')).read()
