@@ -74,7 +74,7 @@ ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
 # Install Python Stuff + other dependencies
 ADD requirements.txt /
-RUN pip install -r requirements.txt && apt-get install -y graphviz dc bc
+RUN pip install -r requirements.txt && apt-get install -y graphviz dc bc libglw1-mesa
 
 # Install p3 stuff
 ADD p3 /p3/p3/
