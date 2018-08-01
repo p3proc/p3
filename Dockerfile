@@ -72,8 +72,15 @@ RUN curl -O https://cmake.org/files/v3.12/cmake-3.12.0.tar.gz && \
 ENV ANTSPATH=/ANTs/bin
 ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
-# Install Python Stuff
+# Install Python Stuff + other dependencies
 ADD requirements.txt /
+RUN pip install -r requirements.txt && apt-get install -y graphviz dc bc
+
+# Install p3 stuff
+ADD p3 /p3/p3/
+ADD p3proc /p3/
+ADD version /p3/
+ENV PYTHONPATH=${PYTHONPATH}:/p3
 
 # Set entrypoint
-#ENTRYPOINT ['']
+ENTRYPOINT ["python","/p3/p3proc"]
