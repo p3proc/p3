@@ -1,5 +1,6 @@
 # p3 - an extensible preprocessing pipeline
 An fMRI Preprocessing Pipeline in python based on a 2015 Jonathan Power Pipeline
+[![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1388)
 
 #### Installing
 
@@ -39,11 +40,12 @@ For more comprehensive usage information, see the [documentation](http://p3.read
 
 See Help
 ```
-usage: p3.py [-h]
-             [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]]
-             [--skip_bids_validator] [-v] [-s SETTINGS] [-g] [-m]
-             [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]] [--summary]
-             [bids_dir] [output_dir] [{participant,group}]
+usage: p3proc [-h]
+              [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]]
+              [--skip_bids_validator] [-v] [-s SETTINGS] [-g] [-m]
+              [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]] [--summary] -l
+              LICENSE_FILE
+              [bids_dir] [output_dir] [{participant,group}]
 
 p3 processing pipeline
 
@@ -93,4 +95,8 @@ optional arguments:
                         you should have an empty __init__.py so that the
                         directory is importable.
   --summary             Get a summary of the BIDS dataset input.
+  -l LICENSE_FILE, --license_file LICENSE_FILE
+                        Path to FreeSurfer license key file. To obtain it you
+                        need to register (for free) at
+                        https://surfer.nmr.mgh.harvard.edu/registration.html
 ```
