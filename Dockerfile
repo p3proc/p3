@@ -8,7 +8,7 @@ RUN apt-get update && \
 
 # Get afni
 WORKDIR /
-RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential && \
+RUN apt-get install -y tcsh xfonts-base gsl-bin netpbm libjpeg62 xvfb xterm libxm4 build-essential libglw1-mesa && \
     mkdir afni && \
     cd /afni && \
     curl -O https://afni.nimh.nih.gov/pub/dist/tgz/linux_ubuntu_16_64.tgz && \
@@ -24,7 +24,7 @@ ENV FSLDIR=/opt/fsl
 RUN curl -O https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-sources.tar.gz && \
 	tar zxf fsl-5.0.10-sources.tar.gz && \
 	rm fsl-5.0.10-sources.tar.gz && \
-    apt-get install -y build-essential libexpat1-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev zlib1g-dev && \
+    apt-get install -y libexpat1-dev libx11-dev libgl1-mesa-dev libglu1-mesa-dev zlib1g-dev dc bc && \
     sed -i '52iFSLCONFDIR=$FSLDIR/config' ${FSLDIR}/etc/fslconf/fsl.sh && \
 	sed -i '53iFSLMACHTYPE=`$FSLDIR/etc/fslconf/fslmachtype.sh`' ${FSLDIR}/etc/fslconf/fsl.sh && \
 	sed -i '57iexport FSLCONFDIR FSLMACHTYPE' ${FSLDIR}/etc/fslconf/fsl.sh && \
@@ -64,7 +64,7 @@ ENV POSSUMDIR=${FSLDIR} OS=Linux FS_OVERRIDE=0 SUBJECTS_DIR=/opt/freesurfer/subj
 WORKDIR /
 RUN curl -O https://cmake.org/files/v3.12/cmake-3.12.0.tar.gz && \
     tar xvf cmake-3.12.0.tar.gz && rm cmake-3.12.0.tar.gz && \
-    apt-get install -y git build-essential && \
+    apt-get install -y git && \
     cd cmake-3.12.0 && ./bootstrap && make && make install && cd .. && rm -r cmake-3.12.0 && \
     git clone https://github.com/ANTsX/ANTs.git /ANTs-source && \
     mkdir ANTs && cd ANTs && cmake ../ANTs-source && make -j 6 && \
@@ -74,7 +74,7 @@ ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
 # Install Python Stuff + other dependencies
 ADD requirements.txt /
-RUN pip install -r requirements.txt && apt-get install -y graphviz dc bc libglw1-mesa
+RUN pip install -r requirements.txt && apt-get install -y graphviz
 
 # Install p3 stuff
 RUN git clone https://github.com/vanandrew/p3.git
