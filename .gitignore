@@ -118,3 +118,6 @@ graph.png
 
 # settings file
 settings.json
+
+# singularity image
+*.simg
