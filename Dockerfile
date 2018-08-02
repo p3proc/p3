@@ -77,9 +77,7 @@ ADD requirements.txt /
 RUN pip install -r requirements.txt && apt-get install -y graphviz dc bc libglw1-mesa
 
 # Install p3 stuff
-ADD p3 /p3/p3/
-ADD p3proc /p3/
-ADD version /p3/
+RUN git clone https://github.com/vanandrew/p3.git
 ENV PYTHONPATH=${PYTHONPATH}:/p3
 
 # Set entrypoint
