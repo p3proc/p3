@@ -146,6 +146,9 @@ man_pages = [
      [author], 1)
 ]
 
+# print out the help info to file so that we can paste it into the docs
+import os
+os.system('python3 ../p3proc -h > usage/help_text.txt')
 
 # -- Options for Texinfo output ----------------------------------------------
 
