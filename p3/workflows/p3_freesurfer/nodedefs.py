@@ -4,6 +4,7 @@ TODO
 
 """
 import os
+from p3 import workflows
 from p3.base import basenodedefs
 from .custom import *
 from nipype import Node,MapNode
@@ -18,6 +19,10 @@ class definednodes(basenodedefs):
     def __init__(self,settings):
         # call base constructor
         super().__init__(settings)
+
+        # Set freesurfer license variable
+        wfs_dir = os.path.dirname(workflows.__file__)
+        os.environ['FS_LICENSE'] = os.path.join(wfs_dir,'license.txt')
 
         # Define freesurfer directory
         self.freesurfer_dir = os.path.join(settings['output_dir'],'freesurfer')

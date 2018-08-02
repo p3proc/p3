@@ -3,7 +3,7 @@
 TODO
 
 """
-from p3.base import basenodedefs
+from p3.base import basenodedefs,set_atlas_path
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
@@ -60,8 +60,8 @@ class definednodes(basenodedefs):
             ),
             name='resample'
         )
-        self.resample.inputs.in_file = settings['atlas']
-        self.resample.inputs.reference = settings['atlas']
+        self.resample.inputs.in_file = set_atlas_path(settings['atlas'])
+        self.resample.inputs.reference = set_atlas_path(settings['atlas'])
 
         # format the reference image (which should be the resampled atlas)
         self.format_reference = MapNode(

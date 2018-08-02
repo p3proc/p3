@@ -25,6 +25,23 @@ def get_basename(filename):
     # return the basename
     return name
 
+def set_atlas_path(atlas):
+    """
+        Checks atlas path for existence
+    """
+
+    # check atlas path; if not exists check the templates directory
+    if not os.path.exists(atlas):
+        # check in templates dir
+        if os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)),'templates',os.path.basename(atlas))):
+            # set atlas to that directory
+            atlas = os.path.join(os.path.dirname(os.path.realpath(__file__)),'templates',os.path.basename(atlas))
+        else:
+            raise IOError('Could not find specified atlas file.')
+
+    # return the path to the atlas
+    return atlas
+
 def output_BIDS_summary(bids_dir):
     """
         Get a summary of the BIDS dataset input
@@ -59,6 +76,7 @@ def check_query(bids_query,bids_dir):
     layout = BIDSLayout(bids_dir)
 
     # parse bids query
+    print('\n')
     output = {}
     for key in bids_query:
         # return the query
@@ -67,20 +85,20 @@ def check_query(bids_query,bids_dir):
         print('{}:'.format(key))
         for o in output[key]:
             print(o.filename)
-
-    # wait 5 seconds
-    print('Files listed are to be processed. Quit now if they are not the right ones...')
-    #time.sleep(2)
+    print('Files listed are to be processed.\n\n')
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
         Create main workflow
     """
 
-    # Set nipype config settings TODO expose these as debug settings
-    config.set('logging','workflow_level','DEBUG')
-    config.set('logging','workflow_level','DEBUG')
+    # Set nipype debug messages if enabled
+    if settings['debug']:
+        config.set('logging','workflow_level','DEBUG')
+        config.set('logging','workflow_level','DEBUG')
+    # always hash on content
     config.set('execution','hash_method','content')
+    # stop on first crash
     config.set('execution','stop_on_first_crash','true')
     logging.update_logging(config)
 
@@ -99,10 +117,6 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
-
-    # check files being processed
-    # TODO: Not really sure if I want to keep this... is p3_bidsselector specific
-    check_query(settings['bids_query'],settings['bids_dir'])
 
     # Run pipeline (check multiproc setting)
     if not settings['disable_run']:
@@ -170,10 +184,9 @@ def default_settings():
             }
         }
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
-    settings['brain_radius'] = 50 # set brain radius for FD calculation (in mm)
     settings['num_threads'] = 8 # sets the number of threads for ANTS registration
     settings['anat_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
-    settings['atlas'] = '/home/vana/Projects/p3/templates/MNI152.nii.gz' # sets the atlas align target
+    settings['atlas'] = 'MNI152.nii.gz' # sets the atlas align target
     settings['avganats'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
     settings['field_map_correction'] = True # sets whether pipeline should run field map correction. You should have field maps in your dataset for this to work.
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected

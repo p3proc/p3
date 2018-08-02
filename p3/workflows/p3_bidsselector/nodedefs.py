@@ -4,7 +4,7 @@ TODO
 
 """
 import os
-from p3.base import basenodedefs
+from p3.base import basenodedefs,check_query
 from .custom import *
 from nipype.interfaces import afni
 from nipype.interfaces.io import BIDSDataGrabber
@@ -21,6 +21,9 @@ class definednodes(basenodedefs):
     def __init__(self,settings):
         # call base constructor
         super().__init__(settings)
+
+        # check files being processed
+        check_query(settings['bids_query'],settings['bids_dir'])
 
         # define output node
         self.set_input(['subject'])

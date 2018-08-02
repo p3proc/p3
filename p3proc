@@ -5,9 +5,10 @@
 import os
 import sys
 import json
-from glob import glob
 import importlib
 import argparse
+import shutil
+from glob import glob
 from p3.base import (
     create_and_run_p3_workflow,
     default_settings,
@@ -15,7 +16,7 @@ from p3.base import (
     )
 from p3 import workflows
 
-# get default workflows path
+# set default workflows path
 sys.path.append(os.path.abspath(os.path.dirname(workflows.__file__)))
 
 # get version
@@ -43,7 +44,7 @@ def main():
     cwd = os.getcwd()
 
     # specify command line arguments
-    parser = argparse.ArgumentParser(description='\033[1mp3\033[0;0m processing pipeline')
+    parser = argparse.ArgumentParser(description='p3 processing pipeline')
     parser.add_argument('bids_dir', help='The directory with the input dataset '
                         'formatted according to the BIDS standard.', nargs='?')
     parser.add_argument('output_dir', help='The directory where the output files '
@@ -72,8 +73,7 @@ def main():
                         'internally specified defaults. See docs for more help details.')
     parser.add_argument('-g', '--generate_settings', help='Generates a default settings file in the '
                         'current working directory for use/modification. This option will ignore all other '
-                        'arguments.',
-                        action='store_true')
+                        'arguments.')
     parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
                         'is harder to debug when this option is on.',
                         action='store_true')
@@ -84,7 +84,8 @@ def main():
                         'should have an empty __init__.py so that the directory is importable.',
                         nargs="+")
     parser.add_argument('--summary', help='Get a summary of the BIDS dataset input.', action='store_true')
-    parser.add_argument('-l','--license_file',help='Path to FreeSurfer license key file. To obtain it you need to register (for free) at https://surfer.nmr.mgh.harvard.edu/registration.html')
+    parser.add_argument('-c','--create_new_workflow',help='Creates workflow template at provided path.')
+    parser.add_argument('-d','--verbose',help='Enable verbose debugging mode.', action='store_true')
 
     # parse command line arguments
     args = parser.parse_args()
@@ -94,10 +95,19 @@ def main():
         # get settings
         settings = default_settings()
         # write settings to file
-        with open(os.path.join(cwd,'settings.json'),'w') as settings_file:
+        with open(os.path.join(args.generate_settings),'w') as settings_file:
             json.dump(settings,settings_file,indent=4,separators=(',',': '))
         # print nice message and exit
-        print('A settings.json was generated in the current directory.')
+        print('A settings.json was generated in {}'.format(args.generate_settings))
+        sys.exit()
+
+    # generate new workflow
+    if args.create_new_workflow:
+        # Get p3 workflows directory
+        wfs_dir = os.path.dirname(workflows.__file__)
+        # copy over the workflow_template and name new workflow
+        shutil.copytree(os.path.join(wfs_dir,'workflow_template'),args.create_new_workflow)
+        print('Created new workflow in {}'.format(args.create_new_workflow))
         sys.exit()
 
     # TODO run bids validator here
@@ -123,12 +133,6 @@ def main():
     if args.workflows:
         for path in args.workflows: # loop over each path
             sys.path.append(os.path.abspath(path))
-
-    # specify freesurfer license
-    if os.path.exists(args.license_file):
-        os.environ['FS_LICENSE'] = args.license_file
-    else:
-        raise Exception("Provided license file does not exist")
 
     # only for a subset of subjects
     if args.participant_label:
@@ -160,6 +164,7 @@ def main():
         settings['tmp_dir'] = os.path.join(settings['output_dir'],'tmp')
         settings['multiproc'] = args.multiproc
         settings['disable_run'] = args.disable_run
+        settings['debug'] = args.verbose
 
         # make directories if not exist
         os.makedirs(settings['output_dir'],exist_ok=True)
@@ -170,7 +175,7 @@ def main():
 
     # running group level
     elif args.analysis_level == "group":
-        print('This option is disabled since there is no group level analysis availiable.')
+        print('This option is disabled since no group level analysis availiable.')
 
 if __name__ == '__main__':
     # execute main function

@@ -3,7 +3,7 @@
 TODO
 
 """
-from p3.base import basenodedefs,get_basename
+from p3.base import basenodedefs,get_basename,set_atlas_path
 from nipype import Node
 from nipype.interfaces import ants
 from nipype.interfaces.utility import Function
@@ -46,4 +46,4 @@ class definednodes(basenodedefs):
             ),
             name='atlasregister'
         )
-        self.register.inputs.fixed_image = settings['atlas'] # get atlas image
+        self.register.inputs.fixed_image = set_atlas_path(settings['atlas']) # get atlas image

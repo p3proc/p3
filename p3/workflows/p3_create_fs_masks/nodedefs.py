@@ -4,7 +4,7 @@ TODO
 
 """
 import os
-from p3.base import basenodedefs
+from p3.base import basenodedefs,set_atlas_path
 from .custom import *
 from nipype.interfaces import afni,freesurfer,ants
 from nipype.interfaces.io import BIDSDataGrabber
@@ -109,7 +109,7 @@ class definednodes(basenodedefs):
             ),
             name='join_warps'
         )
-        self.join_warps.inputs.reference = settings['atlas']
+        self.join_warps.inputs.reference = set_atlas_path(settings['atlas'])
 
         # apply atlas alignment to aparc+aseg
         self.apply_warp = Node(
@@ -120,7 +120,7 @@ class definednodes(basenodedefs):
             ),
             name='apply_warp'
         )
-        self.apply_warp.inputs.reference = settings['atlas']
+        self.apply_warp.inputs.reference = set_atlas_path(settings['atlas'])
 
         # get the first run
         self.epi_firstrun = Node(
