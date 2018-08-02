@@ -20,9 +20,9 @@ processing streams in an intuitive manner.
     dev/developers.rst
 
 Quick Usage
-===========
+-----------
 
-p3 uses the standard BIDS app run command. You can run p3 by simply running:
+p3 uses the standard BIDS_ app run command. You can run p3 by simply running:
 
 .. code:: bash
 
