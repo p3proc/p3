@@ -1,12 +1,7 @@
-.. p3 documentation master file, created by
-    sphinx-quickstart on Thu Jul 12 12:29:44 2018.
-    You can adapt this file completely to your liking, but it should at least
-    contain the root `toctree` directive.
+p3 - fmri processing pipeline
+=============================
 
-p3 fmri processing pipeline
-===========================
-
-The p3 processing pipeline is extensible preprocessing pipeline that encourages
+p3 is an extensible preprocessing pipeline that encourages
 experimentation and customization. In addition to providing a BIDS_-compatible preprocessing
 pipeline for users, it also provides a platform to quickly and easily integrate new
 processing methods into an neuroimaging processing stream.
@@ -21,25 +16,41 @@ processing streams in an intuitive manner.
     :caption: Contents:
 
     usage/usage.rst
+    usage/settings.rst
+    dev/developers.rst
 
 Quick Usage
------------
+===========
 
 p3 uses the standard BIDS app run command. You can run p3 by simply running:
 
 .. code:: bash
 
-    p3.py [BIDS directory] [output directory]
+    p3proc [BIDS directory] [output directory]
 
 This will run the p3 pipeline with the all standard built in settings.
 
-If you are using the docker version of p3. The command is:
+If you are using the Docker_ version of p3, the command is:
 
 .. code:: bash
 
     docker run -it --rm \
-        -v [BIDS directory]:/input \
+        -v [BIDS directory]:/dataset \
         -v [output directory]:/output \
-        vanandrew/p3 /input /output
+        vanandrew/p3 /dataset /output
+
+where **[BIDS directory]** and **[output directory]** are paths on the host
+system to the BIDS dataset and output directory respectively.
+
+If you are using the Singularity_ version of p3, the command is:
+
+.. code:: bash
+
+    singularity run \
+        -B [BIDS directory]:/dataset \
+        -B [output directory]:/output \
+        vanandrew_p3.simg /dataset /output
+
+where **vanandrew_p3.simg** is replaced with the singularity image filename.
 
 .. include:: links.rst
