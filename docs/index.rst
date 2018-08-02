@@ -15,8 +15,9 @@ processing streams in an intuitive manner.
     :maxdepth: 2
     :caption: Contents:
 
-    usage/usage.rst
-    usage/settings.rst
+    user/install.rst
+    user/usage.rst
+    user/settings.rst
     dev/developers.rst
 
 Quick Usage

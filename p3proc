@@ -67,12 +67,12 @@ def main():
     parser.add_argument('--skip_bids_validator', help='Whether or not to perform BIDS dataset validation',
                         action='store_true')
     parser.add_argument('-v', '--version', action='version',
-                        version='\033[1mp3\033[0;0m {}'.format(__version__))
+                        version='p3 {}'.format(__version__))
     parser.add_argument('-s', '--settings', help='A JSON settings file that specifies how the pipeline '
                         'should be configured. If no settings file is provided, the pipeline will use '
                         'internally specified defaults. See docs for more help details.')
     parser.add_argument('-g', '--generate_settings', help='Generates a default settings file in the '
-                        'current working directory for use/modification. This option will ignore all other '
+                        'provided directory for use/modification. This option will ignore all other '
                         'arguments.')
     parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
                         'is harder to debug when this option is on.',
