@@ -84,7 +84,7 @@ def main():
                         'should have an empty __init__.py so that the directory is importable.',
                         nargs="+")
     parser.add_argument('--summary', help='Get a summary of the BIDS dataset input.', action='store_true')
-    parser.add_argument('-l','--license_file',help='Path to FreeSurfer license key file. To obtain it you need to register (for free) at https://surfer.nmr.mgh.harvard.edu/registration.html', required=True)
+    parser.add_argument('-l','--license_file',help='Path to FreeSurfer license key file. To obtain it you need to register (for free) at https://surfer.nmr.mgh.harvard.edu/registration.html')
 
     # parse command line arguments
     args = parser.parse_args()
