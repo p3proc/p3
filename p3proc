@@ -74,17 +74,17 @@ def main():
     parser.add_argument('-g', '--generate_settings', help='Generates a default settings file in the '
                         'provided directory for use/modification. This option will ignore all other '
                         'arguments.')
-    parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
-                        'is harder to debug when this option is on.',
-                        action='store_true')
+    parser.add_argument('--summary', help='Get a summary of the BIDS dataset input.', action='store_true')
     parser.add_argument('--disable_run', help='Stop after writing graphs. Does not run pipeline. Useful '
                         'for making sure your workflow is connected properly before running.',
                         action='store_true')
     parser.add_argument('-w','--workflows', help='Other paths p3 should search for workflows. Note that you '
                         'should have an empty __init__.py so that the directory is importable.',
                         nargs="+")
-    parser.add_argument('--summary', help='Get a summary of the BIDS dataset input.', action='store_true')
     parser.add_argument('-c','--create_new_workflow',help='Creates workflow template at provided path.')
+    parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
+                        'is harder to debug when this option is on.',
+                        action='store_true')
     parser.add_argument('-d','--verbose',help='Enable verbose debugging mode.', action='store_true')
 
     # parse command line arguments
@@ -110,7 +110,9 @@ def main():
         print('Created new workflow in {}'.format(args.create_new_workflow))
         sys.exit()
 
-    # TODO run bids validator here
+    # run bids validator
+    if not args.skip_bids_validator:
+        os.system('bids-validator {}'.format(args.bids_dir))
 
     # check if summary flag enabled
     if args.summary:

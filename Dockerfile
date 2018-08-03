@@ -74,7 +74,11 @@ ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
 # Install Python Stuff + other dependencies
 ADD requirements.txt /
-RUN pip install -r requirements.txt && apt-get install -y graphviz
+RUN pip install -r requirements.txt && apt-get update && apt-get install -y graphviz
+
+# Install bids-validator
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get install -y nodejs && npm install -g bids-validator
 
 # Install p3 stuff
 RUN git clone https://github.com/vanandrew/p3.git

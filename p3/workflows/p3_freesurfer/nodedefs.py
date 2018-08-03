@@ -23,6 +23,8 @@ class definednodes(basenodedefs):
         # Set freesurfer license variable
         wfs_dir = os.path.dirname(base.__file__)
         os.environ['FS_LICENSE'] = os.path.join(wfs_dir,'license.txt')
+        # This is to actually verify that the freesurfer license is at this location
+        assert os.path.exists(os.path.join(wfs_dir,'license.txt')), "Could not find freesurfer license at {}".format(wfs_dir)
 
         # Define freesurfer directory
         self.freesurfer_dir = os.path.join(settings['output_dir'],'freesurfer')

@@ -22,6 +22,40 @@ def get_metadata(epi_file,bids_dir):
     # get fieldmaps for epi
     fieldmap = layout.get_fieldmap(epi_file)
 
+    # check if None; this means the IntendedFor tag is not defined; Try to guess the field map from the data
+    # TODO THIS POTENTIALLY UNSTABLE CODE. SOMEONE SHOULD COME UP WITH A BETTER WAY TO DO THIS!
+    # I assume there is only 1 fieldmap per session
+    if not fieldmap:
+        print('\n****************************************************************************')
+        print('File: {}'.format(epi_file))
+        print('IntendedFor field undefined! I\'ll try to guess the fieldmap file...\n')
+        sub = os.path.split(epi_file)[1].split("_")[0].split("sub-")[1] # set subject
+        type_ = '(phase1|phasediff|epi|fieldmap)' # get all fieldmap types
+        files = layout.get(subject=sub, type=type_, extensions=['nii.gz', 'nii']) # get the potential fmaps
+        # check files length, if 1 then there is probable only 1 session and only one fieldmap
+        if len(files) == 1:
+            fieldmap = {
+                'phasediff': files[0].filename,
+                'type': files[0].type,
+                'magnitude1': files[0].filename.replace('phasediff','magnitude1'),
+                'magnitude2': files[0].filename.replace('phasediff','magnitude2')
+            }
+        else: # assume more than one session
+            ses = os.path.split(epi_file)[1].split("_")[1].split("ses-")[1]
+            for file in files:
+                if file.session == ses: # match the session number
+                    fieldmap = {
+                        'phasediff': file.filename,
+                        'type': file.type,
+                        'magnitude1': file.filename.replace('phasediff','magnitude1'),
+                        'magnitude2': file.filename.replace('phasediff','magnitude2')
+                    }
+
+        # check if we were able to get the fieldmap
+        assert bool(fieldmap), 'We couldn\'t find a fieldmap. Specify the IntendedFor Field or disable field map correction.'
+        print('I think {} is the fieldmap. You should verify this is correct.'.format(fieldmap['phasediff']))
+        print('****************************************************************************\n')
+
     # we only know how to use phasediff map, anything else is not supported...
     assert fieldmap['type'] == 'phasediff', 'Non-phasediff map unsupported for field map correction.'
 
