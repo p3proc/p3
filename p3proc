@@ -111,7 +111,7 @@ def main():
         sys.exit()
 
     # run bids validator
-    if not args.skip_bids_validator:
+    if not args.skip_bids_validator and args.bids_dir:
         os.system('bids-validator {}'.format(args.bids_dir))
 
     # check if summary flag enabled
