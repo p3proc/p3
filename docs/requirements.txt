@@ -1,6 +1,6 @@
-# Dependencies to run p3
-nipype == 1.1.0
 # dependencies for building documentation
 # install me with pip -r requirements.txt
 # use the --user flag for local install
 Sphinx == 1.7.5
+nipype == 1.1.0
+pybids == 0.6.3

@@ -46,15 +46,15 @@ you need to generate a settings file.
 
 .. code:: bash
 
-    # This will generate settings in the current directory
-    p3proc --generate_settings
+    # This will generate settings at the specified path/file
+    p3proc --generate_settings /path/to/settings.json
 
-This will generate a settings.json file in the current directory.
+This will generate a settings.json file at the specified path.
 
 .. warning::
 
-    The generate settings option will overwrite any file called **settings.json** in the
-    current directory you call it in. Be sure you aren't losing any current files before
+    The generate settings option will overwrite any file in the directory path you
+    specify. Be sure you aren't losing any current files before
     running this!
 
 The settings file will allow you to customize runtime settings. See the :ref:`Settings`
