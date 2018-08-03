@@ -7,12 +7,24 @@ An fMRI Preprocessing Pipeline in python based on a 2015 Jonathan Power Pipeline
 
 ##### Docker/Singularity Install
 
-TBD - It's on the TODO list... I promise!
+Simply pull the image from either [Docker Hub](https://hub.docker.com/r/vanandrew/p3/) or
+[Singularity Hub](https://www.singularity-hub.org/collections/1388)
+```
+# Docker
+docker pull vanandrew/p3:[version]
+
+# Singularity
+singularity pull docker://vanandrew/p3:[version] # Docker version for conversion
+# or (the recommended way)
+singularity pull shub://vanandrew/p3:[version] # Direct Singularity Image
+```
+You should replace `[version]` with the pipeline release you are interested in.
 
 ##### Native Install (For Developers)
 
-You will need python 3.6.x installed. If you are on a linux distro, the easiest way is to compile from [source](https://www.python.org/downloads/release/python-366/). If your
-on a mac, you can use [homebrew](https://brew.sh/).
+You will need python 3.6.x installed. If you are on a linux distro, the easiest way is to compile
+from [source](https://www.python.org/downloads/release/python-366/). If you are on a mac, you can
+use [Homebrew](https://brew.sh/).
 
 Install the dependencies in requirements.txt using:
 ```
@@ -32,9 +44,9 @@ You can then clone this repo on your system, and run the pipeline:
 ```
 git clone https://github.com/vanandrew/p3.git
 cd p3
-./p3.py [BIDS_dataset] [output_folder]
+./p3proc [BIDS_dataset] [output_folder]
 ```
 
-##### How to use
+##### Uasge
 
-See the [documentation](http://p3.readthedocs.io/en/latest/).
+See the [documentation](http://p3.readthedocs.io/en/latest/) for more information.
