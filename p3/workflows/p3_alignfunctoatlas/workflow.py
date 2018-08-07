@@ -50,9 +50,6 @@ class alignfunctoatlasworkflow(workflowgenerator):
                 ('TR','TR')
             ]),
             (dn.inputnode,dn.combinetransforms,[
-                ('affine_fmc','affine_fmc')
-            ]),
-            (dn.inputnode,dn.combinetransforms,[
                 ('warp_fmc','warp_fmc')
             ]),
             (dn.inputnode,dn.combinetransforms,[

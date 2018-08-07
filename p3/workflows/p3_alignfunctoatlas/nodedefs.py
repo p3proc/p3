@@ -25,7 +25,6 @@ class definednodes(basenodedefs):
             'func', # I pass this in so I can get the TR info from BIDS
             'func_stc_despike',
             'warp_func_2_refimg',
-            'affine_fmc',
             'warp_fmc',
             'refimg',
             'affine_func_2_anat',
@@ -39,9 +38,6 @@ class definednodes(basenodedefs):
         self.set_subs([
             ('_flirt','_funcres')
         ])
-
-        # define datasink substitutions
-        #self.set_resubs([]])
 
         # grab the resolution of the refimg
         self.get_resolution = Node(
@@ -87,13 +83,12 @@ class definednodes(basenodedefs):
                     'warp_func_2_anat',
                     'affine_anat_2_atlas',
                     'warp_anat_2_atlas',
-                    'affine_fmc',
                     'warp_fmc'
                     ],
                output_names=['combined_transforms4D'],
                function=combinetransforms
            ),
-           iterfield=['func','dim4','TR'],
+           iterfield=['func','dim4','TR','warp_fmc'],
            name='combinetransforms'
         )
 

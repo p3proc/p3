@@ -40,7 +40,7 @@ def format_reference(func,reference,bids_dir):
 
     return (formatted_reference,dim4,TR)
 
-def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_atlas,affine_fmc=None,warp_fmc=None):
+def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_atlas,warp_fmc=None):
     import os
     from p3.base import get_basename
 
@@ -54,13 +54,12 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
 
     # set up transforms (check in field map correction files exist)
     # we exclude the func_2_refimg transform since it is already 4D
-    if affine_fmc and warp_fmc:
-        transforms = '-t {} -t {} -t {} -t {} -t {}'.format(
+    if warp_fmc:
+        transforms = '-t {} -t {} -t {} -t {}'.format(
             warp_anat_2_atlas,
             affine_anat_2_atlas,
             affine_func_2_anat,
             warp_fmc,
-            affine_fmc,
         )
     else:
         transforms = '-t {} -t {} -t {}'.format(

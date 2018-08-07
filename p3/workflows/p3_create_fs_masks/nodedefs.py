@@ -46,9 +46,6 @@ class definednodes(basenodedefs):
             ('_calc','_erode0'),
         ])
 
-        # define datasink substitutions
-        #self.set_resubs([]])
-
         # nipype reconall returns:
         # - aparc,DKTatlas+aseg.mgz
         # - aparc.a2009s+aseg.mgz

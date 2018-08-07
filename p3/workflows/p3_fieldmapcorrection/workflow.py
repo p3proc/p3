@@ -106,70 +106,110 @@ class fieldmapcorrectionworkflow(workflowgenerator):
                 ]),
 
                 # Warp the refimg with fieldmap
-                (dn.get_metadata,dn.get_refimg_files,[
+                (dn.avg_epi,dn.unwarp_epis,[
+                    ('out_file','in_file')
+                ]),
+                (dn.get_metadata,dn.unwarp_epis,[
                     ('echospacing','dwell_time')
                 ]),
-                (dn.register_fieldmap,dn.get_refimg_files,[
+                (dn.register_fieldmap,dn.unwarp_epis,[
                     ('out_file','fmap_in_file')
                 ]),
-                (dn.register_mask,dn.get_refimg_files,[
+                (dn.register_mask,dn.unwarp_epis,[
                     ('out_file','mask_file')
                 ]),
-                (dn.get_metadata,dn.get_refimg_files,[
-                    ('ped','ped')
-                ]),
-                (dn.inputnode,dn.warp_refimg,[
-                    ('refimg','in_file')
-                ]),
-                (dn.get_refimg_files,dn.warp_refimg,[
-                    ('dwell_time','dwell_time')
-                ]),
-                (dn.get_refimg_files,dn.warp_refimg,[
-                    ('fmap_in_file','fmap_in_file')
-                ]),
-                (dn.get_refimg_files,dn.warp_refimg,[
-                    ('mask_file','mask_file')
-                ]),
-                (dn.get_refimg_files,dn.warp_refimg,[
+                (dn.get_metadata,dn.unwarp_epis,[
                     ('ped','unwarp_direction')
                 ]),
 
-                # create the basename
-                (dn.warp_refimg,dn.create_prefix,[
-                    ('unwarped_file','filename')
+                # convert to ants warp
+                (dn.get_metadata,dn.convertvsm2antswarp,[
+                    ('ped','ped')
+                ]),
+                (dn.unwarp_epis,dn.convertvsm2antswarp,[
+                    ('shift_out_file','in_file')
                 ]),
 
-                # Use ants registration to get the transforms from refimg to unwarped refimg
-                (dn.create_prefix,dn.ants_fmc,[
+                # apply ants unwarp warp
+                (dn.avg_epi,dn.applyantsunwarp,[
+                    ('out_file','input_image')
+                ]),
+                (dn.avg_epi,dn.applyantsunwarp,[
+                    ('out_file','reference_image')
+                ]),
+                (dn.convertvsm2antswarp,dn.applyantsunwarp,[
+                    ('out_file','transforms')
+                ]),
+
+                # get refimg transform
+                (dn.convertvsm2antswarp,dn.get_refimg_transform,[
+                    ('out_file','transforms')
+                ]),
+
+                # apply unwarp to refimg
+                (dn.inputnode,dn.applyantsunwarprefimg,[
+                    ('refimg','input_image')
+                ]),
+                (dn.inputnode,dn.applyantsunwarprefimg,[
+                    ('refimg','reference_image')
+                ]),
+                (dn.get_refimg_transform,dn.applyantsunwarprefimg,[
+                    ('transform','transforms')
+                ]),
+
+                # create the basename
+                (dn.applyantsunwarp,dn.create_prefix,[
+                    ('output_image','filename')
+                ]),
+
+                # realign images to the unwarped reference image
+                (dn.create_prefix,dn.realign,[
                     ('basename','output_prefix')
                 ]),
-                (dn.warp_refimg,dn.ants_fmc,[
-                    ('unwarped_file','fixed_image')
+                (dn.applyantsunwarprefimg,dn.realign,[
+                    ('output_image','fixed_image')
                 ]),
-                (dn.inputnode,dn.ants_fmc,[
-                    ('refimg','moving_image')
+                (dn.applyantsunwarp,dn.realign,[
+                    ('output_image','moving_image')
                 ]),
 
-                # Save out unwarped files for QC
-                (dn.ants_fmc,dn.datasink,[
-                    ('warped_image','p3_QC.fieldmapcorrection.@refimg_unwarped')
+                # combine the unwarp and realign into one transform
+                (dn.avg_epi,dn.combine_transforms,[
+                    ('out_file','avgepi')
                 ]),
-                (dn.warp_refimg,dn.datasink,[
-                    ('unwarped_file','p3_QC.fieldmapcorrection.@refimg_unwarped_fsl')
+                (dn.applyantsunwarp,dn.combine_transforms,[
+                    ('output_image','reference')
+                ]),
+                (dn.convertvsm2antswarp,dn.combine_transforms,[
+                    ('out_file','unwarp')
+                ]),
+                (dn.realign,dn.combine_transforms,[
+                    ('out_matrix','realign')
+                ]),
+
+                # output to datasink
+                (dn.realign,dn.datasink,[
+                    ('warped_image','p3_QC.fieldmapcorrection.@unwarped_realigned')
+                ]),
+                (dn.applyantsunwarprefimg,dn.datasink,[
+                    ('output_image','p3_QC.fieldmapcorrection.@unwarped_refimg')
+                ]),
+                (dn.applyantsunwarp,dn.datasink,[
+                    ('output_image','p3_QC.fieldmapcorrection.@unwarped')
+                ]),
+                (dn.avg_epi,dn.datasink,[
+                    ('out_file','p3_QC.fieldmapcorrection.@avgimg')
                 ]),
                 (dn.inputnode,dn.datasink,[
                     ('refimg','p3_QC.fieldmapcorrection.@refimg')
                 ]),
 
                 # Output unwarp outputs for fmc to output node
-                (dn.ants_fmc,dn.outputnode,[
-                    ('warped_image','refimg')
+                (dn.applyantsunwarprefimg,dn.outputnode,[
+                    ('output_image','refimg')
                 ]),
-                (dn.ants_fmc,dn.outputnode,[
-                    ('out_matrix','affine_fmc')
-                ]),
-                (dn.ants_fmc,dn.outputnode,[
-                    ('forward_warp_field','warp_fmc')
+                (dn.combine_transforms,dn.outputnode,[
+                    ('fmc_warp','warp_fmc')
                 ])
             ])
         else:

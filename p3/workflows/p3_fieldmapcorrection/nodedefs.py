@@ -24,12 +24,18 @@ class definednodes(basenodedefs):
 
         # define input/output node
         self.set_input(['func','refimg','func_aligned'])
-        self.set_output(['affine_fmc','warp_fmc','refimg'])
+        self.set_output(['warp_fmc','refimg'])
 
         # define datasink substitutions
         self.set_subs([
-            ('_roi','_reference'),
-            ('_Warped','_ANTs'),
+            ('_roi','_reference')
+        ])
+
+        # define regex substitutions
+        self.set_resubs([
+            (r'_avg_epi\d{1,3}',''),
+            (r'_applyantsunwarp\d{1,3}',''),
+            (r'_realign\d{1,3}','')
         ])
 
         # get magnitude and phase
@@ -151,39 +157,84 @@ class definednodes(basenodedefs):
             name='register_mask'
         )
 
-        # get the values to warp the refimg (the refimg is indexed at 0)
-        self.get_refimg_files = Node(
-            Function(
-                input_names=['dwell_time','fmap_in_file','mask_file','ped'],
-                output_names=['dwell_time','fmap_in_file','mask_file','ped'],
-                function=lambda dwell_time,fmap_in_file,mask_file,ped: (dwell_time[0],fmap_in_file[0],mask_file[0],ped[0])
-            ),
-            name='get_refimg_files'
-        )
-
-        # Warp reference image with fieldmap
-        self.warp_refimg = Node(
+        # unwarp epis fieldmap
+        self.unwarp_epis = MapNode(
             fsl.FUGUE(
                 save_shift=True,
                 output_type='NIFTI_GZ'
             ),
-            name='warp_refimg'
+            iterfield=['in_file','dwell_time','fmap_in_file','mask_file','unwarp_direction'],
+            name='unwarp_epis'
         )
 
-        # create the output name for the registration
-        self.create_prefix = Node(
+        # Convert vsm to ANTS warp
+        self.convertvsm2antswarp = MapNode(
+            Function(
+                input_names=['in_file','ped'],
+                output_names=['out_file'],
+                function=convertvsm2ANTSwarp
+            ),
+            iterfield=['in_file','ped'],
+            name='convertvsm2antswarp'
+        )
+
+        # apply fmc ant warp
+        self.applyantsunwarp = MapNode(
+            ants.ApplyTransforms(
+                out_postfix='_unwarped',
+                num_threads=settings['num_threads']
+            ),
+            iterfield=['input_image','reference_image','transforms'],
+            name='applyantsunwarp'
+        )
+
+        # get refimg transform
+        self.get_refimg_transform = Node(
+            Function(
+                input_names=['transforms'],
+                output_names=['transform'],
+                function=lambda transforms: transforms[0]
+            ),
+            name='get_refimg_transform'
+        )
+
+        # apply fmc ant warp to refimg
+        self.applyantsunwarprefimg = Node(
+            ants.ApplyTransforms(
+                out_postfix='_unwarped',
+                num_threads=settings['num_threads']
+            ),
+            name='applyantsunwarprefimg'
+        )
+
+        # create the output name for the realignment
+        self.create_prefix = MapNode(
             Function(
                 input_names=['filename'],
                 output_names=['basename'],
                 function=get_prefix
             ),
+            iterfield=['filename'],
             name='create_prefix'
         )
 
-        # align the (NOTE: I'm not sure if this is valid, but it was the only way I could get a ANTS warp compatible FMC)
-        self.ants_fmc = Node(
+        # realiqn unwarped to refimgs
+        self.realign = MapNode(
             ants.RegistrationSynQuick(
+                transform_type='a',
                 num_threads=settings['num_threads']
             ),
-            name='ants_fmc'
+            iterfield=['moving_image','output_prefix'],
+            name='realign'
+        )
+
+        # combine transforms
+        self.combine_transforms = MapNode(
+            Function(
+                input_names=['avgepi','reference','unwarp','realign'],
+                output_names=['fmc_warp'],
+                function=combinetransforms
+            ),
+            iterfield=['avgepi','reference','unwarp','realign'],
+            name='combine_transforms'
         )

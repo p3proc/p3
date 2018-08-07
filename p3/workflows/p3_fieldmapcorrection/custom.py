@@ -139,6 +139,91 @@ def fsl_prepare_fieldmap(phasediff,magnitude,TE):
     # return the fieldmap file
     return out_file
 
+def convertvsm2ANTSwarp(in_file,ped):
+    """
+        Convert the voxel shift map to ants warp
+
+        Grabbed this from fmriprep
+        (https://github.com/poldracklab/fmriprep/blob/master/fmriprep/interfaces/itk.py#L178)
+    """
+    import nibabel as nb
+    import numpy as np
+    import os
+    from p3.base import get_basename
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # load file
+    nii = nb.load(in_file)
+
+    phaseEncDim = {'x': 0, 'y': 1, 'z': 2}[ped[0]]
+
+    if len(ped) == 2:
+        phaseEncSign = 1.0
+    else:
+        phaseEncSign = -1.0
+
+    # Fix header
+    hdr = nii.header.copy()
+    hdr.set_data_dtype(np.dtype('<f4'))
+    hdr.set_intent('vector', (), '')
+
+    # Get data, convert to mm
+    data = nii.get_data()
+
+    aff = np.diag([1.0, 1.0, -1.0])
+    if np.linalg.det(aff) < 0 and phaseEncDim != 0:
+       # Reverse direction since ITK is LPS
+       aff *= -1.0
+    aff = aff.dot(nii.affine[:3, :3])
+
+    # scale the data correctly
+    data *= phaseEncSign * nii.header.get_zooms()[phaseEncDim]
+
+    # Add missing dimensions
+    zeros = np.zeros_like(data)
+    field = [zeros, zeros]
+    field.insert(phaseEncDim, data)
+    field = np.stack(field, -1)
+    # Add empty axis
+    field = field[:, :, :, np.newaxis, :]
+
+    # Write out
+    out_file = os.path.join(cwd,'{}_antswarp.nii.gz'.format(get_basename(in_file)))
+    nb.Nifti1Image(field.astype(np.dtype('<f4')), nii.affine, hdr).to_filename(out_file)
+
+    return out_file
+
+def combinetransforms(avgepi,reference,unwarp,realign):
+    import os
+    from p3.base import get_basename
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # get filename to output
+    combined_transforms = os.path.join(cwd,'{}_unwarpedtransform.nii.gz'.format(get_basename(avgepi)))
+
+    # set up transforms
+    transforms = '-t {} -t {}'.format(
+        realign,
+        unwarp
+    )
+
+    # convert the transforms to 4D
+    print('Combining transforms into one warp displacement field...')
+    command = 'antsApplyTransforms -d 3 -o [{},1] {} -r {} -v'.format(
+        combined_transforms,
+        transforms,
+        reference
+    )
+    print(command)
+    os.system(command)
+
+    # return the 4D combined transform
+    return combined_transforms
+
 def get_prefix(filename):
     from p3.base import get_basename
     return '{}_'.format(get_basename(filename))

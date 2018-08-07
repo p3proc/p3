@@ -179,8 +179,7 @@ def default_settings():
             },
         'func':{
             'modality':'func',
-            'task':'rest',
-            'session': 'func01'
+            'task':'rest'
             }
         }
     settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
@@ -289,7 +288,6 @@ def default_settings():
             'source': 'p3_fieldmapcorrection',
             'destination': 'p3_alignfunctoatlas',
             'links': [
-                ['output.affine_fmc','input.affine_fmc'],
                 ['output.warp_fmc','input.warp_fmc'],
                 ['output.refimg','input.refimg']
             ]
