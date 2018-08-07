@@ -1,11 +1,12 @@
 usage: p3proc [-h]
               [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]]
-              [--skip_bids_validator] [-v] [-s SETTINGS] [-g] [-m]
-              [--disable_run] [-w WORKFLOWS [WORKFLOWS ...]] [--summary]
-              [-l LICENSE_FILE]
+              [--skip_bids_validator] [-v] [-s SETTINGS]
+              [-g GENERATE_SETTINGS] [--summary] [--disable_run]
+              [-w WORKFLOWS [WORKFLOWS ...]] [-c CREATE_NEW_WORKFLOW] [-m]
+              [-d]
               [bids_dir] [output_dir] [{participant,group}]
 
-[1mp3[0;0m processing pipeline
+p3 processing pipeline
 
 positional arguments:
   bids_dir              The directory with the input dataset formatted
@@ -39,12 +40,11 @@ optional arguments:
                         should be configured. If no settings file is provided,
                         the pipeline will use internally specified defaults.
                         See docs for more help details.
-  -g, --generate_settings
-                        Generates a default settings file in the current
-                        working directory for use/modification. This option
-                        will ignore all other arguments.
-  -m, --multiproc       Runs pipeline in multiprocessing mode. Note that it is
-                        harder to debug when this option is on.
+  -g GENERATE_SETTINGS, --generate_settings GENERATE_SETTINGS
+                        Generates a default settings file in the provided
+                        directory for use/modification. This option will
+                        ignore all other arguments.
+  --summary             Get a summary of the BIDS dataset input.
   --disable_run         Stop after writing graphs. Does not run pipeline.
                         Useful for making sure your workflow is connected
                         properly before running.
@@ -52,8 +52,8 @@ optional arguments:
                         Other paths p3 should search for workflows. Note that
                         you should have an empty __init__.py so that the
                         directory is importable.
-  --summary             Get a summary of the BIDS dataset input.
-  -l LICENSE_FILE, --license_file LICENSE_FILE
-                        Path to FreeSurfer license key file. To obtain it you
-                        need to register (for free) at
-                        https://surfer.nmr.mgh.harvard.edu/registration.html
+  -c CREATE_NEW_WORKFLOW, --create_new_workflow CREATE_NEW_WORKFLOW
+                        Creates workflow template at provided path.
+  -m, --multiproc       Runs pipeline in multiprocessing mode. Note that it is
+                        harder to debug when this option is on.
+  -d, --verbose         Enable verbose debugging mode.

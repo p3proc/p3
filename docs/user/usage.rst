@@ -1,8 +1,7 @@
-.. Usage:
+.. _Usage:
 
 Usage
 =====
-
 .. note::
 
     The examples in this document use the non-container version of
@@ -18,7 +17,22 @@ Usage
         singularity run vanandrew_p3.simg /dataset /output
 
     These are just examples. You still need to mount/bind the host volumes
-    to access your data see the `Docker Volume`_ and `Singularity Bind`_ documentation.
+    to access your data.
+
+    .. code:: bash
+
+        # mounting in docker is -v
+        docker run -it --rm \
+        -v /path/on/host:/path/on/image \
+        vanandrew/p3 /path/on/image/dataset /path/on/image/output
+
+        # mounting in singularity is -B
+        singularity run \
+        -B /path/on/host:/path/on/image \
+        vanandrew_p3.simg /path/on/image/dataset /path/on/image/output
+
+    It is recommended to refer to the `Docker Volume`_ and `Singularity Bind`_
+    documentation.
 
 Overview
 --------

@@ -13,11 +13,11 @@ processing streams in an intuitive manner.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contents:
 
     user/install.rst
     user/usage.rst
     user/settings.rst
+    user/outputs.rst
     dev/developers.rst
 
 Quick Usage
