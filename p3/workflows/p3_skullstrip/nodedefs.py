@@ -5,7 +5,7 @@ TODO
 """
 from p3.base import basenodedefs
 from nipype import Node,MapNode
-from nipype.interfaces import afni,fsl
+from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function
 
 class definednodes(basenodedefs):
@@ -141,4 +141,13 @@ class definednodes(basenodedefs):
                 function=lambda T1_list: T1_list[0]
             ),
             name='select0T1'
+        )
+
+        # apply bias field correction
+        self.biasfieldcorrect = Node(
+            ants.N4BiasFieldCorrection(
+                num_threads=settings['num_threads'],
+                copy_header=True
+            ),
+            name='biasfieldcorrect'
         )

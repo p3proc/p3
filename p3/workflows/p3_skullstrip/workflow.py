@@ -102,19 +102,24 @@ class skullstripworkflow(workflowgenerator):
             (dn.maskop4,dn.select0T1,[
                 ('out_file','T1_list')
             ]),
-            
-            # output to output node
-            (dn.select0T1,dn.outputnode,[
-                ('T1_0','T1_skullstrip')
+
+            # apply n4 bias field correction
+            (dn.select0T1,dn.biasfieldcorrect,[
+                ('T1_0','input_image')
             ]),
-            (dn.allineate_orig,dn.outputnode,[ # for creating fs masks
-                ('out_matrix','fs2mpr')
+
+            # output to output node
+            (dn.biasfieldcorrect,dn.outputnode,[
+                ('output_image','T1_skullstrip')
             ]),
 
             # save out skullstrip
             (dn.select0T1,dn.datasink,[
                 ('T1_0','p3_QC.skullstrip.@skullstrip')
-            ])
+            ]),
+            (dn.biasfieldcorrect,dn.datasink,[
+                ('output_image','p3_QC.skullstrip.@biasfieldcorrect')
+            ]),
         ])
 
         # return workflow

@@ -80,7 +80,6 @@ class definednodes(basenodedefs):
                     'dim4',
                     'TR',
                     'affine_func_2_anat',
-                    'warp_func_2_anat',
                     'affine_anat_2_atlas',
                     'warp_anat_2_atlas',
                     'warp_fmc'
@@ -92,10 +91,26 @@ class definednodes(basenodedefs):
            name='combinetransforms'
         )
 
+        # align the reference image to atlas and create a dfnd mask from it
+        self.create_dfnd_mask = Node(
+            Function(
+                input_names=[
+                    'refimg',
+                    'affine_func_2_anat',
+                    'affine_anat_2_atlas',
+                    'warp_anat_2_atlas',
+                    'reference'
+                ],
+                output_names=['mask_file'],
+                function=create_dfnd_mask
+            ),
+            name='create_dfnd_mask'
+        )
+
         # apply nonlinear transform
         self.applytransforms = MapNode(
            Function(
-               input_names=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg'],
+               input_names=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg','dfnd_mask'],
                output_names=['out_file'],
                function=applytransforms
            ),

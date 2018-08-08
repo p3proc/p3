@@ -60,6 +60,9 @@ class alignfunctoanatworkflow(workflowgenerator):
             ]),
             (dn.align_func_2_anat,dn.datasink,[
                 ('warped_image','p3_QC.alignfunctoanat.@epi_aligned_t1')
+            ]),
+            (dn.inputnode,dn.datasink,[
+                ('T1_skullstrip','p3_QC.alignfunctoanat.@T1')
             ])
         ])
 

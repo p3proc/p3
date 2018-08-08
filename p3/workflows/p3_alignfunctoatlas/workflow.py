@@ -62,6 +62,23 @@ class alignfunctoatlasworkflow(workflowgenerator):
                 ('warp_anat_2_atlas','warp_anat_2_atlas')
             ]),
 
+            # create dfnd mask
+            (dn.inputnode,dn.create_dfnd_mask,[
+                ('refimg','refimg')
+            ]),
+            (dn.inputnode,dn.create_dfnd_mask,[
+                ('affine_func_2_anat','affine_func_2_anat')
+            ]),
+            (dn.inputnode,dn.create_dfnd_mask,[
+                ('affine_anat_2_atlas','affine_anat_2_atlas')
+            ]),
+            (dn.inputnode,dn.create_dfnd_mask,[
+                ('warp_anat_2_atlas','warp_anat_2_atlas')
+            ]),
+            (dn.resample,dn.create_dfnd_mask,[
+                ('out_file','reference')
+            ]),
+
             # Create Atlas-Registered BOLD Data
             (dn.inputnode,dn.applytransforms,[
                ('func_stc_despike','in_file')
@@ -74,6 +91,9 @@ class alignfunctoatlasworkflow(workflowgenerator):
             ]),
             (dn.inputnode,dn.applytransforms,[
                 ('warp_func_2_refimg','warp_func_2_refimg')
+            ]),
+            (dn.create_dfnd_mask,dn.applytransforms,[
+                ('mask_file','dfnd_mask')
             ]),
 
             # output to output node

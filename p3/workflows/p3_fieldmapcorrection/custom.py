@@ -213,7 +213,7 @@ def combinetransforms(avgepi,reference,unwarp,realign):
 
     # convert the transforms to 4D
     print('Combining transforms into one warp displacement field...')
-    command = 'antsApplyTransforms -d 3 -o [{},1] {} -r {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 3 -o [{},1] {} -r {} -v'.format(
         combined_transforms,
         transforms,
         reference

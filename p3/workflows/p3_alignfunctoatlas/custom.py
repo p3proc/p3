@@ -70,7 +70,7 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
 
     # convert the transforms to 4D
     print('Combining transforms into one warp displacement field...')
-    command = 'antsApplyTransforms -d 3 -o [{},1] {} -r {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 3 -o [{},1] {} -r {} -v'.format(
         combined_transforms,
         transforms,
         reference
@@ -92,7 +92,38 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
     # return the 4D combined transform
     return combined_transforms4D
 
-def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg):
+def create_dfnd_mask(refimg,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_atlas,reference):
+    import os
+    from p3.base import get_basename
+
+    # get the current node directory
+    cwd = os.getcwd()
+
+    # get filename to output
+    out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(get_basename(refimg)))
+    mask_file = os.path.join(cwd,'{}_atlas_dfnd.nii.gz'.format(get_basename(refimg)))
+
+    # create dfnd mask
+    command = 'antsApplyTransforms -f 0.0 -d 3 -o [{}] -i {} -t {} -t {} -t {} -r {} -v'.format(
+        out_file,
+        refimg,
+        warp_anat_2_atlas,
+        affine_anat_2_atlas,
+        affine_func_2_anat,
+        reference
+    )
+    print(command)
+    os.system(command)
+
+    # convert to binary
+    os.system('fslmaths {} -bin {}'.format(
+        out_file,
+        mask_file
+    ))
+
+    return mask_file
+
+def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg,dfnd_mask):
     import os
     from p3.base import get_basename
 
@@ -103,7 +134,7 @@ def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg
     out_file = os.path.join(cwd,'{}_moco_atlas.nii.gz'.format(get_basename(in_file)))
 
     # set up command to run
-    command = 'antsApplyTransforms -d 4 -i {} -r {} -o {} -t {} -t {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 4 -i {} -r {} -o {} -t {} -t {} -v'.format(
         in_file,
         reference4D,
         out_file,
@@ -114,6 +145,13 @@ def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg
 
     # apply transforms
     os.system(command)
+
+    # mask the aligned func with the dfnd mask
+    print('Applying dfnd mask...')
+    os.system('fslmaths {0} -mul {1} {0}'.format(
+        out_file,
+        dfnd_mask
+    ))
 
     # return moco, atlas-aligned functional image
     return out_file

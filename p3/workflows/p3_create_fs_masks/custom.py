@@ -15,7 +15,7 @@ def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas)
     fs_concat_transform = os.path.join(cwd,'fs_concat_transform.nii.gz')
 
     # setup command for execution
-    command = 'antsApplyTransforms -d 3 -o [{},1] -t {} -t {} -t {} -r {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 3 -o [{},1] -t {} -t {} -t {} -r {} -v'.format(
         fs_concat_transform,
         warp_anat_2_atlas,
         affine_anat_2_atlas,
@@ -41,7 +41,7 @@ def apply_warp(in_file,reference,transform):
     out_file = os.path.join(cwd,'{}_atlas.nii.gz'.format(get_basename(in_file)))
 
     # set up command to run
-    command = 'antsApplyTransforms -d 3 -i {} -r {} -o {} -t {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 3 -i {} -r {} -o {} -t {} -v'.format(
         in_file,
         reference,
         out_file,

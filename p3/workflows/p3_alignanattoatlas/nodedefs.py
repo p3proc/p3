@@ -26,7 +26,8 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_calc_calc_calc_calc_calc_Warped','_atlas')
+            ('_calc_calc_calc_calc_calc',''),
+            ('_Warped','_atlas')
         ])
 
         # create the output name for the registration

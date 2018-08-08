@@ -71,7 +71,7 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
 
     # setup commandline execution
     command = 'antsMotionCorr -d 3 -o [{},{}] -m MI[{},{},{},{},{},{}] -t {}[{}] -u 1 -e 1 ' \
-        '-s {} -f {} -i {} -w {} -v'.format(
+        '-s {} -f {} -i {} -n 1 -w {} -v'.format(
             output_basename,
             output_warpedimg,
             fixed_image,

@@ -36,7 +36,7 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_calc_calc_calc_calc_calc_Warped','_atlas'),
+            ('_calc_calc_calc_calc_calc_corrected_Warped','_corrected_atlas'),
             ('_out',''),
             ('_resample','_funcres'),
             ('_calc_calc_calc_calc_calc','_erode4'),
