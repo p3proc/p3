@@ -104,7 +104,7 @@ def create_dfnd_mask(refimg,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_a
     mask_file = os.path.join(cwd,'{}_atlas_dfnd.nii.gz'.format(get_basename(refimg)))
 
     # create dfnd mask
-    command = 'antsApplyTransforms -f 0.0 -d 3 -o [{}] -i {} -t {} -t {} -t {} -r {} -v'.format(
+    command = 'antsApplyTransforms -f 0.0 -d 3 -o {} -i {} -t {} -t {} -t {} -r {} -v'.format(
         out_file,
         refimg,
         warp_anat_2_atlas,
