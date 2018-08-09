@@ -175,11 +175,12 @@ class definednodes(basenodedefs):
         # Calc FD
         self.calcFD = MapNode(
             Function(
-                input_names=['moco_params','brain_radius'],
-                output_names=['FD'],
+                input_names=['moco_params','brain_radius','threshold'],
+                output_names=['FD','tmask'],
                 function=calcFD
             ),
             iterfield=['moco_params'],
             name='calcFD'
         )
         self.calcFD.inputs.brain_radius = settings['brain_radius']
+        self.calcFD.inputs.threshold = settings['FD_threshold']

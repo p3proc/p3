@@ -99,7 +99,7 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     return(output_warp,output_mocoparams,output_warpedimg)
 
 # calculate FD
-def calcFD(moco_params,brain_radius):
+def calcFD(moco_params,brain_radius,threshold):
     import os
     import math
     from p3.base import get_basename
@@ -109,6 +109,7 @@ def calcFD(moco_params,brain_radius):
 
     # set output filename
     out_file = os.path.join(cwd,'{}.FD'.format(get_basename(moco_params)))
+    tmask_out_file = os.path.join(cwd,'{}.tmask'.format(get_basename(moco_params)))
 
     # open file
     with open(moco_params,'r') as moco_file:
@@ -136,5 +137,11 @@ def calcFD(moco_params,brain_radius):
             FD_file.write(str(val))
             FD_file.write('\n')
 
+    # write tmask to file
+    with open(tmask_out_file,'w') as tmask_file:
+        for val in FD:
+            tmask_file.write(str(int(val<threshold)))
+            tmask_file.write('\n')
+
     # return the FD file
-    return out_file
+    return out_file,tmask_out_file

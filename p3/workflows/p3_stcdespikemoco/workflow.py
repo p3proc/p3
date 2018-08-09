@@ -87,6 +87,9 @@ class stcdespikemocoworkflow(workflowgenerator):
             (dn.calcFD,dn.datasink,[ # FD values
                 ('FD','p3.@FD')
             ]),
+            (dn.calcFD,dn.datasink,[ # tmask values
+                ('tmask','p3.@tmask')
+            ]),
         ])
 
         # Conditionals for Time Shift/Despiking

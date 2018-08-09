@@ -193,6 +193,8 @@ def default_settings():
     settings['run_recon_all'] = True # sets whether pipeline should run recon-all (if you decide not to you should place your own p3_freesurfer data under output p3_freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
     settings['num_threads'] = 8 # sets the number of threads for ANTS registration
     settings['brain_radius'] = 50 # brain radius for FD calculations (in mm)
+    settings['FD_threshold'] = 0.2 # FD threshold for creating tmasks
+    settings['FD_filtered_threshold'] = 0.1 # Filtered FD threshold for filtered tmask
     settings['workflows'] = [ # defines the workflows to import
             'p3_bidsselector',
             'p3_freesurfer',
