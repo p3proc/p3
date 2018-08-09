@@ -51,7 +51,7 @@ class definednodes(basenodedefs):
         self.despike = MapNode(
             ExtendedDespike(
                 args="-ignore {} -NEW -nomask".format(
-                    settings['epi_reference']
+                    settings['func_reference_frame']
                 ),
                 outputtype="NIFTI_GZ"
             ),
@@ -81,7 +81,7 @@ class definednodes(basenodedefs):
         self.tshift = MapNode(
             afni.TShift(
                 args="-heptic",
-                ignore=settings['epi_reference'],
+                ignore=settings['func_reference_frame'],
                 tzero=0,
                 outputtype="NIFTI_GZ"
             ),
@@ -108,17 +108,18 @@ class definednodes(basenodedefs):
         )
 
         # Setup basefile for volreg (pre slice time correction/despike)
-        self.firstrunonly = Node( # this will grab only the first run to feed as a basefile
+        self.refrunonly = Node( # this will grab only the first run to feed as a basefile
             Function(
-                input_names=['epi'],
+                input_names=['epi','run'],
                 output_names=['epi'],
-                function=lambda epi: epi[0]
+                function=lambda epi,run: epi[run]
             ),
-            name='retrievefirstrun'
+            name='refrunonly'
         )
+        self.refrunonly.inputs.run = settings['func_reference_run']
         self.extractroi = Node( # get reference frame of first run
             fsl.ExtractROI(
-                t_min=settings['epi_reference'],
+                t_min=settings['func_reference_frame'],
                 t_size=1,
                 output_type='NIFTI_GZ'
             ),
@@ -126,17 +127,18 @@ class definednodes(basenodedefs):
         )
 
         # Setup basefile for volreg (post slice time correction/despike)
-        self.firstrunonly_post = Node( # this will grab only the first run to feed as a basefile
+        self.refrunonly_post = Node( # this will grab only the first run to feed as a basefile
             Function(
-                input_names=['epi'],
+                input_names=['epi','run'],
                 output_names=['epi'],
-                function=lambda epi: epi[0]
+                function=lambda epi,run: epi[run]
             ),
-            name='retrievefirstrun_post'
+            name='refrunonly_post'
         )
+        self.refrunonly_post.inputs.run = settings['func_reference_run']
         self.extractroi_post = Node( # get reference frame of first run
             fsl.ExtractROI(
-                t_min=settings['epi_reference'],
+                t_min=settings['func_reference_frame'],
                 t_size=1,
                 output_type='NIFTI_GZ'
             ),
@@ -169,3 +171,15 @@ class definednodes(basenodedefs):
             iterfield=['in_file'],
             name='moco_before'
         )
+
+        # Calc FD
+        self.calcFD = MapNode(
+            Function(
+                input_names=['moco_params','brain_radius'],
+                output_names=['FD'],
+                function=calcFD
+            ),
+            iterfield=['moco_params'],
+            name='calcFD'
+        )
+        self.calcFD.inputs.brain_radius = settings['brain_radius']

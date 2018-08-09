@@ -24,10 +24,10 @@ class stcdespikemocoworkflow(workflowgenerator):
             ]),
 
             # Setup basefile for motion correction (pre-stc/despike)
-            (dn.inputnode,dn.firstrunonly,[
+            (dn.inputnode,dn.refrunonly,[
                 ('func','epi')
             ]),
-            (dn.firstrunonly,dn.extractroi,[
+            (dn.refrunonly,dn.extractroi,[
                 ('epi','in_file')
             ]),
 
@@ -39,16 +39,21 @@ class stcdespikemocoworkflow(workflowgenerator):
                 ('func','in_file')
             ]),
 
+            # calculate FD
+            (dn.moco_before,dn.calcFD,[
+                ('oned_file','moco_params')
+            ]),
+
             # Setup basefile for motion correction (post-stc/despike)
-            (dn.stc_despike_pool,dn.firstrunonly_post,[
+            (dn.stc_despike_pool,dn.refrunonly_post,[
                 ('epi','epi')
             ]),
-            (dn.firstrunonly_post,dn.extractroi_post,[
+            (dn.refrunonly_post,dn.extractroi_post,[
                 ('epi','in_file')
             ]),
 
             ### Do motion correction (after stc/despike)
-            # Align to first frame of first run
+            # Align to ref frame of ref run
             (dn.extractroi_post,dn.moco,[
                 ('roi_file','fixed_image')
             ]),
@@ -78,6 +83,9 @@ class stcdespikemocoworkflow(workflowgenerator):
             # output rigid body transform motion params to file before despike/tshift
             (dn.moco_before,dn.datasink,[ # before
                 ('oned_file','p3.@mocobefore')
+            ]),
+            (dn.calcFD,dn.datasink,[ # FD values
+                ('FD','p3.@FD')
             ]),
         ])
 

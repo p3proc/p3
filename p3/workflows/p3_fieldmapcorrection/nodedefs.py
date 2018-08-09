@@ -28,7 +28,9 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('_roi','_reference')
+            ('_roi','_reference'),
+            ('_Warped_mean','_moco'),
+            ('_Warped','_realign')
         ])
 
         # define regex substitutions
@@ -191,12 +193,13 @@ class definednodes(basenodedefs):
         # get refimg transform
         self.get_refimg_transform = Node(
             Function(
-                input_names=['transforms'],
+                input_names=['transforms','run'],
                 output_names=['transform'],
-                function=lambda transforms: transforms[0]
+                function=lambda transforms,run: transforms[run]
             ),
             name='get_refimg_transform'
         )
+        self.get_refimg_transform.inputs.run = settings['func_reference_run']
 
         # apply fmc ant warp to refimg
         self.applyantsunwarprefimg = Node(

@@ -97,3 +97,44 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
 
     # return the outputs
     return(output_warp,output_mocoparams,output_warpedimg)
+
+# calculate FD
+def calcFD(moco_params,brain_radius):
+    import os
+    import math
+    from p3.base import get_basename
+
+    # save to node folder (go up 2 directories bc of iterfield)
+    cwd = os.path.dirname(os.path.dirname(os.getcwd()))
+
+    # set output filename
+    out_file = os.path.join(cwd,'{}.FD'.format(get_basename(moco_params)))
+
+    # open file
+    with open(moco_params,'r') as moco_file:
+        moco_nums = moco_file.readlines()
+
+    # format the moco numbers from strings to float
+    f_moco_nums = [tuple(map(float,list(filter(bool,moco_num.rstrip().split("  "))))) for moco_num in moco_nums]
+    fr_moco_nums = [(
+        f_moco_num[0]*brain_radius*math.pi/180,
+        f_moco_num[1]*brain_radius*math.pi/180,
+        f_moco_num[2]*brain_radius*math.pi/180,
+        f_moco_num[3],
+        f_moco_num[4],
+        f_moco_num[5]
+        ) for f_moco_num in f_moco_nums]
+
+    # calculate FD
+    FD = [0]
+    for f1,f2 in zip(fr_moco_nums[0:-1],fr_moco_nums[1:]):
+        FD.append(sum(map(abs,[v1 - v2 for v1,v2 in zip(f1,f2)])))
+
+    # write FD to file
+    with open(out_file,'w') as FD_file:
+        for val in FD:
+            FD_file.write(str(val))
+            FD_file.write('\n')
+
+    # return the FD file
+    return out_file

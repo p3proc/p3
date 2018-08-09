@@ -182,8 +182,8 @@ def default_settings():
             'task':'rest'
             }
         }
-    settings['epi_reference'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
-    settings['num_threads'] = 8 # sets the number of threads for ANTS registration
+    settings['func_reference_run'] = 0 # selects the epi run to take the reference image from (It is 0 indexed)
+    settings['func_reference_frame'] = 4 # selects the epi reference frame to use (It is 0 indexed, and taken from the first run)
     settings['anat_reference'] = 0 # selects the T1 to align to if multiple T1 images in dataset (It is 0 indexed. T1s are order from lowest session,lowest run to highest session,highest run. Leave as 0 if only 1 T1)
     settings['atlas'] = 'MNI152.nii.gz' # sets the atlas align target
     settings['avganats'] = True # avgs all T1s in dataset if multiple T1s (Set this to False if you only have 1 T1 or you will probably get an error!)
@@ -191,6 +191,8 @@ def default_settings():
     settings['slice_time_correction'] = True # sets whether epi images should be slice time corrected
     settings['despiking'] = True # sets whether epi images should be despiked
     settings['run_recon_all'] = True # sets whether pipeline should run recon-all (if you decide not to you should place your own p3_freesurfer data under output p3_freesurfer_output, where each folder is {NAME} in sub-{NAME} in the bids dataset)
+    settings['num_threads'] = 8 # sets the number of threads for ANTS registration
+    settings['brain_radius'] = 50 # brain radius for FD calculations (in mm)
     settings['workflows'] = [ # defines the workflows to import
             'p3_bidsselector',
             'p3_freesurfer',

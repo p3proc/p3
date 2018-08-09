@@ -15,7 +15,7 @@ avganats
 anat_reference
 --------------
 
-epi_reference
+func_reference_frame
 -------------
 
 num_threads
