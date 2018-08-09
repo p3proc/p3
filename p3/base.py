@@ -114,6 +114,11 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     # connect nodes
     p3.connect(connections)
 
+    # apply sideloads
+    print(p3.get_node('p3_skullstrip.output').inputs)
+    sideload_nodes(p3,settings)
+    print(p3.get_node('p3_skullstrip.output').inputs)
+
     # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
@@ -124,6 +129,14 @@ def create_and_run_p3_workflow(imported_workflows,settings):
             p3.run(plugin='MultiProc')
         else:
             p3.run()
+
+def sideload_nodes(p3,settings):
+    """
+        Sideload values into nodes
+    """
+    for sideload in settings ['sideload']:
+        nodename = '{}.{}'.format(sideload['workflow'],sideload['node'])
+        p3.get_node(nodename).set_input(sideload['input'][0],sideload['input'][1])
 
 def generate_subworkflows(imported_workflows,settings):
     """
@@ -342,6 +355,13 @@ def default_settings():
                 ['output.anat','input.T1'],
             ]
         }
+    ]
+    settings['sideload'] = [
+        {
+            'workflow': 'p3_skullstrip',
+            'node': 'output',
+            'input': ['T1_skullstrip','/home/vanandrew/test.nii.gz']
+        },
     ]
 
     # return settings
