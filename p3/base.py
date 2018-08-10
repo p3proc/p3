@@ -115,9 +115,7 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     p3.connect(connections)
 
     # apply sideloads
-    print(p3.get_node('p3_skullstrip.output').inputs)
-    sideload_nodes(p3,settings)
-    print(p3.get_node('p3_skullstrip.output').inputs)
+    sideload_nodes(p3,connections,settings)
 
     # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
@@ -130,13 +128,47 @@ def create_and_run_p3_workflow(imported_workflows,settings):
         else:
             p3.run()
 
-def sideload_nodes(p3,settings):
+def sideload_nodes(p3,connections,settings):
     """
         Sideload values into nodes
     """
-    for sideload in settings ['sideload']:
+    # loop over sideload list and set the input for the node
+    for sideload in settings['sideload']:
+        # construct the node name
         nodename = '{}.{}'.format(sideload['workflow'],sideload['node'])
+        # set the input for the selected field
         p3.get_node(nodename).set_input(sideload['input'][0],sideload['input'][1])
+
+        # get edge list for the entire pipeline
+        edge_list = p3._graph.edges
+        # find edges of the destination node whose input we are overriding
+        edge_dest = [edge for edge in edge_list if edge[1].name == sideload['workflow']]
+        for edge in edge_dest:
+            edge_data = p3._graph.get_edge_data(*edge) # get edge data
+            # check if the connection contains the field we are trying to replace
+            for connection in edge_data['connect']:
+                # disconnect the nodes if it is the field we are replacing
+                if connection[1] == '{}.{}'.format(sideload['node'],sideload['input'][0]):
+                    p3.disconnect(edge[0],connection[0],edge[1],connection[1])
+                    print('Disconnect: {}'.format((edge[0].name,connection[0],edge[1].name,connection[1])))
+
+        # get the edge list for the workflow
+        edge_list = p3.get_node(sideload['workflow'])._graph.edges
+        # find edges of the destination node whose input we are overriding
+        edge_dest = [edge for edge in edge_list if edge[1].name == sideload['node']]
+        # loop through each edge pair and check if the field we are side loading exists with that pair
+        for edge in edge_dest:
+            edge_data = p3.get_node(sideload['workflow'])._graph.get_edge_data(*edge) # get edge data
+            # check if the connection contains the field we are trying to replace
+            for connection in edge_data['connect']:
+                # disconnect the nodes if it is the field we are replacing
+                if connection[1] == '{}'.format(sideload['input'][0]):
+                    p3.get_node(sideload['workflow']).disconnect(edge[0],connection[0],edge[1],connection[1])
+                    print('Disconnect: {}'.format((edge[0].name,connection[0],edge[1].name,connection[1])))
+
+        # print sideload status
+        print('\nSideload Status for node {}.{}:'.format(sideload['workflow'],sideload['node']))
+        print(p3.get_node('{}.{}'.format(sideload['workflow'],sideload['node'])).inputs)
 
 def generate_subworkflows(imported_workflows,settings):
     """
@@ -356,13 +388,7 @@ def default_settings():
             ]
         }
     ]
-    settings['sideload'] = [
-        {
-            'workflow': 'p3_skullstrip',
-            'node': 'output',
-            'input': ['T1_skullstrip','/home/vanandrew/test.nii.gz']
-        },
-    ]
+    settings['sideload'] = []
 
     # return settings
     return settings
