@@ -54,7 +54,7 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp,threads):
     from p3.utility import get_basename
 
     # set number of threads
-    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = threads
+    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = str(threads)
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
