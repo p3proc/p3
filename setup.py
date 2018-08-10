@@ -1,8 +1,7 @@
+#!/usr/bin/env python3.6
 import setuptools
 import os
-
-# get version
-__version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'version')).read()
+from p3 import __version__
 
 with open("README.md","r") as fh:
     long_description = fh.read()
@@ -16,7 +15,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/vanandrew/p3",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=["tests"]),
+    include_package_data=True,
+    scripts=['p3proc'],
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

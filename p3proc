@@ -12,13 +12,8 @@ from glob import glob
 from p3.pipeline import create_and_run_p3_workflow
 from p3.settings import default_preproc_settings
 from p3.utility import output_BIDS_summary
-from p3 import workflows # import default workflows
-
-# set default workflows path
-sys.path.append(os.path.abspath(os.path.dirname(workflows.__file__)))
-
-# get version
-__version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),'version')).read()
+from p3 import workflows,__version__ # import default workflows
+sys.path.append(os.path.abspath(os.path.dirname(workflows.__file__))) # set default workflows path
 
 def main():
     """
@@ -77,7 +72,8 @@ def main():
                         'for making sure your workflow is connected properly before running.',
                         action='store_true')
     parser.add_argument('-w','--workflows', help='Other paths p3 should search for workflows. Note that you '
-                        'should have an empty __init__.py so that the directory is importable.',
+                        'should have at least an empty __init__.py so that the directory is importable. See '
+                        'the documentation for more details.',
                         nargs="+")
     parser.add_argument('-c','--create_new_workflow',help='Creates workflow template at provided path.')
     parser.add_argument('-m', '--multiproc', help='Runs pipeline in multiprocessing mode. Note that it '
