@@ -195,12 +195,9 @@ def convertvsm2ANTSwarp(in_file,ped):
 
     return out_file
 
-def combinetransforms(avgepi,reference,unwarp,realign,threads):
+def combinetransforms(avgepi,reference,unwarp,realign):
     import os
     from p3.utility import get_basename
-
-    # set number of threads
-    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = threads
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))

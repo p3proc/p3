@@ -19,10 +19,6 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # set threads to 1 if multiproc set
-        if settings['multiproc']:
-            settings['num_threads'] = 1
-
         # define input/output node
         self.set_input(['T1','orig','brainmask'])
         self.set_output(['T1_skullstrip','allineate_freesurfer2anat'])

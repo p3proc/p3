@@ -21,10 +21,6 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # set threads to 1 if multiproc set
-        if settings['multiproc']:
-            settings['num_threads'] = 1
-
         # define input/output node
         self.set_input([
             'func', # I pass this in so I can get the TR info from BIDS
@@ -87,8 +83,7 @@ class definednodes(basenodedefs):
                     'affine_func_2_anat',
                     'affine_anat_2_atlas',
                     'warp_anat_2_atlas',
-                    'warp_fmc',
-                    'threads'
+                    'warp_fmc'
                     ],
                output_names=['combined_transforms4D'],
                function=combinetransforms
@@ -96,7 +91,6 @@ class definednodes(basenodedefs):
            iterfield=['func','dim4','TR','warp_fmc'],
            name='combinetransforms'
         )
-        self.combinetransforms.inputs.threads = settings['num_threads']
 
         # align the reference image to atlas and create a dfnd mask from it
         self.create_dfnd_mask = Node(
@@ -106,24 +100,21 @@ class definednodes(basenodedefs):
                     'affine_func_2_anat',
                     'affine_anat_2_atlas',
                     'warp_anat_2_atlas',
-                    'reference',
-                    'threads'
+                    'reference'
                 ],
                 output_names=['mask_file'],
                 function=create_dfnd_mask
             ),
             name='create_dfnd_mask'
         )
-        self.create_dfnd_mask.inputs.threads = settings['num_threads']
 
         # apply nonlinear transform
         self.applytransforms = MapNode(
            Function(
-               input_names=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg','dfnd_mask','threads'],
+               input_names=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg','dfnd_mask'],
                output_names=['out_file'],
                function=applytransforms
            ),
            iterfield=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg'],
            name='applytransforms'
         )
-        self.applytransforms.inputs.threads = settings['num_threads']

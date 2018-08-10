@@ -20,10 +20,6 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # set threads to 1 if multiproc set
-        if settings['multiproc']:
-            settings['num_threads'] = 1
-
         # define input/output node
         self.set_input(['refimg','T1_skullstrip'])
         self.set_output(['affine_func_2_anat','warp_func_2_anat'])

@@ -21,10 +21,6 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
-        # set threads to 1 if multiproc set
-        if settings['multiproc']:
-            settings['num_threads'] = 1
-
         # define input/output node
         self.set_input(['func'])
         self.set_output(['refimg','func_stc_despike','warp_func_2_refimg','func_aligned'])
@@ -152,7 +148,7 @@ class definednodes(basenodedefs):
         # Moco (after)
         self.moco = MapNode(
             Function(
-                input_names=['fixed_image','moving_image','transform','writewarp','threads'],
+                input_names=['fixed_image','moving_image','transform','writewarp'],
                 output_names=['warp','mocoparams','warped_img'],
                 function=antsMotionCorr
             ),
@@ -161,7 +157,6 @@ class definednodes(basenodedefs):
         )
         self.moco.inputs.transform = 'Rigid'
         self.moco.inputs.writewarp = True
-        self.moco.inputs.threads = settings['num_threads']
 
         # Moco (before)
         self.moco_before = MapNode(
