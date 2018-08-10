@@ -21,6 +21,10 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
+        # set threads to 1 if multiproc set
+        if settings['multiproc']:
+            settings['num_threads'] = 1
+
         # define input/output node
         self.set_input(['T1_skullstrip'])
         self.set_output(['affine_anat_2_atlas','warp_anat_2_atlas','anat_atlas'])

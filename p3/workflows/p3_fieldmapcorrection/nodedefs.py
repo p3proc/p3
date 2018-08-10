@@ -22,6 +22,10 @@ class definednodes(basenodedefs):
         # call base constructor
         super().__init__(settings)
 
+        # set threads to 1 if multiproc set
+        if settings['multiproc']:
+            settings['num_threads'] = 1
+
         # define input/output node
         self.set_input(['func','refimg','func_aligned'])
         self.set_output(['warp_fmc','refimg'])
@@ -234,10 +238,11 @@ class definednodes(basenodedefs):
         # combine transforms
         self.combine_transforms = MapNode(
             Function(
-                input_names=['avgepi','reference','unwarp','realign'],
+                input_names=['avgepi','reference','unwarp','realign','threads'],
                 output_names=['fmc_warp'],
                 function=combinetransforms
             ),
             iterfield=['avgepi','reference','unwarp','realign'],
             name='combine_transforms'
         )
+        self.combine_transforms.inputs.threads = settings['num_threads']
