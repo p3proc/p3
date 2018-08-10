@@ -45,7 +45,7 @@ def combinetransforms(func,reference,dim4,TR,affine_func_2_anat,affine_anat_2_at
     from p3.utility import get_basename
 
     # set number of threads
-    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = str(threads)
+    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = threads
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -100,7 +100,7 @@ def create_dfnd_mask(refimg,affine_func_2_anat,affine_anat_2_atlas,warp_anat_2_a
     from p3.utility import get_basename
 
     # set number of threads
-    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = str(threads)
+    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = threads
 
     # get the current node directory
     cwd = os.getcwd()
@@ -134,7 +134,7 @@ def applytransforms(in_file,reference4D,combined_transforms4D,warp_func_2_refimg
     from p3.utility import get_basename
 
     # set number of threads
-    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = str(threads)
+    os.environ['ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS'] = threads
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
