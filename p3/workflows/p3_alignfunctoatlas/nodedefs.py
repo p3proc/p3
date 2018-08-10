@@ -3,7 +3,8 @@
 TODO
 
 """
-from p3.base import basenodedefs,set_atlas_path
+from p3.base import basenodedefs
+from p3.utility import set_atlas_path
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl

@@ -4,13 +4,13 @@ TODO
 
 """
 import os
-from p3.base import basenodedefs,set_atlas_path
+from p3.base import basenodedefs
+from p3.utility import set_atlas_path
 from .custom import *
 from nipype.interfaces import afni,freesurfer,ants
 from nipype.interfaces.io import BIDSDataGrabber
 from nipype.interfaces.utility import Merge,Function
 from nipype import Node,MapNode
-from functools import reduce
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow

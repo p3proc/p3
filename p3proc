@@ -9,12 +9,10 @@ import importlib
 import argparse
 import shutil
 from glob import glob
-from p3.base import (
-    create_and_run_p3_workflow,
-    default_settings,
-    output_BIDS_summary
-    )
-from p3 import workflows
+from p3.pipeline import create_and_run_p3_workflow
+from p3.settings import default_preproc_settings
+from p3.utility import output_BIDS_summary
+from p3 import workflows # import default workflows
 
 # set default workflows path
 sys.path.append(os.path.abspath(os.path.dirname(workflows.__file__)))
@@ -93,7 +91,7 @@ def main():
     # check if generating settings
     if args.generate_settings:
         # get settings
-        settings = default_settings()
+        settings = default_preproc_settings()
         # write settings to file
         with open(os.path.join(args.generate_settings),'w') as settings_file:
             json.dump(settings,settings_file,indent=4,separators=(',',': '))
@@ -149,7 +147,7 @@ def main():
         # get default settings if settings not defined
         if not args.settings:
             print('No settings file defined in input. Using default settings...')
-            settings = default_settings()
+            settings = default_preproc_settings()
         else: # load settings from file
             with open(args.settings,'r') as settings_file:
                 settings = json.load(settings_file)

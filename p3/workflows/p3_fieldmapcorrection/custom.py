@@ -120,7 +120,7 @@ def get_metadata(epi_file,bids_dir):
 
 def fsl_prepare_fieldmap(phasediff,magnitude,TE):
     import os
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -149,7 +149,7 @@ def convertvsm2ANTSwarp(in_file,ped):
     import nibabel as nb
     import numpy as np
     import os
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -197,7 +197,7 @@ def convertvsm2ANTSwarp(in_file,ped):
 
 def combinetransforms(avgepi,reference,unwarp,realign):
     import os
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -225,5 +225,5 @@ def combinetransforms(avgepi,reference,unwarp,realign):
     return combined_transforms
 
 def get_prefix(filename):
-    from p3.base import get_basename
+    from p3.utility import get_basename
     return '{}_'.format(get_basename(filename))

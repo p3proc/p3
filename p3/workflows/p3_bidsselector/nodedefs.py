@@ -4,7 +4,7 @@ TODO
 
 """
 import os
-from p3.base import basenodedefs,check_query
+from p3.base import basenodedefs
 from .custom import *
 from nipype.interfaces import afni
 from nipype.interfaces.io import BIDSDataGrabber

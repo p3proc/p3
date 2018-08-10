@@ -51,7 +51,7 @@ class ExtendedDespike(afni.Despike):
 # define a custom function for the antsMotionCorr
 def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     import os
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -102,7 +102,7 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
 def calcFD(moco_params,brain_radius,threshold):
     import os
     import math
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))

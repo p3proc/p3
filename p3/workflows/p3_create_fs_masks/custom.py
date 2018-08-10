@@ -32,7 +32,7 @@ def join_warps(reference,affine_fs_2_anat,affine_anat_2_atlas,warp_anat_2_atlas)
 
 def apply_warp(in_file,reference,transform):
     import os
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # get cwd
     cwd = os.getcwd()
@@ -61,7 +61,7 @@ def resample_2_epi(T1,epi,aparc_aseg=None):
     """
     import os
     import shutil
-    from p3.base import get_basename
+    from p3.utility import get_basename
 
     # get cwd
     cwd = os.getcwd()
