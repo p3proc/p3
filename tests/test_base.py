@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import sys
-sys.path.append("..")
 import unittest
 from p3.base import *
 from p3.settings import default_preproc_settings

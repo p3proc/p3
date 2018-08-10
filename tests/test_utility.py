@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import sys
-sys.path.append("..")
 import unittest
 from p3.utility import *
+import p3
 import os
 
 class test(unittest.TestCase):
@@ -21,7 +20,8 @@ class test(unittest.TestCase):
         )
 
     def test_set_atlas_path(self):
-        manual_path = os.path.abspath("../p3/templates/MNI152.nii.gz")
+        root_path = os.path.dirname(os.path.abspath(os.path.realpath(p3.__file__)))
+        manual_path = os.path.join(root_path,"templates","MNI152.nii.gz")
         self.assertEqual(
             set_atlas_path(
                 "MNI152.nii.gz"
