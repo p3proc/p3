@@ -91,6 +91,7 @@ class definednodes(basenodedefs):
            iterfield=['func','dim4','TR','warp_fmc'],
            name='combinetransforms'
         )
+        self.combinetransforms.n_procs = settings['num_threads']
 
         # align the reference image to atlas and create a dfnd mask from it
         self.create_dfnd_mask = Node(
@@ -107,6 +108,7 @@ class definednodes(basenodedefs):
             ),
             name='create_dfnd_mask'
         )
+        self.create_dfnd_mask.n_procs = settings['num_threads']
 
         # apply nonlinear transform
         self.applytransforms = MapNode(
@@ -118,3 +120,4 @@ class definednodes(basenodedefs):
            iterfield=['in_file','reference4D','combined_transforms4D','warp_func_2_refimg'],
            name='applytransforms'
         )
+        self.applytransforms.n_procs = settings['num_threads']

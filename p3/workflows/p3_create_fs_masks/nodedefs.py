@@ -96,6 +96,7 @@ class definednodes(basenodedefs):
             ),
             name='align_fs_2_anat'
         )
+        self.align_fs_2_anat.n_procs = settings['num_threads']
 
         # join warps (leave defaults for nonlinear warp)
         self.join_warps = Node(

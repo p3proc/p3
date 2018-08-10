@@ -189,6 +189,7 @@ class definednodes(basenodedefs):
             iterfield=['input_image','reference_image','transforms'],
             name='applyantsunwarp'
         )
+        self.applyantsunwarp.n_procs = settings['num_threads']
 
         # get refimg transform
         self.get_refimg_transform = Node(
@@ -209,6 +210,7 @@ class definednodes(basenodedefs):
             ),
             name='applyantsunwarprefimg'
         )
+        self.applyantsunwarprefimg.n_procs = settings['num_threads']
 
         # create the output name for the realignment
         self.create_prefix = MapNode(
@@ -230,6 +232,7 @@ class definednodes(basenodedefs):
             iterfield=['moving_image','output_prefix'],
             name='realign'
         )
+        self.realign.n_procs = settings['num_threads']
 
         # combine transforms
         self.combine_transforms = MapNode(
@@ -241,3 +244,4 @@ class definednodes(basenodedefs):
             iterfield=['avgepi','reference','unwarp','realign'],
             name='combine_transforms'
         )
+        self.combine_transforms.n_procs = settings['num_threads']

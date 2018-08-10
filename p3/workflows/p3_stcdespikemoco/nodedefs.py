@@ -157,6 +157,7 @@ class definednodes(basenodedefs):
         )
         self.moco.inputs.transform = 'Rigid'
         self.moco.inputs.writewarp = True
+        self.moco.n_procs = settings['num_threads']
 
         # Moco (before)
         self.moco_before = MapNode(

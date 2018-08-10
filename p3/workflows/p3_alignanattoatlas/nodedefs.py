@@ -49,3 +49,4 @@ class definednodes(basenodedefs):
             name='atlasregister'
         )
         self.register.inputs.fixed_image = set_atlas_path(settings['atlas']) # get atlas image
+        self.register.n_procs = settings['num_threads']

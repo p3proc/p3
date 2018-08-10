@@ -92,3 +92,4 @@ class definednodes(basenodedefs):
             ),
             name='align_func_2_anat'
         )
+        self.align_func_2_anat.n_procs = settings['num_threads']
