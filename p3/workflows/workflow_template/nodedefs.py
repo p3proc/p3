@@ -11,20 +11,20 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output nodes
-        self.setinput([
+        # self.setinput([
             # input fields go here
-        ])
-        self.setoutput([
+        # ])
+        # self.setoutput([
             # output fields go here
-        ])
+        # ])
 
         # define datasink substitutions
-        self.set_subs([
+        # self.set_subs([
             # simple substitutions go here
-        ])
-        self.set_resubs([
+        # ])
+        # self.set_resubs([
             # regex substitutions go here
-        ])
+        # ])
 
         # Any nodes should go under self.[node name]
         # Nodes are called in workflow through the prefix "dn.[node name]"

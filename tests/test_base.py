@@ -3,6 +3,7 @@ import unittest
 from p3.base import *
 from p3.settings import default_preproc_settings
 from nipype import Node,Workflow
+import tempfile
 
 class test(unittest.TestCase):
     def test_basenodedefs(self):
@@ -35,7 +36,7 @@ class test(unittest.TestCase):
         )
     def test_workflowgnerator(self):
         settings = default_preproc_settings()
-        settings['tmp_dir'] = './'
+        settings['tmp_dir'] = tempfile.TemporaryDirectory().name
         workflowgenerator('test',settings)
         self.assertIsInstance(
             workflowgenerator.workflow,
