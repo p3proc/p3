@@ -43,6 +43,9 @@ class stcdespikemocoworkflow(workflowgenerator):
             (dn.moco_before,dn.calcFD,[
                 ('oned_file','moco_params')
             ]),
+            (dn.extract_stc,dn.calcFD,[
+                ('TR','TR')
+            ]),
 
             # Setup basefile for motion correction (post-stc/despike)
             (dn.stc_despike_pool,dn.refrunonly_post,[
@@ -84,12 +87,13 @@ class stcdespikemocoworkflow(workflowgenerator):
             (dn.moco_before,dn.datasink,[ # before
                 ('oned_file','p3.@mocobefore')
             ]),
-            (dn.calcFD,dn.datasink,[ # FD values
-                ('FD','p3.@FD')
-            ]),
-            (dn.calcFD,dn.datasink,[ # tmask values
-                ('tmask','p3.@tmask')
-            ]),
+            (dn.calcFD,dn.datasink,[
+                ('FD','p3.@FD'), # FD values
+                ('tmask','p3.@tmask'), # tmask
+                ('filt_moco','p3.@filt_moco'), # filtered moco
+                ('filt_FD','p3.@filt_FD'), # filtered FD
+                ('filt_tmask','p3.@filt_tmask'), # filtered tmask
+            ])
         ])
 
         # Conditionals for Time Shift/Despiking

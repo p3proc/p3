@@ -72,6 +72,8 @@ RUN curl -O https://cmake.org/files/v3.12/cmake-3.12.0.tar.gz && \
 ENV ANTSPATH=/ANTs/bin
 ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
+### MOVE ALL OF THIS ABOVE TO ANOTHER BASE IMAGE; BUILD OFF THAT BASE IMAGE ## 
+
 # Install Python Stuff + other dependencies
 ADD requirements.txt /
 RUN pip install -r requirements.txt && apt-get update && apt-get install -y graphviz

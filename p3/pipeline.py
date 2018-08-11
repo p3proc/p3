@@ -1,6 +1,7 @@
 import inspect
 from nipype import Workflow,config,logging
 from .base import workflowgenerator
+from shutil import copy
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """

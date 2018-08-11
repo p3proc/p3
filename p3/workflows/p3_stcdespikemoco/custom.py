@@ -99,10 +99,40 @@ def antsMotionCorr(fixed_image,moving_image,transform,writewarp):
     return(output_warp,output_mocoparams,output_warpedimg)
 
 # calculate FD
-def calcFD(moco_params,brain_radius,threshold):
+def calcFD(moco_params,brain_radius,threshold,filtered_threshold,TR,min_bpm,max_bpm):
     import os
     import math
     from p3.utility import get_basename
+    import numpy as np
+    from scipy import signal
+
+    def respiration_iirnotch(TR_in_sec,bpm_min=18.582,bpm_max=25.7263):
+        """ Function for calculating filter parameters for respiration filter
+
+            Takes in the TR (optional min/max breaths-per-min, bpm_min, bpm_max).
+            Returns the parameters for IIR Notch filter.
+        """
+
+        fs = 1.0/TR_in_sec  # Sampling frequency (Hz)
+        fn = fs/2.0         # Nyquist frequency (Hz)
+
+        # RR MIN
+        rr_min = bpm_min/60.0                              # respiration rate minimum in Hz
+        fa_min = abs(rr_min-math.floor((rr_min+fn)/fs)*fs) # Aliased minimum frequency (Hz)
+        w0_min = fa_min/fn                                 # Normalized minimum frequency
+
+        # RR MAX
+        rr_max = bpm_max/60.0                              # respiration rate maximum in Hz
+        fa_max = abs(rr_max-math.floor((rr_max+fn)/fs)*fs) # Aliased maximum frequency (Hz)
+        w0_max = fa_max/fn                                 # Normalized maximum frequency
+
+        # RR iirnotch filter
+        w0 = np.mean([w0_min,w0_max])      # Mean normalized frequency
+        bw = abs(w0_max-w0_min)            # Normalized bandwidth
+        Q = w0/bw                          # Quality factor
+        b,a = signal.iirnotch(w0,Q)        # Filter design
+
+        return b,a
 
     # save to node folder (go up 2 directories bc of iterfield)
     cwd = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -110,6 +140,9 @@ def calcFD(moco_params,brain_radius,threshold):
     # set output filename
     out_file = os.path.join(cwd,'{}.FD'.format(get_basename(moco_params)))
     tmask_out_file = os.path.join(cwd,'{}.tmask'.format(get_basename(moco_params)))
+    filt_moco_file = os.path.join(cwd,'{}_filtered.1D'.format(get_basename(moco_params)))
+    filt_out_file = os.path.join(cwd,'{}_filtered.FD'.format(get_basename(moco_params)))
+    filt_tmask_out_file = os.path.join(cwd,'{}_filtered.tmask'.format(get_basename(moco_params)))
 
     # open file
     with open(moco_params,'r') as moco_file:
@@ -125,6 +158,24 @@ def calcFD(moco_params,brain_radius,threshold):
         f_moco_num[4],
         f_moco_num[5]
         ) for f_moco_num in f_moco_nums]
+
+    # convert to numpy array and filter the motion numbers
+    np_moco_nums = np.array(f_moco_nums)
+    TR = float(TR) # convert TR to float
+    b,a = respiration_iirnotch(TR,min_bpm,max_bpm) # create filter
+    # filter data (run twice for 4th order)
+    filt_moco_stage1 = signal.filtfilt(b,a,np_moco_nums,axis=0,padtype=None)
+    filt_moco_stage2 = signal.filtfilt(b,a,filt_moco_stage1,axis=0,padtype=None)
+    filt_moco = filt_moco_stage2
+    # Convert rotations to mm
+    filt_moco[:,4:7] = filt_moco[:,4:7]*brain_radius*math.pi/180
+    # Calculate FD values for the series
+    filtered_FD = np.array([np.concatenate(
+            (np.array([0]),np.sum(np.absolute(filt_moco[1:,:]-filt_moco[0:-1,:]),axis=1)
+        ),axis=0)]).transpose()
+    # convert to lists
+    filt_moco = np.ndarray.tolist(filt_moco)
+    filtered_FD = [FD_val[0] for FD_val in np.ndarray.tolist(filtered_FD)]
 
     # calculate FD
     FD = [0]
@@ -143,5 +194,23 @@ def calcFD(moco_params,brain_radius,threshold):
             tmask_file.write(str(int(val<threshold)))
             tmask_file.write('\n')
 
+    # write filtered motion numbers to file
+    with open(filt_moco_file,'w') as fm_file:
+        for val in filt_moco:
+            fm_file.write(' '.join([str(v) for v in val]))
+            fm_file.write('\n')
+
+    # write filtered FD to file
+    with open(filt_out_file,'w') as filt_FD_file:
+        for val in filtered_FD:
+            filt_FD_file.write(str(val))
+            filt_FD_file.write('\n')
+
+    # write filtered tmask to file
+    with open(filt_tmask_out_file,'w') as filt_tmask_file:
+        for val in filtered_FD:
+            filt_tmask_file.write(str(int(val<filtered_threshold)))
+            filt_tmask_file.write('\n')
+
     # return the FD file
-    return out_file,tmask_out_file
+    return out_file,tmask_out_file,filt_moco_file,filt_out_file,filt_tmask_out_file
