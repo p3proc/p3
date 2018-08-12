@@ -41,10 +41,13 @@ class bidsselectorworkflow(workflowgenerator):
                 ]),
 
                 # output QC
-                (dn.alignanattoanat,dn.datasink,[
+                (dn.alignanattoanat,dn.datasink,[ # output of each anatomy image to anatomy reference
                     ('out_file','p3_QC.bidsselector.@alignanattoanat')
                 ]),
-                (dn.avganat,dn.datasink,[
+                (dn.selectanat,dn.datasink,[ # ouptut original images for comparison
+                    ('anat_align','p3_QC.bidsselector.@originals')
+                ]),
+                (dn.avganat,dn.datasink,[ # output of average anatomy image
                     ('avg_anat','p3_QC.bidsselector.@avganat')
                 ])
             ])

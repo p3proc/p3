@@ -27,12 +27,13 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('MOCOparams','_moco')
+            ('MOCOparams','_moco'),
+            ('sub-','func/sub-') # put in func folder
         ])
 
          # define datasink regular expression substitutions
         self.set_resubs([
-            (r'_moco_before\d{1,3}','')
+            (r'_moco_before\d{1,3}/func/','') # dump QC output without func folder
         ])
 
         # extract slice timing so we can pass it to slice time correction

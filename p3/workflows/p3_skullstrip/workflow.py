@@ -113,13 +113,16 @@ class skullstripworkflow(workflowgenerator):
                 ('output_image','T1_skullstrip')
             ]),
 
-            # save out skullstrip
-            (dn.select0T1,dn.datasink,[
+            # save out skullstrip + original
+            (dn.inputnode,dn.datasink,[ # original image
+                ('T1','p3_QC.skullstrip.@T1')
+            ]),
+            (dn.select0T1,dn.datasink,[ # skullstriped file
                 ('T1_0','p3_QC.skullstrip.@skullstrip')
             ]),
-            (dn.biasfieldcorrect,dn.datasink,[
+            (dn.biasfieldcorrect,dn.datasink,[ # bias field corrected image
                 ('output_image','p3_QC.skullstrip.@biasfieldcorrect')
-            ]),
+            ])
         ])
 
         # return workflow

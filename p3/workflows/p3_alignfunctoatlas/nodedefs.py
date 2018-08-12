@@ -4,11 +4,12 @@ TODO
 
 """
 from p3.base import basenodedefs
-from p3.utility import set_atlas_path
+from p3.utility import set_atlas_path,get_basename
 from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl
 from nipype.interfaces.utility import Function
+import os
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
@@ -36,8 +37,11 @@ class definednodes(basenodedefs):
         self.set_output(['func_atlas'])
 
         # define datasink substitutions
+        atlas_base = get_basename(settings['atlas']) # get atlas basename
         self.set_subs([
-            ('_flirt','_funcres')
+            ('_flirt','_funcres'),
+            ('sub-','func/sub-'), # save to func folder
+            (atlas_base,'atlas/{}'.format(atlas_base)) # save resampled atlas to atlas folder
         ])
 
         # grab the resolution of the refimg

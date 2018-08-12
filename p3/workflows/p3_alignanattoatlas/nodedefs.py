@@ -28,7 +28,8 @@ class definednodes(basenodedefs):
         # define datasink substitutions
         self.set_subs([
             ('_calc_calc_calc_calc_calc',''),
-            ('_Warped','_atlas')
+            ('_Warped','_atlas'),
+            ('sub-','anat/sub-') # place file under anat folder
         ])
 
         # create the output name for the registration
