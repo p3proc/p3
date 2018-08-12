@@ -29,7 +29,9 @@ class definednodes(basenodedefs):
         self.set_subs([
             ('_calc_calc_calc_calc_calc',''),
             ('_Warped','_atlas'),
-            ('sub-','anat/sub-') # place file under anat folder
+        ])
+        self.set_resubs([
+            ('sub-(?P<subject>\w+_)','anat/sub-\g<subject>_') # place file under anat folder
         ])
 
         # create the output name for the registration
