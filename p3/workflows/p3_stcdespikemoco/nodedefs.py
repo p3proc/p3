@@ -33,7 +33,9 @@ class definednodes(basenodedefs):
 
          # define datasink regular expression substitutions
         self.set_resubs([
-            (r'_moco_before\d{1,3}/func/','') # dump QC output without func folder
+            ('_moco_before\d{1,3}/',''), # get rid of _moco_before subfolders
+            ('sub-(?P<subject>\w+_)','func/sub-\g<subject>'), # place files under func folder
+            ('func/(?P<filename>\S+).nii.gz','\g<filename>.nii.gz') # ...except for the QC files, it should NOT have a func folder
         ])
 
         # extract slice timing so we can pass it to slice time correction

@@ -44,7 +44,9 @@ class definednodes(basenodedefs):
             ('_calc_calc_calc','_erode2'),
             ('_calc_calc','_erode1'),
             ('_calc','_erode0'),
-            ('sub-','anat/sub-') # place file under anat folder
+        ])
+        self.set_resubs([
+            ('sub-(?P<subject>\w+_)','anat/sub-\g<subject>') # place file under anat folder
         ])
 
         # nipype reconall returns:

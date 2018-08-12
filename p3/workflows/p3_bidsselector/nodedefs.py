@@ -31,7 +31,8 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_resubs([
-            ('_alignanattoanat\d{1,3}','')
+            ('_alignanattoanat\d{1,3}',''),
+            ('bidsselector/sub-(?P<subject>\w+)_','bidsselector/sub-\g<subject>/sub-\g<subject>_') # put raw files under subject
         ])
 
         # parametrize subject for multiple subject processing
