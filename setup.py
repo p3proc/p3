@@ -7,7 +7,7 @@ with open("README.md","r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="p3",
+    name="p3proc",
     version=__version__,
     author="Andrew Van",
     author_email="vanandrew@wustl.edu",
