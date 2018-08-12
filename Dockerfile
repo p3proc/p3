@@ -74,17 +74,12 @@ ENV PATH=${PATH}:${ANTSPATH}:/ANTs/Scripts
 
 ### MOVE ALL OF THIS ABOVE TO ANOTHER BASE IMAGE; BUILD OFF THAT BASE IMAGE ## 
 
-# Install Python Stuff + other dependencies
-ADD requirements.txt /
-RUN pip install -r requirements.txt && apt-get update && apt-get install -y graphviz
+# Install p3proc + other dependencies
+RUN pip install p3proc && apt-get update && apt-get install -y graphviz
 
 # Install bids-validator
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt-get install -y nodejs && npm install -g bids-validator
 
-# Install p3 stuff
-RUN git clone https://github.com/vanandrew/p3.git
-ENV PYTHONPATH=${PYTHONPATH}:/p3
-
 # Set entrypoint
-ENTRYPOINT ["python","/p3/p3proc"]
+ENTRYPOINT ["p3proc"]
