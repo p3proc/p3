@@ -43,7 +43,8 @@ class definednodes(basenodedefs):
             (atlas_base,'atlas/{}'.format(atlas_base)) # save resampled atlas to atlas folder
         ])
         self.set_resubs([
-            ('sub-(?P<subject>\w+_)','func/sub-\g<subject>') # place file under anat folder
+            ('sub-(?P<subject>\w+_)','func/sub-\g<subject>'), # place file under anat folder
+            ('func/sub-(?P<subject>\w+)_ses-(?P<session>\w+)_','func/ses-\g<session>/sub-\g<subject>_ses-\g<session>_') # add session folders if they exist
         ])
 
         # grab the resolution of the refimg

@@ -34,7 +34,8 @@ class definednodes(basenodedefs):
         self.set_resubs([
             ('_moco_before\d{1,3}/',''), # get rid of _moco_before subfolders
             ('sub-(?P<subject>\w+)_','func/sub-\g<subject>_'), # place files under func folder
-            ('func/(?P<filename>\S+).nii.gz','\g<filename>.nii.gz') # ...except for the QC files, it should NOT have a func folder
+            ('func/(?P<filename>\S+).nii.gz','\g<filename>.nii.gz'), # ...except for the QC files, it should NOT have a func folder
+            ('func/sub-(?P<subject>\w+)_ses-(?P<session>\w+)_','func/ses-\g<session>/sub-\g<subject>_ses-\g<session>_') # add session folders if they exist
         ])
 
         # extract slice timing so we can pass it to slice time correction
