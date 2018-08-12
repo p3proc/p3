@@ -17,6 +17,15 @@ setuptools.setup(
     url="https://github.com/vanandrew/p3",
     packages=setuptools.find_packages(exclude=["tests"]),
     include_package_data=True,
+    install_requires=[
+        'nipype >= 1.1.1',
+        'duecredit >= 0.2.2',
+        'pybids >= 0.6.3',
+        'pandas >= 0.23.1',
+        'patsy >= 0.5.0',
+        'numpy == 1.14.5', # at least until warnings on 1.15.0 are fixed
+        'xvfbwrapper >= 0.2.9'
+    ],
     scripts=['p3proc'],
     classifiers=(
         "Programming Language :: Python :: 3",
