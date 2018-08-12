@@ -27,14 +27,13 @@ class definednodes(basenodedefs):
 
         # define datasink substitutions
         self.set_subs([
-            ('MOCOparams','_moco'),
-            ('sub-','func/sub-') # put in func folder
+            ('MOCOparams','_moco')
         ])
 
          # define datasink regular expression substitutions
         self.set_resubs([
             ('_moco_before\d{1,3}/',''), # get rid of _moco_before subfolders
-            ('sub-(?P<subject>\w+)_)','func/sub-\g<subject>'), # place files under func folder
+            ('sub-(?P<subject>\w+)_','func/sub-\g<subject>_'), # place files under func folder
             ('func/(?P<filename>\S+).nii.gz','\g<filename>.nii.gz') # ...except for the QC files, it should NOT have a func folder
         ])
 
