@@ -8,7 +8,7 @@ import tempfile
 class test(unittest.TestCase):
     def test_basenodedefs(self):
         settings = default_preproc_settings()
-        settings['output_dir'] = './'
+        settings['output_dir'] = tempfile.TemporaryDirectory().name
         dn = basenodedefs(settings)
         self.assertIsInstance(
             dn,

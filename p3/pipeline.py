@@ -1,7 +1,8 @@
 import inspect
 from nipype import Workflow,config,logging
 from .base import workflowgenerator
-from shutil import copy
+from shutil import copy2
+import os
 
 def create_and_run_p3_workflow(imported_workflows,settings):
     """
@@ -36,6 +37,10 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     # Create graph images
     p3.write_graph(graph2use='flat',simple_form=False)
     p3.write_graph(graph2use='colored')
+
+    # copy the grpah files to the output directory
+    copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph.png'),settings['output_dir'])
+    copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph_detailed.png'),settings['output_dir'])
 
     # Run pipeline (check multiproc setting)
     if not settings['disable_run']:
