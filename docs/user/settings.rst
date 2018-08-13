@@ -8,7 +8,7 @@ default workflows of p3.
 
 **bids_query**
     Sets the bids query for the bidsselector workflow. The input to this settings key should
-    be a dictionary containing the *anat* and *func* keys. See _pybids docs for more
+    be a dictionary containing the *anat* and *func* keys. See pybids_ docs for more
     information.
 
     .. code::

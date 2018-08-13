@@ -47,7 +47,8 @@ To use the native version of p3. It is recommended to have at least Python 3.6 a
 the easiest way to obtain a copy is from your package manager, or to compile from `Python Source`_.
 If you are on a Mac, the recommended way is through Homebrew_.
 
-After obtaining Python, git clone the repo and install all the Python dependencies in requirements.txt.
+After obtaining Python, you can install p3 in 2 ways. The first is to git clone the repo and
+install all the Python dependencies in requirements.txt.
 
 .. code:: bash
 
@@ -64,6 +65,15 @@ If you are testing with documentation, also install the requirements.txt under t
 
     # This installs the docs dependencies
     pip install -r docs/requirements.txt
+
+The other way is install p3 via pip.
+
+.. code:: bash
+
+    # install via pip
+    pip install p3proc
+
+Note that this method does not let you modify the source code/documentation.
 
 Next you will need to install all of neuroimaging packages required by the default workflows in p3.
 
