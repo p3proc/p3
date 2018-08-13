@@ -128,7 +128,7 @@ here to specify what images to process. For example, in the settings file:
             "epi":
             {
                 "modality": "func",
-                "task: "rest"
+                "task": "rest"
             }
         }
     }

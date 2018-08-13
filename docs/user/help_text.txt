@@ -50,8 +50,9 @@ optional arguments:
                         properly before running.
   -w WORKFLOWS [WORKFLOWS ...], --workflows WORKFLOWS [WORKFLOWS ...]
                         Other paths p3 should search for workflows. Note that
-                        you should have an empty __init__.py so that the
-                        directory is importable.
+                        you should have at least an empty __init__.py so that
+                        the directory is importable. See the documentation for
+                        more details.
   -c CREATE_NEW_WORKFLOW, --create_new_workflow CREATE_NEW_WORKFLOW
                         Creates workflow template at provided path.
   -m, --multiproc       Runs pipeline in multiprocessing mode. Note that it is
