@@ -71,7 +71,7 @@ def get_metadata(epi_file,bids_dir):
     # get effective echo time of phasediff
     echotime1 = layout.get_metadata(phasediff)['EchoTime1']
     echotime2 = layout.get_metadata(phasediff)['EchoTime2']
-    TE = (echotime2 - echotime1)*1000
+    TE = abs(echotime2 - echotime1)*1000
 
     # get the echospacing for the epi image
     echospacing = layout.get_metadata(epi_file)['EffectiveEchoSpacing']
