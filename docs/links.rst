@@ -15,3 +15,4 @@
 .. _FSL: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation
 .. _Freesurfer: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 .. _ANTs: http://stnava.github.io/ANTs/
+.. _`BIDS-Validator`: https://github.com/INCF/bids-validator

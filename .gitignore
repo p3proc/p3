@@ -121,3 +121,6 @@ settings.json
 
 # singularity image
 *.simg
+
+# doc help text
+docs/user/help_text.txt

@@ -18,9 +18,9 @@ processing streams in an intuitive manner.
     user/usage.rst
     user/settings.rst
     user/outputs.rst
-    usr/tutorials.rst
+    dev/workflows.rst
     dev/developers.rst
-    dev/tutorials.rst
+    tutorials/tutorials.rst
 
 Quick Usage
 -----------

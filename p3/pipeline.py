@@ -35,12 +35,12 @@ def create_and_run_p3_workflow(imported_workflows,settings):
     sideload_nodes(p3,connections,settings)
 
     # Create graph images
-    p3.write_graph(graph2use='flat',simple_form=False)
-    p3.write_graph(graph2use='colored')
+    p3.write_graph(os.path.join(settings['output_dir'],'graph','p3'),graph2use='flat',simple_form=False)
+    p3.write_graph(os.path.join(settings['output_dir'],'graph','p3'),graph2use='colored')
 
     # copy the grpah files to the output directory
-    copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph.png'),settings['output_dir'])
-    copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph_detailed.png'),settings['output_dir'])
+    # copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph.png'),settings['output_dir'])
+    # copy2(os.path.join(settings['tmp_dir'],'p3_pipeline','graph_detailed.png'),settings['output_dir'])
 
     # Run pipeline (check multiproc setting)
     if not settings['disable_run']:
@@ -108,8 +108,8 @@ def generate_subworkflows(imported_workflows,settings):
                     # create and assign the workflow to the dictionary
                     subworkflows[name] = getattr(wf,obj)(name,settings)
                     # write out the graphs for each subworkflow
-                    subworkflows[name].write_graph(name,graph2use='flat',simple_form=False)
-                    subworkflows[name].write_graph(name,graph2use='colored')
+                    subworkflows[name].write_graph(os.path.join(settings['output_dir'],'graph',name),graph2use='flat',simple_form=False)
+                    subworkflows[name].write_graph(os.path.join(settings['output_dir'],'graph',name),graph2use='colored')
 
     # return subworkflows
     return subworkflows

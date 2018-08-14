@@ -55,7 +55,33 @@ p3 uses the standard BIDS_ app interface for execution:
     does not currently run with group level analysis and so disables it by default.
     The **participant** option is specified implicitly on program execution.
 
-This will run the pipeline with its default settings. To customize the settings,
+You can run specific subjects with:
+
+.. code:: bash
+
+    # this runs subject 01 02 and 03
+    p3proc /dataset /output --participant_label 01 02 03
+
+These labels are the same as the **sub-** tags defined in the BIDS spec.
+
+You can also run p3 in multiproc mode, which will use all availiable cores of the
+compute environment.
+
+.. code:: bash
+
+    # run in multiproc mode
+    p3proc /dataset /output --multiproc
+
+p3 includes the BIDS-Validator_, which you can disable.
+
+.. code:: bash
+
+    # this disables the bids validator
+    p3proc /dataset /output --skip_bids_validator
+
+Settings
+--------
+Without a settings argument, p3 will use its default settings. To customize the settings,
 you need to generate a settings file.
 
 .. code:: bash
@@ -82,7 +108,87 @@ You can use the settings file you generate with the following:
     # This will use the settings defined in settings.json
     p3proc /dataset /output --settings settings.json
 
-Filtering the Dataset
+Creating workflows and testing
+------------------------------
+p3 allows you to extend its capabilities by adding new workflows. You can create a template workflow with:
+
+.. code:: bash
+
+    # This will create a new template workflow at the specified path
+    p3proc --create_new_workflow /path/to/mynewworkflow
+
+    # Template directory stucture
+    /path/to/mynewworkflow
+        __init__.py
+        custom.py
+        nodedefs.py
+        workflow.py
+
+See creating new workflows for more information.
+
+To use the new workflows you've created. You will need to import them on the command line.
+
+.. code:: bash
+
+    # this will import your workflows and use your settings file
+    p3proc /dataset /output --workflows /path/to/workflows --settings /path/to/settings.json
+
+where **/path/to/workflows** is a folder that contains a folder of workflows generated from the **--create_new_workflow**
+option, and an empty __init__.py file.
+
+.. code:: bash
+
+        # This is what your directory structure should look like
+        /path/to/workflows
+            __init__.py
+            mynewworkflow1
+                __init__.py
+                custom.py
+                nodedefs.py
+                workflow.py
+            mynewworkflow2
+                __init__.py
+                custom.py
+                nodedefs.py
+                workflow.py
+            ...
+
+You also need to register them in the settings file.
+
+.. code:: bash
+
+    # In your settings file, your workflows field should contain the workflow you are adding
+    "workflows": [
+        "p3_bidsselector",
+        "p3_freesurfer",
+        "p3_skullstrip",
+        "p3_stcdespikemoco",
+        "p3_fieldmapcorrection",
+        "p3_alignanattoatlas",
+        "p3_alignfunctoanat",
+        "p3_alignfunctoatlas",
+        "p3_create_fs_masks",
+        "mynewworkflow" # <-- Added workflow
+    ]
+
+.. note::
+
+    When registering the workflow in your settings file, you should use the name of the
+    folder containing the workflow, not the name of the workflowgenerator class in the workflow.py file.
+
+A useful option is to stop p3 prior to running the pipeline.
+
+.. code:: bash
+
+    p3proc /dataset /output --disable_run
+
+This is useful to check for errors/see the connected graph output before actually running the pipeline.
+
+You can also use the pipeline in **verbose mode**, which will print useful messages for debugging purposes.
+
+    p3proc /dataset /output --verbose
+
+Filtering the dataset
 ---------------------
 p3 has the option to print availiable keys in the BIDS_ dataset that you
 can filter.
@@ -91,6 +197,10 @@ can filter.
 
     # Note that the only argument required here is the BIDS dataset itself
     p3proc /MSC_BIDS --summary
+
+This is what should be outputted:
+
+.. code:: bash
 
     Below are some available keys in the dataset to filter on:
 

@@ -92,7 +92,7 @@ def main():
         with open(os.path.join(args.generate_settings),'w') as settings_file:
             json.dump(settings,settings_file,indent=4,separators=(',',': '))
         # print nice message and exit
-        print('A settings.json was generated in {}'.format(args.generate_settings))
+        print('A settings file was generated in {}'.format(args.generate_settings))
         sys.exit()
 
     # generate new workflow

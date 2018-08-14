@@ -1,7 +1,7 @@
 .. _Outputs:
 
-Outputs
-=======
+Default Outputs
+===============
 .. note::
 
     It should be noted that these are the outputs of the default workflows for the

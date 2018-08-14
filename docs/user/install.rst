@@ -40,8 +40,7 @@ See the :ref:`Usage` section for more details on how to run p3.
 Native Install (For Advanced Users and Developers)
 --------------------------------------------------
 The native install process for p3 is quite involved and generally not recommended
-for most end users. It is mainly intended for developers of p3 to debug and create
-new workflows for the pipeline.
+for most end users. It is mainly intended for developers of p3 to debug the pipeline.
 
 To use the native version of p3. It is recommended to have at least Python 3.6 and up. On Linux,
 the easiest way to obtain a copy is from your package manager, or to compile from `Python Source`_.
