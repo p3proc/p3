@@ -1,7 +1,7 @@
-.. `Default Workflows`:
+.. _`Default Workflows`:
 
-Default Workflows
-=================
+Workflows
+---------
 **p3_bidsselector**
 
 .. image:: ../_static/imgs/p3_bidsselector.png

@@ -124,7 +124,7 @@ p3 allows you to extend its capabilities by adding new workflows. You can create
         nodedefs.py
         workflow.py
 
-See creating new workflows for more information.
+See the :ref:`Creating New Workflows` section for more information on creating new workflows.
 
 To use the new workflows you've created. You will need to import them on the command line.
 

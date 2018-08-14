@@ -1,18 +1,15 @@
 .. _Outputs:
 
-Default Outputs
-===============
+Outputs
+-------
 .. note::
 
     It should be noted that these are the outputs of the default workflows for the
     p3 pipeline. Changes to the workflow will not gurantee that you will have the same outputs
     as these or that they will be named the same.
 
-**graph.png**
-    A graph output of the overall pipeline.
-
-**graph_detailed.png**
-    A detailed graph output of the overall pipeline. Shows all node input/output connections.
+**graph**
+    This folder contains the graph outputs of each subworkflow as well as the overall workflow (saved as **p3.png**).
 
 **freesurfer**
     This folder contains the freesurfer outputs. There is a **skullstrip** subfolder for storing
