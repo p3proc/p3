@@ -2,8 +2,8 @@ from nipype import Workflow
 from .nodedefs import definednodes
 from p3.base import workflowgenerator
 
-class bidsselectorworkflow(workflowgenerator):
-    """ Defines the bids selector workflow
+class createfsmasksworkflow(workflowgenerator):
+    """ Defines the freesurfer mask creation workflow
 
         TODO
 

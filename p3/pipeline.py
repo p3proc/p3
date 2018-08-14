@@ -107,6 +107,9 @@ def generate_subworkflows(imported_workflows,settings):
                 if getattr(wf,obj).__bases__[0] == workflowgenerator:
                     # create and assign the workflow to the dictionary
                     subworkflows[name] = getattr(wf,obj)(name,settings)
+                    # write out the graphs for each subworkflow
+                    subworkflows[name].write_graph(name,graph2use='flat',simple_form=False)
+                    subworkflows[name].write_graph(name,graph2use='colored')
 
     # return subworkflows
     return subworkflows

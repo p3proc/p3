@@ -9,7 +9,6 @@ from .custom import *
 from nipype import Node,MapNode
 from nipype.interfaces import afni,fsl,ants
 from nipype.interfaces.utility import Function,IdentityInterface
-from nipype.workflows.dmri.fsl.utils import vsm2warp
 
 class definednodes(basenodedefs):
     """Class initializing all nodes in workflow
