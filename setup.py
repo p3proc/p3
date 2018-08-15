@@ -14,7 +14,7 @@ setuptools.setup(
     description="The p3 fmri processing pipeline",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/vanandrew/p3",
+    url="https://github.com/p3proc/p3",
     packages=setuptools.find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=[
