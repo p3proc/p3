@@ -50,8 +50,8 @@ If you are using the Singularity_ version of p3, the command is:
     singularity run \
         -B [BIDS directory]:/dataset \
         -B [output directory]:/output \
-        p3_proc_p3.simg /dataset /output
+        p3proc_p3.simg /dataset /output
 
-where **vanandrew_p3.simg** is replaced with the singularity image filename.
+where **p3proc_p3.simg** is replaced with the singularity image filename.
 
 .. include:: links.rst
