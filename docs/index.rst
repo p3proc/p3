@@ -38,7 +38,7 @@ If you are using the Docker_ version of p3, the command is:
     docker run -it --rm \
         -v [BIDS directory]:/dataset \
         -v [output directory]:/output \
-        vanandrew/p3 /dataset /output
+        p3proc/p3 /dataset /output
 
 where **[BIDS directory]** and **[output directory]** are paths on the host
 system to the BIDS dataset and output directory respectively.
@@ -50,7 +50,7 @@ If you are using the Singularity_ version of p3, the command is:
     singularity run \
         -B [BIDS directory]:/dataset \
         -B [output directory]:/output \
-        vanandrew_p3.simg /dataset /output
+        p3_proc_p3.simg /dataset /output
 
 where **vanandrew_p3.simg** is replaced with the singularity image filename.
 

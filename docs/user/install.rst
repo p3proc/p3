@@ -17,23 +17,23 @@ You can obtain the p3 container images by pulling from their respective repos on
     # You can replace 'latest' with the specific version you want
 
     # Docker
-    docker pull vanandrew/p3:latest
+    docker pull p3proc/p3:latest
 
     # Singularity
     ### Direct Singularity Image
-    singularity pull shub://vanandrew/p3:latest
+    singularity pull shub://p3proc/p3:latest
     ### Docker version for conversion; known to fail occasionally
-    singularity pull docker://vanandrew/p3:latest
+    singularity pull docker://p3proc/p3:latest
 
 You can then run the pipeline with the run commands of Docker_ and Singularity_.
 
 .. code:: bash
 
     # docker
-    docker run -it --rm vanandrew/p3:latest
+    docker run -it --rm p3proc/p3:latest
 
     # singularity
-    singularity run vanandrew_p3.simg
+    singularity run p3proc_p3.simg
 
 See the :ref:`Usage` section for more details on how to run p3.
 

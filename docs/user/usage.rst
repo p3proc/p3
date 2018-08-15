@@ -12,9 +12,9 @@ Usage
     .. code:: bash
 
         # These are equivalent to p3proc /dataset /output
-        docker run -it --rm vanandrew/p3 /dataset /output
+        docker run -it --rm p3proc/p3 /dataset /output
         # or
-        singularity run vanandrew_p3.simg /dataset /output
+        singularity run p3proc_p3.simg /dataset /output
 
     These are just examples. You still need to mount/bind the host volumes
     to access your data.
@@ -24,12 +24,12 @@ Usage
         # mounting in docker is -v
         docker run -it --rm \
         -v /path/on/host:/path/on/image \
-        vanandrew/p3 /path/on/image/dataset /path/on/image/output
+        p3proc/p3 /path/on/image/dataset /path/on/image/output
 
         # mounting in singularity is -B
         singularity run \
         -B /path/on/host:/path/on/image \
-        vanandrew_p3.simg /path/on/image/dataset /path/on/image/output
+        p3proc_p3.simg /path/on/image/dataset /path/on/image/output
 
     It is recommended to refer to the `Docker Volume`_ and `Singularity Bind`_
     documentation.
