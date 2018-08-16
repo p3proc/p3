@@ -249,4 +249,6 @@ tutorial will show you how to do just that.
         # run p3
         p3proc ~/dataset ~/output -w ~/myworkflows -s settings.json
 
+   This will run your pipeline with the your custom workflow.
+
 .. include:: ../links.rst
