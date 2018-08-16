@@ -1,2 +1,2 @@
 Bootstrap:docker
-From:vanandrew/p3:latest
+From:p3proc/p3:latest

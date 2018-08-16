@@ -87,20 +87,28 @@ Outputs
             sub-(subject)/(func_processed)_Warped.nii.gz # processed motion corrected functional image
 
 **fs_masks**
-    This folder contains the freesurfer mask outputs.
+    This folder contains the freesurfer mask outputs. They are eroded by several levels denoted by
+    the _erodeX suffix.
 
     **aparc_aseg**
+        freesurfer segmentation volume
 
     **cb**
+        cerbellum mask
 
     **csf**
+        csf mask
 
     **gm**
+        gray matter mask
 
     **gmr**
+        gray matter ribbon
 
     **scn**
+        subcortical nuclei mask
 
     **wm**
+        white matter mask
 
 .. include:: ../links.rst
