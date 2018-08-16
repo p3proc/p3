@@ -1,9 +1,8 @@
-.. _`Basic Example`:
+.. _`Example`:
 
-Basic Example
--------------
-This example shows you how to run p3. It's meant for non-technical users and
-assumes not knowledge of Docker.
+Example
+-------
+This tutorial walks through a simple example usage of p3.
 
 1. Obtain a BIDS_ dataset. You can convert your own data or use one of the shared
    BIDS_ dataset on OpenNeuro_. In this tutorial, we use the `MSC dataset`_.
@@ -44,9 +43,10 @@ assumes not knowledge of Docker.
         # this stores the home directory as an absolute path in ${HOMEPATH}
         export HOMEPATH=$(pwd -P)
 
-4. Now let's mount the volumes on to the docker container. The **-v** command lets
-   you mount host volumes to the docker container. We'll mount the BIDS dataset
-   to /dataset on the container and the output directory to the /output directory
+4. Now let's mount the volumes on to the docker container. The **-v** falg lets
+   you mount host volumes to the docker container, while the **-B** flag mounts the
+   host volumes for a singularity container. We'll mount the BIDS dataset
+   to /dataset and the output directory to the /output directory on the container.
    (Note that docker needs absolute paths).
 
    .. code:: bash
@@ -56,6 +56,14 @@ assumes not knowledge of Docker.
             -v ${HOMEPATH}/MSC_BIDS:/dataset:ro \ # this mounts the BIDS data as read-only
             -v ${HOMEPATH}/output:/output \ # mount the output directory
             p3proc/p3
+
+        # OR
+
+        # run the p3 singularity image
+        singularity run \ # singularity run command
+            -B ${HOMEPATH}/MSC_BIDS:/dataset:ro \ # this mounts the BIDS data as read-only
+            -B ${HOMEPATH}/output:/output \ # mount the output directory
+            p3proc_p3.simg
 
    You should see this output, since we didn't pass any arguments...
 
@@ -74,15 +82,22 @@ assumes not knowledge of Docker.
 
    .. note::
 
-        Docker mounts are automatically created, even if they don\'t exist. This means
+        Docker/singularity mounts are automatically created, even if they don\'t exist. This means
         you can use any names for the container path.
 
         .. code:: bash
 
             # use a custom path
+
+            # Docker
             docker run -it --rm \
                 -v ${HOMEPATH}/mydir:/custompath # This mounts ~/mydir to /custompath
                 p3proc/p3
+
+            # Singularity
+            singularity run \
+                -B ${HOMEPATH}/mydir:/custompath # This mounts ~/mydir to /custompath
+                p3proc_p3.simg
 
 5. Next, let\'s generate a settings file. We need to create a settings folder to mount.
 
@@ -99,6 +114,11 @@ assumes not knowledge of Docker.
         docker run -it --rm \
             -v ${HOMEPATH}/mysettings:/settings \
             p3proc -g /settings/newsettings.json
+
+        # Singularity
+        singularity run \
+            -B ${HOMEPATH}/mysettings:/settings \
+            p3proc_p3.simg -g /settings/newsettings.json
 
    This will generate a settings file called **newsettings.json**. Since we mounted
    our **mysettings** folder to the ./settings folder on the container, the **newsettings.json**
@@ -118,18 +138,31 @@ assumes not knowledge of Docker.
             -v ${HOMEPATH}/output:/output \
             p3proc/p3 /dataset /output # we use the container paths for the dataset/output
 
+        # Singularity
+        singularity run \
+            -B ${HOMEPATH}/MSC_BIDS:/dataset:ro \
+            -B ${HOMEPATH}/output:/output \
+            p3proc_p3.simg /dataset /output # we use the container paths for the dataset/output
+
    This will run the internally set default settings. If we want to use our
    settings file generated in step 5. We\'ll need to mount our **mysettings**
    folder and add the settings argument to the execution call.
 
    .. code:: bash
 
-         # Run the most basic pipeline command
-         docker run -it --rm \
-             -v ${HOMEPATH}/MSC_BIDS:/dataset:ro \
-             -v ${HOMEPATH}/output:/output \
-             -v ${HOMEPATH}/mysettings:/settings \ # mount our settings folder
-             p3proc/p3 /dataset /output -s settings/newsettings.json # add the settings argument
+        # Run with settings
+        docker run -it --rm \
+            -v ${HOMEPATH}/MSC_BIDS:/dataset:ro \
+            -v ${HOMEPATH}/output:/output \
+            -v ${HOMEPATH}/mysettings:/settings \ # mount our settings folder
+            p3proc/p3 /dataset /output -s settings/newsettings.json # add the settings argument
+
+        # Singularity
+        singularity run \
+            -B ${HOMEPATH}/MSC_BIDS:/dataset:ro \
+            -B ${HOMEPATH}/output:/output \
+            -B ${HOMEPATH}/mysettings:/settings \ # mount our settings folder
+            p3proc_p3.simg /dataset /output -s settings/newsettings.json # add the settings argument
 
    This will run the pipeline with the specified settings.
 

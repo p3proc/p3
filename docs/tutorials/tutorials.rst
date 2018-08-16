@@ -3,6 +3,6 @@
 Tutorials
 =========
 
-.. include:: basic_example.rst
+.. include:: example.rst
 
 .. include:: new_workflows.rst
