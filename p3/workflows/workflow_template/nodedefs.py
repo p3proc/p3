@@ -11,10 +11,10 @@ class definednodes(basenodedefs):
         super().__init__(settings)
 
         # define input/output nodes
-        # self.setinput([
+        # self.set_input([
             # input fields go here
         # ])
-        # self.setoutput([
+        # self.set_output([
             # output fields go here
         # ])
 

@@ -20,3 +20,4 @@
 .. _`MSC dataset`: https://openneuro.org/datasets/ds000224/versions/00002
 .. _`Docker Image`: https://hub.docker.com/r/p3proc/p3/
 .. _`Singularity Image`: https://singularity-hub.org/collections/1388
+.. _`Function Interface`: https://nipype.readthedocs.io/en/latest/users/function_interface.html
