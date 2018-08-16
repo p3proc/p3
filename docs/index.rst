@@ -17,7 +17,6 @@ processing streams in an intuitive manner.
     user/install.rst
     user/usage.rst
     defaults/defaults.rst
-    dev/new_workflows.rst
     tutorials/tutorials.rst
 
 Quick Usage

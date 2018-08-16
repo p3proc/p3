@@ -16,3 +16,7 @@
 .. _Freesurfer: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 .. _ANTs: http://stnava.github.io/ANTs/
 .. _`BIDS-Validator`: https://github.com/INCF/bids-validator
+.. _OpenNeuro: https://openneuro.org/
+.. _`MSC dataset`: https://openneuro.org/datasets/ds000224/versions/00002
+.. _`Docker Image`: https://hub.docker.com/r/p3proc/p3/
+.. _`Singularity Image`: https://singularity-hub.org/collections/1388
