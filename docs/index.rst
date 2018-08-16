@@ -1,6 +1,9 @@
 p3 - fmri processing pipeline
 =============================
 
+.. image:: _static/imgs/p3.png
+    :scale: 50%
+
 p3 is an extensible preprocessing pipeline that encourages
 experimentation and customization. In addition to providing a BIDS_-compatible preprocessing
 pipeline for users, it also provides a platform to quickly and easily integrate new
