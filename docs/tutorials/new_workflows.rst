@@ -224,16 +224,20 @@ tutorial will show you how to do just that.
                 "source": "p3_bidsselector",
                 "destination": "customworkflow",
                 "links": [
-                    "output.anat",
-                    "input.T1" # this is the T1 input in our custom workflow
+                    [
+                        "output.anat",
+                        "input.T1" # this is the T1 input in our custom workflow
+                    ]
                 ]
             },
             {
                 "source": "customworkflow",
                 "destination": "p3_alignanattoatlas",
                 "links": [
-                    "output.skullstripped_T1", # this is our skullstripped T1 output
-                    "input.T1_skullstrip"
+                    [
+                        "output.skullstripped_T1", # this is our skullstripped T1 output
+                        "input.T1_skullstrip"
+                    ]
                 ]
             },
             ...
