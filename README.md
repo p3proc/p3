@@ -22,7 +22,7 @@ Simply clone the repo, then run:
 python3 setup.py develop
 ```
 
-##Release chain
+## Release chain
 
 change version --> build p3 --> upload to PyPI --> upload to docker hub --> build on singularity hub
 
