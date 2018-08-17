@@ -4,8 +4,7 @@ Workflows
 ---------
 p3_bidsselector
 ^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_bidsselector.png
+    .. image:: ../_static/imgs/p3_bidsselector.png
 
 description
 """""""""""
@@ -25,8 +24,7 @@ output
 
 p3_freesurfer
 ^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_freesurfer.png
+    .. image:: ../_static/imgs/p3_freesurfer.png
 
 description
 """""""""""
@@ -53,8 +51,7 @@ output
 
 p3_skullstrip
 ^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_skullstrip.png
+    .. image:: ../_static/imgs/p3_skullstrip.png
 
 description
 """""""""""
@@ -81,8 +78,7 @@ output
 
 p3_stcdespikemoco
 ^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_stcdespikemoco.png
+    .. image:: ../_static/imgs/p3_stcdespikemoco.png
 
 description
 """""""""""
@@ -109,8 +105,7 @@ output
 
 p3_fieldmapcorrection
 ^^^^^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_fieldmapcorrection.png
+    .. image:: ../_static/imgs/p3_fieldmapcorrection.png
 
 description
 """""""""""
@@ -137,8 +132,7 @@ output
 
 p3_alignanattoatlas
 ^^^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_alignanattoatlas.png
+    .. image:: ../_static/imgs/p3_alignanattoatlas.png
 
 description
 """""""""""
@@ -162,8 +156,7 @@ output
 
 p3_alignfunctoanat
 ^^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_alignfunctoanat.png
+    .. image:: ../_static/imgs/p3_alignfunctoanat.png
 
 description
 """""""""""
@@ -187,8 +180,7 @@ output
 
 p3_alignfunctoatlas
 ^^^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_alignfunctoatlas.png
+    .. image:: ../_static/imgs/p3_alignfunctoatlas.png
 
 description
 """""""""""
@@ -230,8 +222,7 @@ output
 
 p3_create_fs_masks
 ^^^^^^^^^^^^^^^^^^
-
-.. image:: ../_static/imgs/p3_create_fs_masks.png
+    .. image:: ../_static/imgs/p3_create_fs_masks.png
 
 description
 """""""""""
@@ -259,10 +250,5 @@ input
 
     :T1:
         path to T1 image
-
-output
-""""""
-    :func_atlas:
-        list of paths to atlas aligned functional images
 
 .. include:: ../links.rst

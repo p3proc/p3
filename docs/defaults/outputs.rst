@@ -5,7 +5,7 @@ Outputs
 .. note::
 
     It should be noted that these are the outputs of the default workflows for the
-    p3 pipeline. Changes to the workflow will not gurantee that you will have the same outputs
+    p3 pipeline. Changes to the workflow will not guarantee that you will have the same outputs
     as these or that they will be named the same.
 
 graph
