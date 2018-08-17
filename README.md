@@ -14,6 +14,16 @@ processing streams in an intuitive manner.
 
 ## DevOps Notes
 
+### Setting up the repo for development
+
+Simply clone the repo, then run:
+```
+# add --user if necessary
+python3 setup.py develop
+```
+
+##Release chain
+
 change version --> build p3 --> upload to PyPI --> upload to docker hub --> build on singularity hub
 
 ### Build p3 package
