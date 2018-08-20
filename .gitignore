@@ -124,3 +124,6 @@ settings.json
 
 # doc help text
 docs/user/help_text.txt
+
+# ignore .DS_Store
+.DS_Store
